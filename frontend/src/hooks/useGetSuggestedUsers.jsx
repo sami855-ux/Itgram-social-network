@@ -1,23 +1,27 @@
-import { setSuggestedUsers } from "@/redux/authSlice";
-import axios from "axios";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch } from "react-redux"
+import { useEffect } from "react"
+import axios from "axios"
 
+import { setSuggestedUsers } from "@/redux/authSlice"
 
 const useGetSuggestedUsers = () => {
-    const dispatch = useDispatch();
-    useEffect(() => {
-        const fetchSuggestedUsers = async () => {
-            try {
-                const res = await axios.get('https://instaclone-g9h5.onrender.com/api/v1/user/suggested', { withCredentials: true });
-                if (res.data.success) { 
-                    dispatch(setSuggestedUsers(res.data.users));
-                }
-            } catch (error) {
-                console.log(error);
-            }
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const fetchSuggestedUsers = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:3000/api/v1/user/suggested",
+          { withCredentials: true }
+        )
+        if (res.data.success) {
+          dispatch(setSuggestedUsers(res.data.users))
         }
-        fetchSuggestedUsers();
-    }, []);
-};
-export default useGetSuggestedUsers;
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchSuggestedUsers()
+  }, [])
+}
+export default useGetSuggestedUsers
