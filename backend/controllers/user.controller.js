@@ -185,17 +185,19 @@ export const getSuggestedUsers = async (req, res) => {
 }
 export const followOrUnfollow = async (req, res) => {
   try {
-    const followKrneWala = req.id // patel
-    const jiskoFollowKrunga = req.params.id // shivani
-    if (followKrneWala === jiskoFollowKrunga) {
+    console.log("hi")
+    const followerId = req.id // The ID of the user who wants to follow/unfollow
+    const targetUserId = req.params.id // The ID of the user being followed/unfollowed
+
+    if (followerId === targetUserId) {
       return res.status(400).json({
         message: "You cannot follow/unfollow yourself",
         success: false,
       })
     }
 
-    const user = await User.findById(followKrneWala)
-    const targetUser = await User.findById(jiskoFollowKrunga)
+    const user = await User.findById(followerId) // Get the user who is following/unfollowing
+    const targetUser = await User.findById(targetUserId) // Get the user being followed/unfollowed
 
     if (!user || !targetUser) {
       return res.status(400).json({
@@ -203,40 +205,46 @@ export const followOrUnfollow = async (req, res) => {
         success: false,
       })
     }
-    // mai check krunga ki follow krna hai ya unfollow
-    const isFollowing = user.following.includes(jiskoFollowKrunga)
+
+    // Check if the user is already following the target user
+    const isFollowing = user.following.includes(targetUserId)
+
     if (isFollowing) {
-      // unfollow logic ayega
+      // If already following, unfollow logic
       await Promise.all([
         User.updateOne(
-          { _id: followKrneWala },
-          { $pull: { following: jiskoFollowKrunga } }
+          { _id: followerId },
+          { $pull: { following: targetUserId } }
         ),
         User.updateOne(
-          { _id: jiskoFollowKrunga },
-          { $pull: { followers: followKrneWala } }
+          { _id: targetUserId },
+          { $pull: { followers: followerId } }
         ),
       ])
       return res
         .status(200)
         .json({ message: "Unfollowed successfully", success: true })
     } else {
-      // follow logic ayega
+      // If not following, follow logic
       await Promise.all([
         User.updateOne(
-          { _id: followKrneWala },
-          { $push: { following: jiskoFollowKrunga } }
+          { _id: followerId },
+          { $push: { following: targetUserId } }
         ),
         User.updateOne(
-          { _id: jiskoFollowKrunga },
-          { $push: { followers: followKrneWala } }
+          { _id: targetUserId },
+          { $push: { followers: followerId } }
         ),
       ])
       return res
         .status(200)
-        .json({ message: "followed successfully", success: true })
+        .json({ message: "Followed successfully", success: true })
     }
   } catch (error) {
     console.log(error)
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    })
   }
 }

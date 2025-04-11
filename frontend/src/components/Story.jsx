@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux"
 import { useEffect, useRef, useState } from "react"
+import { Link } from "react-router-dom"
 import { Loader2 } from "lucide-react"
 import { Plus } from "lucide-react"
 import { toast } from "sonner"
@@ -10,7 +11,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { readFileAsDataURL } from "@/lib/utils"
 import { setStory } from "@/redux/storySlice"
 import { Textarea } from "./ui/textarea"
-import logo from "../assets/logo2.png"
 import { Button } from "./ui/button"
 
 export default function Story() {
@@ -70,14 +70,16 @@ export default function Story() {
 
   const fetchAllStories = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/v1/story/all") // Update the endpoint URL if necessary
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/story/all`
+      )
       if (response.data.success) {
         console.log("Fetched stories:", response.data.stories)
-        return response.data.stories // Return the stories if needed
+        return response.data.stories
       }
     } catch (error) {
       console.error("Error fetching stories:", error)
-      return null // Or handle the error in a way that fits your app
+      return null
     }
   }
 
@@ -96,7 +98,7 @@ export default function Story() {
     <>
       <div className="REEL max-w-full h-28 pl-[28%] flex items-center gap-3 overflow-x-scroll scrollbar-thin scrollbar-thumb-gray-400">
         <section
-          className="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-full cursor-pointer"
+          className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full cursor-pointer"
           onClick={handleModal}
         >
           <Plus />
@@ -177,14 +179,16 @@ export default function Story() {
 
 const ReelSingle = ({ story }) => {
   return (
-    <section className="w-16 h-16 p-[2px] bg-gradient-to-tr from-[#5bfec0] to-[#ca37f2] rounded-full cursor-pointer">
-      <div className="w-full h-full bg-white dark:bg-black rounded-full flex items-center justify-center">
-        <img
-          src={story.media}
-          alt="reel"
-          className="w-14 h-14 rounded-full object-cover"
-        />
-      </div>
-    </section>
+    <Link to={`/story/${story?._id}`}>
+      <section className="w-[77px] h-[77px] p-[2px] bg-gradient-to-tr from-[#5bfec0] to-[#ca37f2] rounded-full cursor-pointer">
+        <div className="flex items-center justify-center w-full h-full bg-white rounded-full dark:bg-black">
+          <img
+            src={story?.media}
+            alt="reel"
+            className="object-cover w-16 h-16 rounded-full"
+          />
+        </div>
+      </section>
+    </Link>
   )
 }

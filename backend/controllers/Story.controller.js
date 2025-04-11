@@ -38,7 +38,7 @@ export const addStory = async (req, res) => {
     await story.populate({ path: "author", select: "-password" })
 
     return res.status(201).json({
-      message: "New Story is added successfully",
+      message: "New story is added successfully",
       story,
       success: true,
     })
@@ -99,9 +99,10 @@ export const getAllStories = async (req, res) => {
   try {
     const stories = await Story.find()
       .populate("author", "username profilePicture _id") // Include user ID along with username and profile picture
-      .populate("comments.user", "username _id") // Include user ID for the commenters as well
-      // Assuming you also have an image field in the Story model
-      .select("media") // Select the image field from the Story model (if it exists)
+      .populate("comments.user", "username _id")
+      .select("media")
+      .select("createdAt")
+      .select("caption")
 
     res.status(200).json({
       success: true,

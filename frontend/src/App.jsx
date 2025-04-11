@@ -15,6 +15,8 @@ import Signup from "./components/Signup"
 import { setSocket } from "./redux/socketSlice"
 import { setOnlineUsers } from "./redux/chatSlice"
 import { setLikeNotification } from "./redux/rtnSlice"
+import StoryViewer from "./components/StoryViewer"
+import Explore from "./components/Explore"
 
 const browserRouter = createBrowserRouter([
   {
@@ -34,10 +36,17 @@ const browserRouter = createBrowserRouter([
         ),
       },
       {
+        path: "/explore",
+        element: (
+          <ProtectedRoutes>
+            <Explore />
+          </ProtectedRoutes>
+        ),
+      },
+      {
         path: "/profile/:id",
         element: (
           <ProtectedRoutes>
-            {" "}
             <Profile />
           </ProtectedRoutes>
         ),
@@ -67,6 +76,10 @@ const browserRouter = createBrowserRouter([
   {
     path: "/signup",
     element: <Signup />,
+  },
+  {
+    path: "/story/:storyId",
+    element: <StoryViewer />,
   },
 ])
 

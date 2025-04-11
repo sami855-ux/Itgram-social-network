@@ -20,6 +20,7 @@ import { setPosts, setSelectedPost } from "@/redux/postSlice"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { Button } from "./ui/button"
 import logo from "../assets/logo2.png"
+import person from "../assets/person.png"
 
 const LeftSidebar = () => {
   const navigate = useNavigate()
@@ -58,6 +59,8 @@ const LeftSidebar = () => {
       navigate("/")
     } else if (textType === "Messages") {
       navigate("/chat")
+    } else if (textType === "Explore") {
+      navigate("/explore")
     }
   }
 
@@ -73,7 +76,9 @@ const LeftSidebar = () => {
       icon: (
         <Avatar className="w-8 h-8 border border-gray-400">
           <AvatarImage src={user?.profilePicture} alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>
+            <img src={person} alt="default image" />
+          </AvatarFallback>
         </Avatar>
       ),
       text: "Profile",
@@ -81,13 +86,13 @@ const LeftSidebar = () => {
     { icon: <LogOut />, text: "Logout" },
   ]
   return (
-    <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen">
+    <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 hidden md:block lg:w-[16%] md:w-24 h-screen bg-white transition-all ease duration-200">
       <div className="flex flex-col">
         <div className="flex items-center justify-center my-2">
           <img
             src={logo}
             alt="logo"
-            className="object-cover w-20 h-20 rounded-full"
+            className="invisible object-cover w-20 h-20 rounded-full lg:visible"
           />
         </div>
         <div>
@@ -96,17 +101,17 @@ const LeftSidebar = () => {
               <div
                 onClick={() => sidebarHandler(item.text)}
                 key={index}
-                className="relative flex items-center gap-3 p-3 my-3 rounded-lg cursor-pointer hover:bg-gray-100"
+                className="relative flex items-center gap-3 p-3 my-3 cursor-pointer rounded-xl hover:bg-gray-100"
               >
-                {item.icon}
-                <span>{item.text}</span>
+                <span>{item.icon}</span>
+                <span className="hidden lg:flex">{item.text}</span>
                 {item.text === "Notifications" &&
                   likeNotification.length > 0 && (
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           size="icon"
-                          className="absolute w-5 h-5 bg-red-600 rounded-full hover:bg-red-600 bottom-6 left-6"
+                          className="absolute w-5 h-5 bg-red-500 rounded-full hover:bg-red-600 bottom-6 left-6"
                         >
                           {likeNotification.length}
                         </Button>

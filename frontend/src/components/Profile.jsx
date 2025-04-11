@@ -2,11 +2,13 @@ import { AtSign, Heart, MessageCircle } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { useState } from "react"
+import axios from "axios"
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import useGetUserProfile from "@/hooks/useGetUserProfile"
 import { Button } from "./ui/button"
 import { Badge } from "./ui/badge"
+import person from "../assets/person.png"
 
 const Profile = () => {
   const params = useParams()
@@ -23,6 +25,29 @@ const Profile = () => {
     setActiveTab(tab)
   }
 
+  const followOrUnfollowUser = async (targetUserId) => {
+    try {
+      // Send the follow/unfollow request to the backend
+      const response = await axios.post(
+        `${
+          import.meta.env.VITE_BASE_URL
+        }/api/v1/user/followorunfollow/${targetUserId}`,
+
+        { withCredentials: true }
+      )
+
+      // Handle the response
+      if (response.data.success) {
+        console.log(response.data.message) // "Followed successfully" or "Unfollowed successfully"
+      } else {
+        console.log(response.data.message) // Error message
+      }
+    } catch (error) {
+      console.error("Error in follow/unfollow:", error)
+      alert("An error occurred while processing your request")
+    }
+  }
+
   const displayedPost =
     activeTab === "posts" ? userProfile?.posts : userProfile?.bookmarks
 
@@ -36,7 +61,9 @@ const Profile = () => {
                 src={userProfile?.profilePicture}
                 alt="profilephoto"
               />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarFallback>
+                <img src={person} alt="default image" />
+              </AvatarFallback>
             </Avatar>
           </section>
           <section>
@@ -77,7 +104,12 @@ const Profile = () => {
                   </>
                 ) : (
                   <>
-                    <Button className="bg-[#0095F6] hover:bg-[#3192d2] h-8">
+                    <Button
+                      className="bg-[#0095F6] hover:bg-[#3192d2] h-8"
+                      onClick={() => {
+                        followOrUnfollowUser(userId)
+                      }}
+                    >
                       Follow
                     </Button>
                     <Button className="bg-[#eff2f3] text-gray-800 hover:bg-[#ccdbe5] h-8">
@@ -107,7 +139,7 @@ const Profile = () => {
                 </p>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="font-light capitalize text-sm">
+                <span className="text-sm font-light capitalize">
                   {userProfile?.bio || "bio here..."}
                 </span>
                 <Badge className="w-fit" variant="secondary">
