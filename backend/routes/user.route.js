@@ -7,6 +7,7 @@ import {
   login,
   logout,
   register,
+  checkFollowing,
 } from "../controllers/user.controller.js"
 import isAuthenticated from "../middlewares/isAuthenticated.js"
 import upload from "../middlewares/multer.js"
@@ -22,5 +23,6 @@ router
   .post(isAuthenticated, upload.single("profilePhoto"), editProfile)
 router.route("/suggested").get(isAuthenticated, getSuggestedUsers)
 router.route("/followorunfollow/:id").post(isAuthenticated, followOrUnfollow)
+router.get("/isfollowing/:id", isAuthenticated, checkFollowing)
 
 export default router

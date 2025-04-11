@@ -252,32 +252,78 @@ export const deletePost = async (req, res) => {
 export const bookmarkPost = async (req, res) => {
   try {
     const postId = req.params.id
-    const authorId = req.id
-    const post = await Post.findById(postId)
-    if (!post)
-      return res.status(404).json({ message: "Post not found", success: false })
+    const currentUserId = req.id
 
-    const user = await User.findById(authorId)
-    if (user.bookmarks.includes(post._id)) {
-      // already bookmarked -> remove from the bookmark
-      await user.updateOne({ $pull: { bookmarks: post._id } })
-      await user.save()
-      return res
-        .status(200)
-        .json({
-          type: "unsaved",
-          message: "Post removed from bookmark",
-          success: true,
-        })
+    // Check if the post exists
+    const existingPost = await Post.findById(postId)
+    if (!existingPost) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      })
+    }
+
+    // Check if the user exists
+    const currentUser = await User.findById(currentUserId)
+    if (!currentUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      })
+    }
+
+    const isBookmarked = currentUser.bookmarks.includes(postId)
+
+    if (isBookmarked) {
+      // Remove bookmark
+      await User.updateOne(
+        { _id: currentUserId },
+        { $pull: { bookmarks: postId } }
+      )
+
+      return res.status(200).json({
+        success: true,
+        type: "unsaved",
+        message: "Post removed from bookmarks",
+      })
     } else {
-      // bookmark krna pdega
-      await user.updateOne({ $addToSet: { bookmarks: post._id } })
-      await user.save()
-      return res
-        .status(200)
-        .json({ type: "saved", message: "Post bookmarked", success: true })
+      // Add to bookmarks
+      await User.updateOne(
+        { _id: currentUserId },
+        { $addToSet: { bookmarks: postId } }
+      )
+
+      return res.status(200).json({
+        success: true,
+        type: "saved",
+        message: "Post bookmarked successfully",
+      })
     }
   } catch (error) {
-    console.log(error)
+    console.error("Error in bookmarkPost controller:", error)
+
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while bookmarking the post",
+    })
+  }
+}
+
+export const isPostBookmarked = async (req, res) => {
+  try {
+    const { postId } = req.params
+    const userId = req.id
+
+    const user = await User.findById(userId)
+
+    if (!user)
+      return res.status(404).json({ success: false, message: "User not found" })
+
+    const isBookmarked = user.bookmarks.includes(postId)
+
+    return res.status(200).json({ success: true, isBookmarked })
+  } catch (err) {
+    console.error("Error checking bookmark:", err)
+    res.status(500).json({ success: false, message: "Server error" })
   }
 }

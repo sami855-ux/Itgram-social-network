@@ -10,6 +10,7 @@ import {
   getAllPost,
   getCommentsOfPost,
   getUserPost,
+  isPostBookmarked,
   likePost,
 } from "../controllers/post.controller.js"
 
@@ -26,5 +27,6 @@ router.route("/:id/comment").post(isAuthenticated, addComment)
 router.route("/:id/comment/all").post(isAuthenticated, getCommentsOfPost)
 router.route("/delete/:id").delete(isAuthenticated, deletePost)
 router.route("/:id/bookmark").get(isAuthenticated, bookmarkPost)
+router.route("/isbookmarked/:postId").get(isAuthenticated, isPostBookmarked)
 
 export default router

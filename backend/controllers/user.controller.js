@@ -185,7 +185,6 @@ export const getSuggestedUsers = async (req, res) => {
 }
 export const followOrUnfollow = async (req, res) => {
   try {
-    console.log("hi")
     const followerId = req.id // The ID of the user who wants to follow/unfollow
     const targetUserId = req.params.id // The ID of the user being followed/unfollowed
 
@@ -246,5 +245,19 @@ export const followOrUnfollow = async (req, res) => {
       message: "Internal Server Error",
       success: false,
     })
+  }
+}
+
+export const checkFollowing = async (req, res) => {
+  const currentUserId = req.id
+  const targetUserId = req.params.id
+
+  try {
+    const currentUser = await User.findById(currentUserId)
+    const isFollowing = currentUser.following.includes(targetUserId)
+
+    res.json({ success: true, isFollowing })
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Internal Server Error" })
   }
 }
