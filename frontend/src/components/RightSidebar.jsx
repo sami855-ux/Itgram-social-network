@@ -8,7 +8,7 @@ import person from "@/assets/person.png"
 const RightSidebar = () => {
   const { user } = useSelector((store) => store.auth)
   return (
-    <div className="hidden pr-32 my-10 w-fit lg:block">
+    <div className="hidden pr-24 my-10 w-fit lg:block">
       <div className="flex items-center gap-2">
         <Link to={`/profile/${user?._id}`}>
           <Avatar>

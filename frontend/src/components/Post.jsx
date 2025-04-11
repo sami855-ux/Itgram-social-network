@@ -1,7 +1,13 @@
-import { Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react"
+import {
+  Bookmark,
+  Loader2,
+  MessageCircle,
+  MoreHorizontal,
+  Send,
+} from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { FaHeart, FaRegHeart } from "react-icons/fa"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import axios from "axios"
 
@@ -11,6 +17,7 @@ import { setPosts, setSelectedPost } from "@/redux/postSlice"
 import CommentDialog from "./CommentDialog"
 import { Button } from "./ui/button"
 import { Badge } from "./ui/badge"
+import { Link } from "react-router-dom"
 
 const Post = ({ post }) => {
   const [text, setText] = useState("")
@@ -20,6 +27,9 @@ const Post = ({ post }) => {
   const [liked, setLiked] = useState(post.likes.includes(user?._id) || false)
   const [postLike, setPostLike] = useState(post.likes.length)
   const [comment, setComment] = useState(post.comments)
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [isClickedLoading, setIsClcikedLoading] = useState(false)
+  const [isPostBookmarked, setIsPostBookmarked] = useState(false)
   const dispatch = useDispatch()
 
   const changeEventHandler = (e) => {
@@ -120,18 +130,105 @@ const Post = ({ post }) => {
       if (res.data.success) {
         toast.success(res.data.message)
       }
+      setIsPostBookmarked((prev) => !prev)
     } catch (error) {
       console.log(error)
     }
   }
+
+  const followOrUnfollowUser = async (targetUserId) => {
+    try {
+      setIsClcikedLoading(true)
+      // Send the follow/unfollow request to the backend
+      const response = await axios.post(
+        `${
+          import.meta.env.VITE_BASE_URL
+        }/api/v1/user/followorunfollow/${targetUserId}`,
+        {},
+        { withCredentials: true }
+      )
+      const isFollowed = await checkIfFollowed(post.author._id)
+      setIsFollowing(isFollowed)
+      // Handle the response
+      if (response.data.success) {
+        toast.success(response.data.message)
+      } else {
+        toast.error(response.data.message) // Error message
+      }
+    } catch (error) {
+      toast.error("Error in follow/unfollow:", error)
+    } finally {
+      setIsClcikedLoading(false)
+    }
+  }
+
+  const checkIfFollowed = async (userId) => {
+    console.log(userId)
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/isfollowing/${userId}`,
+        { withCredentials: true }
+      )
+
+      if (response.data.success) {
+        console.log(response.data.isFollowing, userId)
+
+        return response.data.isFollowing // true or false
+      } else {
+        return false
+      }
+    } catch (error) {
+      console.error("Error checking follow status:", error)
+      return false
+    }
+  }
+
+  const checkIfBookmarked = async (postId) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/post/isbookmarked/${postId}`,
+        { withCredentials: true }
+      )
+
+      if (response.data.success) {
+        return response.data.isBookmarked // true or false
+      } else {
+        console.warn("Unexpected response:", response.data.message)
+        return false
+      }
+    } catch (error) {
+      console.error("Error checking bookmark status:", error)
+      return false
+    }
+  }
+
+  useEffect(() => {
+    const checkFollowStatus = async () => {
+      if (post?.author?._id) {
+        const status = await checkIfFollowed(post.author._id)
+        setIsFollowing(status)
+      }
+    }
+    const checkBookmarkStatus = async () => {
+      if (post?._id) {
+        const status = await checkIfBookmarked(post?._id)
+        setIsPostBookmarked(status)
+      }
+    }
+    checkFollowStatus()
+    checkBookmarkStatus()
+  }, [post?.author?._id, post?._id])
+
   return (
     <div className="w-[500px] max-w-sm mx-auto my-8 border-b border-gray-300">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Avatar>
-            <AvatarImage src={post.author?.profilePicture} alt="post_image" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
+          <Link to={`/profile/${post.author?._id}`}>
+            <Avatar>
+              <AvatarImage src={post.author?.profilePicture} alt="post_image" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+          </Link>
           <div className="flex items-center gap-3">
             <h1 className="font-semibold capitalize text-[14px]">
               {post.author?.username}
@@ -151,14 +248,23 @@ const Post = ({ post }) => {
             <MoreHorizontal className="cursor-pointer" />
           </DialogTrigger>
           <DialogContent className="flex flex-col items-center text-sm text-center">
-            {post?.author?._id !== user?._id && (
-              <Button
-                variant="ghost"
-                className="cursor-pointer w-fit text-[#ED4956] font-bold"
-              >
-                Unfollow
-              </Button>
-            )}
+            {post?.author?._id !== user?._id &&
+              (isClickedLoading ? (
+                <Button>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Please wait
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  className="cursor-pointer w-fit text-[#f46c78] font-bold"
+                  onClick={() => {
+                    followOrUnfollowUser(post?.author?._id)
+                  }}
+                >
+                  {isFollowing ? "Unfollow" : "Follow"}
+                </Button>
+              ))}
 
             <Button variant="ghost" className="cursor-pointer w-fit">
               Add to favorites
@@ -206,10 +312,17 @@ const Post = ({ post }) => {
           />
           <Send className="cursor-pointer hover:text-gray-600" />
         </div>
-        <Bookmark
-          onClick={bookmarkHandler}
-          className="cursor-pointer hover:text-gray-600"
-        />
+        {isPostBookmarked ? (
+          <Bookmark
+            onClick={bookmarkHandler}
+            className="text-black cursor-pointer hover:text-gray-600 fill-black"
+          />
+        ) : (
+          <Bookmark
+            onClick={bookmarkHandler}
+            className="cursor-pointer hover:text-gray-600 "
+          />
+        )}
       </div>
       <span className="block mb-2 font-medium">{postLike} likes</span>
       <p>

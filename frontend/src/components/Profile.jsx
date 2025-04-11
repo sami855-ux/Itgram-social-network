@@ -1,7 +1,7 @@
 import { AtSign, Heart, MessageCircle } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import { useSelector } from "react-redux"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import axios from "axios"
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
@@ -15,6 +15,7 @@ const Profile = () => {
   const userId = params.id
   useGetUserProfile(userId)
   const [activeTab, setActiveTab] = useState("posts")
+  const [follow, setFollow] = useState(false)
 
   const { userProfile, user } = useSelector((store) => store.auth)
 
@@ -26,13 +27,14 @@ const Profile = () => {
   }
 
   const followOrUnfollowUser = async (targetUserId) => {
+    console.log()
     try {
       // Send the follow/unfollow request to the backend
       const response = await axios.post(
         `${
           import.meta.env.VITE_BASE_URL
         }/api/v1/user/followorunfollow/${targetUserId}`,
-
+        {},
         { withCredentials: true }
       )
 
@@ -48,9 +50,31 @@ const Profile = () => {
     }
   }
 
+  const checkIfFollowed = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/isfollowing/${userId}`,
+        { withCredentials: true }
+      )
+
+      if (response.data.success) {
+        setFollow(response.data.isFollowing) // true or false
+      } else {
+        console.warn("Unexpected response:", response.data.message)
+        setFollow(false)
+      }
+    } catch (error) {
+      console.error("Error checking follow status:", error)
+      setFollow(false)
+    }
+  }
+
   const displayedPost =
     activeTab === "posts" ? userProfile?.posts : userProfile?.bookmarks
 
+  useEffect(() => {
+    checkIfFollowed()
+  }, [])
   return (
     <div className="flex justify-center max-w-5xl pl-10 mx-auto">
       <div className="flex flex-col gap-20 p-8">
@@ -105,13 +129,14 @@ const Profile = () => {
                 ) : (
                   <>
                     <Button
-                      className="bg-[#0095F6] hover:bg-[#3192d2] h-8"
+                      className="bg-[#c9dce9] hover:bg-[#3192d2] h-8 text-gray-800"
                       onClick={() => {
                         followOrUnfollowUser(userId)
                       }}
                     >
-                      Follow
+                      {follow ? "unfollow" : "follow"}
                     </Button>
+
                     <Button className="bg-[#eff2f3] text-gray-800 hover:bg-[#ccdbe5] h-8">
                       Message
                     </Button>

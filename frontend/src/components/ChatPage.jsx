@@ -48,7 +48,9 @@ const ChatPage = () => {
   return (
     <div className="flex ml-[16%] h-screen">
       <section className="w-full my-8 md:w-1/4">
-        <h1 className="px-3 mb-4 text-xl font-bold">{user?.username}</h1>
+        <h1 className="px-3 mb-4 text-xl font-bold text-gray-800 capitalize">
+          {user?.username}
+        </h1>
         <hr className="mb-4 border-gray-300" />
         <div className="overflow-y-auto h-[80vh]">
           {suggestedUsers.map((suggestedUser, id) => {
@@ -64,9 +66,11 @@ const ChatPage = () => {
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <span className="font-medium">{suggestedUser?.username}</span>
+                  <span className="font-medium capitalize">
+                    {suggestedUser?.username}
+                  </span>
                   <span
-                    className={`text-xs font-bold ${
+                    className={`text-xs font-[400] ${
                       isOnline ? "text-green-600" : "text-red-600"
                     } `}
                   >
@@ -79,14 +83,16 @@ const ChatPage = () => {
         </div>
       </section>
       {selectedUser ? (
-        <section className="flex flex-col flex-1 h-full border-l border-l-gray-300">
-          <div className="sticky top-0 z-10 flex items-center gap-3 px-3 py-2 bg-white border-b border-gray-300">
+        <section className="flex flex-col flex-1 h-full py-5 border-l border-l-gray-300">
+          <div className="sticky top-0 z-10 flex items-center gap-3 px-3 py-3 border-b border-gray-300">
             <Avatar>
               <AvatarImage src={selectedUser?.profilePicture} alt="profile" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col">
-              <span>{selectedUser?.username}</span>
+            <div className="flex flex-col py-1 capitalize">
+              <span className="text-lg capitalize">
+                {selectedUser?.username}
+              </span>
             </div>
           </div>
           <Messages selectedUser={selectedUser} />
@@ -95,10 +101,13 @@ const ChatPage = () => {
               value={textMessage}
               onChange={(e) => setTextMessage(e.target.value)}
               type="text"
-              className="flex-1 mr-2 focus-visible:ring-transparent"
+              className="flex-1 mr-2 border-gray-300 rounded-xl focus-visible:ring-transparent"
               placeholder="Messages..."
             />
-            <Button onClick={() => sendMessageHandler(selectedUser?._id)}>
+            <Button
+              className="px-16"
+              onClick={() => sendMessageHandler(selectedUser?._id)}
+            >
               Send
             </Button>
           </div>

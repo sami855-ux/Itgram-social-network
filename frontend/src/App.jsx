@@ -4,11 +4,13 @@ import { io } from "socket.io-client"
 import { useEffect } from "react"
 
 import ProtectedRoutes from "./components/ProtectedRoutes"
-import ChatPage from "./components/ChatPage"
+import ExplorePeople from "./components/ExplorePeople"
 import EditProfile from "./components/EditProfile"
+import MainLayout from "./components/MainLayout"
+import ChatPage from "./components/ChatPage"
+import Explore from "./components/Explore"
 import Home from "./components/Home"
 import Login from "./components/Login"
-import MainLayout from "./components/MainLayout"
 import Profile from "./components/Profile"
 import Signup from "./components/Signup"
 
@@ -16,7 +18,6 @@ import { setSocket } from "./redux/socketSlice"
 import { setOnlineUsers } from "./redux/chatSlice"
 import { setLikeNotification } from "./redux/rtnSlice"
 import StoryViewer from "./components/StoryViewer"
-import Explore from "./components/Explore"
 
 const browserRouter = createBrowserRouter([
   {
@@ -40,6 +41,14 @@ const browserRouter = createBrowserRouter([
         element: (
           <ProtectedRoutes>
             <Explore />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: "/explore/people",
+        element: (
+          <ProtectedRoutes>
+            <ExplorePeople />
           </ProtectedRoutes>
         ),
       },
