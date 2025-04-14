@@ -39,7 +39,7 @@ const Signup = () => {
     try {
       setLoading(true)
       const res = await axios.post(
-        "http://127.0.0.1:3000/api/v1/user/register",
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/register`,
         input,
         {
           headers: {
@@ -70,11 +70,12 @@ const Signup = () => {
       navigate("/")
     }
   }, [])
+
   return (
-    <div className="flex items-center justify-center w-screen h-screen background_image">
+    <div className="flex items-center justify-center w-screen h-screen background_image ">
       <form
         onSubmit={signupHandler}
-        className="flex flex-col gap-5 px-20 py-8 border border-gray-100 rounded-lg shadow-2xl bg-slate-100"
+        className="flex flex-col gap-5 px-20 py-4 border border-gray-100 rounded-lg shadow-2xl bg-slate-100"
       >
         <div className="my-4">
           <div className="flex items-center justify-center mb-2">
@@ -117,6 +118,17 @@ const Signup = () => {
             onChange={changeEventHandler}
             className="my-2 border border-gray-400 focus-visible:ring-transparent"
           />
+        </div>
+        <div className="flex flex-col gap-2">
+          <span className="font-medium">Role</span>
+          <select
+            name="role"
+            className="py-2 border border-gray-400 outline-none text-[15px]"
+          >
+            <option value="">Select option</option>
+            <option value="hiring">Hiring</option>
+            <option value="Employee">Employee</option>
+          </select>
         </div>
         {loading ? (
           <Button>
