@@ -6,18 +6,20 @@ import { useEffect } from "react"
 import ProtectedRoutes from "./components/ProtectedRoutes"
 import ExplorePeople from "./components/ExplorePeople"
 import EditProfile from "./components/EditProfile"
+import StoryViewer from "./components/StoryViewer"
 import MainLayout from "./components/MainLayout"
 import ChatPage from "./components/ChatPage"
 import Explore from "./components/Explore"
-import Home from "./components/Home"
-import Login from "./components/Login"
-import Profile from "./components/Profile"
+import PostJob from "./components/PostJob"
 import Signup from "./components/Signup"
+import Profile from "./components/Profile"
+import Login from "./components/Login"
+import Home from "./components/Home"
 
 import { setSocket } from "./redux/socketSlice"
 import { setOnlineUsers } from "./redux/chatSlice"
 import { setLikeNotification } from "./redux/rtnSlice"
-import StoryViewer from "./components/StoryViewer"
+import PostedJobSeeker from "./components/PostedJobSeeker"
 
 const browserRouter = createBrowserRouter([
   {
@@ -41,6 +43,22 @@ const browserRouter = createBrowserRouter([
         element: (
           <ProtectedRoutes>
             <Explore />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: "/postJob",
+        element: (
+          <ProtectedRoutes>
+            <PostJob />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: "/postedJob",
+        element: (
+          <ProtectedRoutes>
+            <PostedJobSeeker />
           </ProtectedRoutes>
         ),
       },

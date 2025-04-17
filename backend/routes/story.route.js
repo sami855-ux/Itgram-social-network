@@ -5,6 +5,7 @@ import upload from "../middlewares/multer.js"
 import {
   addStory,
   commentOnStory,
+  dislikeStory,
   getAllStories,
   likeStory,
 } from "../controllers/Story.controller.js"
@@ -18,7 +19,9 @@ router
 // comment to the story
 router.post("/comment/:storyId", isAuthenticated, commentOnStory)
 // like the story
-router.post("/like/:storyId", isAuthenticated, likeStory)
+router.put("/:id/like", likeStory)
+// dislike the story
+router.put("/:id/dislike", dislikeStory)
 // get all stories
 router.get("/all", getAllStories)
 

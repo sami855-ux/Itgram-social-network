@@ -12,16 +12,15 @@ import Messages from "./Messages"
 
 const ChatPage = () => {
   const [textMessage, setTextMessage] = useState("")
-  const { user, suggestedUsers, selectedUser } = useSelector(
-    (store) => store.auth
-  )
+  const [suggestedUsers, setSuggestedUsers] = useState([])
+  const { user, selectedUser } = useSelector((store) => store.auth)
   const { onlineUsers, messages } = useSelector((store) => store.chat)
   const dispatch = useDispatch()
 
   const sendMessageHandler = async (receiverId) => {
     try {
       const res = await axios.post(
-        `http://localhost:3000/api/v1/message/send/${receiverId}`,
+        `${import.meta.env.VITE_BASE_URL}/api/v1/message/send/${receiverId}`,
         { textMessage },
         {
           headers: {
@@ -39,20 +38,51 @@ const ChatPage = () => {
     }
   }
 
+  const fetchUsersForMessaging = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/userForMessaging`,
+        {
+          withCredentials: true,
+        }
+      )
+
+      return response.data.users
+    } catch (error) {
+      console.error("Failed to fetch messaging users:", error)
+      return []
+    }
+  }
+
   useEffect(() => {
     return () => {
+      const loadUsers = async () => {
+        const allUsers = await fetchUsersForMessaging()
+        setSuggestedUsers(allUsers)
+      }
+
+      loadUsers()
       dispatch(setSelectedUser(null))
     }
   }, [])
 
   return (
     <div className="flex ml-[16%] h-screen">
-      <section className="w-full my-8 md:w-1/4">
+      <section className="w-full py-8 pl-4 border-r border-gray-200 md:w-1/4">
         <h1 className="px-3 mb-4 text-xl font-bold text-gray-800 capitalize">
           {user?.username}
         </h1>
-        <hr className="mb-4 border-gray-300" />
+        <div className="pb-7">
+          <Avatar className="w-16 h-16 m-3 border">
+            <AvatarImage src={user?.profilePicture} />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+        </div>
+        {/* <hr className="mb-4 border-gray-300" /> */}
         <div className="overflow-y-auto h-[80vh]">
+          <h1 className="px-3 mb-4 text-xl font-bold text-gray-800 capitalize">
+            Messages
+          </h1>
           {suggestedUsers.map((suggestedUser, id) => {
             const isOnline = onlineUsers.includes(suggestedUser?._id)
             return (
@@ -61,7 +91,7 @@ const ChatPage = () => {
                 className="flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-50"
                 key={id}
               >
-                <Avatar className="w-14 h-14">
+                <Avatar className="w-16 h-16">
                   <AvatarImage src={suggestedUser?.profilePicture} />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>

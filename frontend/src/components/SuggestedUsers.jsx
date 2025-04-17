@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 
 import Suggested from "./Suggested"
@@ -9,8 +9,8 @@ const SuggestedUsers = () => {
 
   return (
     <div className="my-10">
-      <div className="flex items-center justify-between text-sm w-96">
-        <h1 className="font-semibold text-[15px] text-gray-700">
+      <div className="flex items-center justify-between text-sm">
+        <h1 className="font-semibold text-[15px] text-gray-800">
           Suggested for you
         </h1>
         <span
@@ -22,7 +22,7 @@ const SuggestedUsers = () => {
           See all
         </span>
       </div>
-      {suggestedUsers.map((user, userId) => (
+      {suggestedUsers.slice(0, 5).map((user, userId) => (
         <Suggested user={user} key={userId} />
       ))}
     </div>

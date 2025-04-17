@@ -45,22 +45,21 @@ const Post = ({ post }) => {
     try {
       const action = liked ? "dislike" : "like"
       const res = await axios.get(
-        `http://localhost:3000/api/v1/post/${post._id}/${action}`,
+        `http://localhost:3000/api/v1/post/${post?._id}/${action}`,
         { withCredentials: true }
       )
-      console.log(res.data)
       if (res.data.success) {
         const updatedLikes = liked ? postLike - 1 : postLike + 1
         setPostLike(updatedLikes)
         setLiked(!liked)
 
         const updatedPostData = posts.map((p) =>
-          p._id === post._id
+          p?._id === post?._id
             ? {
                 ...p,
                 likes: liked
-                  ? p.likes.filter((id) => id !== user._id)
-                  : [...p.likes, user._id],
+                  ? p.likes.filter((id) => id !== user?._id)
+                  : [...p.likes, user?._id],
               }
             : p
         )
@@ -75,7 +74,7 @@ const Post = ({ post }) => {
   const commentHandler = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:3000/api/v1/post/${post._id}/comment`,
+        `http://localhost:3000/api/v1/post/${post?._id}/comment`,
         { text },
         {
           headers: {
@@ -90,7 +89,7 @@ const Post = ({ post }) => {
         setComment(updatedCommentData)
 
         const updatedPostData = posts.map((p) =>
-          p._id === post._id ? { ...p, comments: updatedCommentData } : p
+          p?._id === post?._id ? { ...p, comments: updatedCommentData } : p
         )
 
         dispatch(setPosts(updatedPostData))
@@ -105,7 +104,7 @@ const Post = ({ post }) => {
   const deletePostHandler = async () => {
     try {
       const res = await axios.delete(
-        `http://localhost:3000/api/v1/post/delete/${post?._id}`,
+        `${import.meta.env.VITE_BASE_URL}/api/v1/post/delete/${post?._id}`,
         { withCredentials: true }
       )
       if (res.data.success) {
@@ -124,7 +123,7 @@ const Post = ({ post }) => {
   const bookmarkHandler = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3000/api/v1/post/${post?._id}/bookmark`,
+        `${import.meta.env.VITE_BASE_URL}/api/v1/post/${post?._id}/bookmark`,
         { withCredentials: true }
       )
       if (res.data.success) {
@@ -139,6 +138,7 @@ const Post = ({ post }) => {
   const followOrUnfollowUser = async (targetUserId) => {
     try {
       setIsClcikedLoading(true)
+
       // Send the follow/unfollow request to the backend
       const response = await axios.post(
         `${
@@ -147,8 +147,9 @@ const Post = ({ post }) => {
         {},
         { withCredentials: true }
       )
-      const isFollowed = await checkIfFollowed(post.author._id)
+      const isFollowed = await checkIfFollowed(post?.author?._id)
       setIsFollowing(isFollowed)
+
       // Handle the response
       if (response.data.success) {
         toast.success(response.data.message)
@@ -163,7 +164,6 @@ const Post = ({ post }) => {
   }
 
   const checkIfFollowed = async (userId) => {
-    console.log(userId)
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/api/v1/user/isfollowing/${userId}`,
@@ -171,14 +171,11 @@ const Post = ({ post }) => {
       )
 
       if (response.data.success) {
-        console.log(response.data.isFollowing, userId)
-
         return response.data.isFollowing // true or false
       } else {
         return false
       }
     } catch (error) {
-      console.error("Error checking follow status:", error)
       return false
     }
   }
@@ -193,11 +190,9 @@ const Post = ({ post }) => {
       if (response.data.success) {
         return response.data.isBookmarked // true or false
       } else {
-        console.warn("Unexpected response:", response.data.message)
         return false
       }
     } catch (error) {
-      console.error("Error checking bookmark status:", error)
       return false
     }
   }
@@ -205,7 +200,7 @@ const Post = ({ post }) => {
   useEffect(() => {
     const checkFollowStatus = async () => {
       if (post?.author?._id) {
-        const status = await checkIfFollowed(post.author._id)
+        const status = await checkIfFollowed(post?.author?._id)
         setIsFollowing(status)
       }
     }
@@ -233,7 +228,7 @@ const Post = ({ post }) => {
             <h1 className="font-semibold capitalize text-[14px]">
               {post.author?.username}
             </h1>
-            {user?._id === post.author._id && (
+            {user?._id === post.author?._id && (
               <Badge
                 variant="secondary"
                 className="pt-1 border border-gray-200"
@@ -269,7 +264,7 @@ const Post = ({ post }) => {
             <Button variant="ghost" className="cursor-pointer w-fit">
               Add to favorites
             </Button>
-            {user && user?._id === post?.author._id && (
+            {user && user?._id === post?.author?._id && (
               <Button
                 onClick={deletePostHandler}
                 variant="ghost"
@@ -283,7 +278,7 @@ const Post = ({ post }) => {
       </div>
       <img
         className="object-cover w-full my-2 rounded-md h-[450px] aspect-square"
-        src={post.image}
+        src={post?.image}
         alt="post_img"
       />
 
@@ -327,7 +322,7 @@ const Post = ({ post }) => {
       <span className="block mb-2 font-medium">{postLike} likes</span>
       <p>
         <span className="mr-2 font-semibold">{post.author?.username}</span>
-        <span className="text-[15px]">{post.caption}</span>
+        <span className="text-[15px]">{post?.caption}</span>
       </p>
       {comment.length > 0 && (
         <span

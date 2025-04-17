@@ -1,3 +1,8 @@
+import { useDispatch, useSelector } from "react-redux"
+import { Link, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import axios from "axios"
 import {
   Heart,
   Home,
@@ -6,21 +11,19 @@ import {
   PlusSquare,
   Search,
   TrendingUp,
-  Clapperboard,
+  Loader2,
+  Briefcase,
+  ClipboardPlus,
 } from "lucide-react"
-import { useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { toast } from "sonner"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
-import { useDispatch, useSelector } from "react-redux"
-import { setAuthUser } from "@/redux/authSlice"
-import CreatePost from "./CreatePost"
-import { setPosts, setSelectedPost } from "@/redux/postSlice"
+
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import { Button } from "./ui/button"
-import logo from "../assets/logo2.png"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { setPosts, setSelectedPost } from "@/redux/postSlice"
+import { setAuthUser } from "@/redux/authSlice"
 import person from "../assets/person.png"
+import logo from "../assets/logo2.png"
+import CreatePost from "./CreatePost"
+import { Button } from "./ui/button"
 
 const LeftSidebar = () => {
   const navigate = useNavigate()
@@ -30,22 +33,59 @@ const LeftSidebar = () => {
   )
   const dispatch = useDispatch()
   const [open, setOpen] = useState(false)
+  const [isSearchClicked, setSearchClicked] = useState(false)
+  const [query, setQuery] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [searchResult, setSearchResult] = useState([])
 
   const logoutHandler = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:3000/api/v1/user/logout", {
-        withCredentials: true,
-      })
+      const res = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/logout`,
+        {
+          withCredentials: true,
+        }
+      )
       if (res.data.success) {
         dispatch(setAuthUser(null))
         dispatch(setSelectedPost(null))
         dispatch(setPosts([]))
+
         navigate("/login")
         toast.success(res.data.message)
       }
     } catch (error) {
       toast.error(error.response.data.message)
     }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    if (!query.trim()) return
+
+    setQuery((curr) => curr.trim())
+    setSearchResult([])
+
+    try {
+      setIsLoading(true)
+      const res = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/search?query=${query}`,
+        {
+          withCredentials: true,
+        }
+      )
+
+      if (res.data.success) {
+        setSearchResult(res.data.users)
+      }
+    } catch (err) {
+      toast.error(err.response.data.message)
+    } finally {
+      setIsLoading(false)
+    }
+
+    setQuery("")
   }
 
   const sidebarHandler = (textType) => {
@@ -61,14 +101,19 @@ const LeftSidebar = () => {
       navigate("/chat")
     } else if (textType === "Explore") {
       navigate("/explore")
+    } else if (textType === "Post a Job") {
+      navigate("/postJob")
+    } else if (textType === "Posted Job") {
+      navigate("/postedJob")
     }
   }
 
   const sidebarItems = [
     { icon: <Home />, text: "Home" },
     { icon: <Search />, text: "Search" },
-    { icon: <Clapperboard />, text: "Reel" },
     { icon: <TrendingUp />, text: "Explore" },
+    { icon: <Briefcase />, text: "Posted Job" },
+    { icon: <ClipboardPlus />, text: "Post a Job" },
     { icon: <MessageCircle />, text: "Messages" },
     { icon: <Heart />, text: "Notifications" },
     { icon: <PlusSquare />, text: "Create" },
@@ -85,8 +130,14 @@ const LeftSidebar = () => {
     },
     { icon: <LogOut />, text: "Logout" },
   ]
+
+  useEffect(() => {
+    setSearchResult([])
+    console.log(user)
+  }, [isSearchClicked])
+
   return (
-    <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 hidden md:block lg:w-[16%] md:w-24 h-screen bg-white transition-all ease duration-200">
+    <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 hidden md:block lg:w-[16%] md:w-24 h-screen bg-slate-200 transition-all ease duration-200">
       <div className="flex flex-col">
         <div className="flex items-center justify-center my-2">
           <img
@@ -97,14 +148,30 @@ const LeftSidebar = () => {
         </div>
         <div>
           {sidebarItems.map((item, index) => {
+            // Skip 'Posted Job' if the user is not a recruiter
+            if (item.text === "Posted Job" && user?.role !== "job seeker") {
+              return null
+            }
+            // Skip 'Post a Job' if the user is not a recruiter
+            if (item.text === "Post a Job" && user?.role !== "recruiter") {
+              return null
+            }
+
             return (
               <div
-                onClick={() => sidebarHandler(item.text)}
+                onClick={() => {
+                  sidebarHandler(item.text)
+
+                  if (item.text === "Search") {
+                    setSearchClicked((curr) => !curr)
+                  }
+                }}
                 key={index}
-                className="relative flex items-center gap-3 p-3 my-3 cursor-pointer rounded-xl hover:bg-gray-100"
+                className={`flex relative items-center gap-3 p-3 my-3 cursor-pointer rounded-xl hover:bg-slate-100`}
               >
                 <span>{item.icon}</span>
                 <span className="hidden lg:flex">{item.text}</span>
+
                 {item.text === "Notifications" &&
                   likeNotification.length > 0 && (
                     <Popover>
@@ -127,14 +194,21 @@ const LeftSidebar = () => {
                                   key={notification.userId}
                                   className="flex items-center gap-2 my-2"
                                 >
-                                  <Avatar>
-                                    <AvatarImage
-                                      src={
-                                        notification.userDetails?.profilePicture
-                                      }
-                                    />
-                                    <AvatarFallback>CN</AvatarFallback>
-                                  </Avatar>
+                                  <Link
+                                    to={`/profile/${notification.userDetails?._id}`}
+                                  >
+                                    <Avatar>
+                                      <AvatarImage
+                                        src={
+                                          notification.userDetails
+                                            ?.profilePicture
+                                        }
+                                        alt="post_image"
+                                      />
+                                      <AvatarFallback>CN</AvatarFallback>
+                                    </Avatar>
+                                  </Link>
+
                                   <p className="text-sm">
                                     <span className="font-bold">
                                       {notification.userDetails?.username}
@@ -156,6 +230,92 @@ const LeftSidebar = () => {
       </div>
 
       <CreatePost open={open} setOpen={setOpen} />
+
+      {/* Overlay */}
+      {isSearchClicked && (
+        <div
+          className="absolute top-0 left-0 z-30 w-screen h-screen bg-gray-900/75"
+          onClick={() => {
+            setSearchClicked(false)
+          }}
+        ></div>
+      )}
+      {isSearchClicked && (
+        <div className="absolute top-16 left-24 md:left-52 lg:left-96 bg-white w-[60dvw] h-[85dvh] z-40 rounded-md p-7">
+          <h2 className="pb-5 text-xl font-semibold">Search for a user</h2>
+
+          <form
+            className="flex items-center w-full gap-4"
+            onSubmit={handleSubmit}
+          >
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Enter the username..."
+              className="px-3 py-2 text-[15px] font-light border border-gray-200 rounded-lg outline-none bg-gray-50 w-[70%]"
+            />
+
+            {isLoading ? (
+              <Button>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Please wait
+              </Button>
+            ) : (
+              <Button type="submit">Search</Button>
+            )}
+          </form>
+          <hr className="w-full my-4 border border-gray-100" />
+
+          {isLoading ? (
+            <div className="flex items-center justify-center w-full h-96">
+              <p className="">
+                {" "}
+                <Loader2 className="mr-2 h-14 w-14 animate-spin" />
+              </p>
+            </div>
+          ) : searchResult && searchResult.length > 0 ? (
+            <div className="flex flex-col w-full gap-1 p-4 overflow-scroll h-fit search-container">
+              {searchResult.map((user, userIndex) => {
+                return (
+                  <Link
+                    to={`/profile/${user?._id}`}
+                    key={userIndex}
+                    onClick={() => {
+                      setSearchClicked(false)
+                    }}
+                    className="flex items-center justify-between px-2 py-3 my-2 rounded-lg w-96 hover:bg-gray-100"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Link to={`/profile/${user?._id}`}>
+                        <Avatar>
+                          <AvatarImage
+                            src={user?.profilePicture}
+                            alt="post_image"
+                          />
+                          <AvatarFallback>
+                            <img src={person} alt="default_image" />
+                          </AvatarFallback>
+                        </Avatar>
+                      </Link>
+                      <div>
+                        <h1 className="text-sm font-semibold text-gray-800 capitalize">
+                          <Link to={`/profile/${user?._id}`}>
+                            {user?.username}
+                          </Link>
+                        </h1>
+                        <span className="text-[13px] text-gray-600">
+                          Suggested for you
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          ) : null}
+        </div>
+      )}
     </div>
   )
 }

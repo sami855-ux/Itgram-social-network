@@ -11,10 +11,10 @@ import { Post } from "../models/post.model.js"
 dotenv.config()
 
 export const register = async (req, res) => {
-  console.log("🔍 Checking MongoDB connection:", mongoose.connection.readyState)
   try {
-    const { username, email, password } = req.body
-    if (!username || !email || !password) {
+    const { username, email, password, role } = req.body
+
+    if (!username || !email || !password || !role) {
       return res.status(401).json({
         message: "Something is missing, please check!",
         success: false,
@@ -32,6 +32,7 @@ export const register = async (req, res) => {
       username,
       email,
       password: hashedPassword,
+      role: role || "job seeker",
     })
     return res.status(201).json({
       message: "Account created successfully.",
@@ -88,6 +89,7 @@ export const login = async (req, res) => {
       followers: user.followers,
       following: user.following,
       posts: populatedPosts,
+      role: user.role,
     }
     return res
       .cookie("token", token, {
@@ -167,22 +169,31 @@ export const editProfile = async (req, res) => {
 }
 export const getSuggestedUsers = async (req, res) => {
   try {
-    const suggestedUsers = await User.find({ _id: { $ne: req.id } }).select(
-      "-password"
-    )
-    if (!suggestedUsers) {
-      return res.status(400).json({
-        message: "Currently do not have any users",
-      })
+    // Step 1: Get the current user
+    const currentUser = await User.findById(req.id)
+
+    if (!currentUser) {
+      return res.status(404).json({ message: "User not found" })
     }
+
+    // Step 2: Get list of user IDs the current user is following
+    const following = currentUser.following || []
+
+    // Step 3: Find users that are NOT the current user and NOT in the following list
+    const suggestedUsers = await User.find({
+      _id: { $ne: req.id, $nin: following },
+    }).select("-password")
+
     return res.status(200).json({
       success: true,
       users: suggestedUsers,
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
+    res.status(500).json({ message: "Server Error" })
   }
 }
+
 export const followOrUnfollow = async (req, res) => {
   try {
     const followerId = req.id // The ID of the user who wants to follow/unfollow
@@ -259,5 +270,66 @@ export const checkFollowing = async (req, res) => {
     res.json({ success: true, isFollowing })
   } catch (err) {
     res.status(500).json({ success: false, message: "Internal Server Error" })
+  }
+}
+
+export const getUsersForMessaging = async (req, res) => {
+  try {
+    const userId = req.id
+
+    const currentUser = await User.findById(userId)
+
+    if (!currentUser) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    const followingIds = currentUser.following || []
+
+    // Get followed users
+    const followedUsers = await User.find({
+      _id: { $in: followingIds },
+    }).select("-password")
+
+    // Get unfollowed users (excluding self and followed users)
+    const unfollowedUsers = await User.find({
+      _id: { $ne: userId, $nin: followingIds },
+    }).select("-password")
+
+    // Combine both lists: followed first
+    const allUsers = [...followedUsers, ...unfollowedUsers]
+
+    return res.status(200).json({
+      success: true,
+      users: allUsers,
+    })
+  } catch (error) {
+    console.error("Error getting users for messaging:", error)
+    res.status(500).json({ message: "Server Error" })
+  }
+}
+
+export const searchUser = async (req, res) => {
+  try {
+    const { query } = req.query
+
+    if (!query) {
+      return res.status(400).json({ message: "Search query is required" })
+    }
+
+    const users = await User.find({
+      $or: [
+        { username: { $regex: query, $options: "i" } },
+        { name: { $regex: query, $options: "i" } },
+      ],
+    }).select("-password")
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: "No users found" })
+    }
+
+    return res.status(200).json({ success: true, users })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ message: "Server error" })
   }
 }

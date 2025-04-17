@@ -11,8 +11,11 @@
   background-image: url("./assets/images.webp");
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 100%;
+  background-size: cover;
 }
 .REEL::-webkit-scrollbar {
+  display: none;
+}
+.search-container::-webkit-scrollbar {
   display: none;
 }

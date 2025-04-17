@@ -8,11 +8,15 @@ const userSchema = new mongoose.Schema(
     profilePicture: { type: String, default: "" },
     bio: { type: String, default: "" },
     gender: { type: String, enum: ["male", "female"] },
+    role: {
+      type: String,
+      enum: ["job seeker", "recruiter"],
+      default: "job seeker",
+    },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     bookmarks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
-    reels: [{ type: mongoose.Schema.Types.ObjectId, ref: "Reel" }],
     stories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Story" }],
   },
   { timestamps: true }

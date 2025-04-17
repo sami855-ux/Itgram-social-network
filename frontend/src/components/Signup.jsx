@@ -19,6 +19,7 @@ const Signup = () => {
     username: "",
     email: "",
     password: "",
+    role: "",
   })
   const [loading, setLoading] = useState(false)
   const { user } = useSelector((store) => store.auth)
@@ -55,6 +56,7 @@ const Signup = () => {
           username: "",
           email: "",
           password: "",
+          role: "",
         })
       }
     } catch (error) {
@@ -123,11 +125,13 @@ const Signup = () => {
           <span className="font-medium">Role</span>
           <select
             name="role"
+            value={input.role}
+            onChange={changeEventHandler}
             className="py-2 border border-gray-400 outline-none text-[15px]"
           >
             <option value="">Select option</option>
-            <option value="hiring">Hiring</option>
-            <option value="Employee">Employee</option>
+            <option value="recruiter">Recruiter</option>
+            <option value="job seeker">Job seeker</option>
           </select>
         </div>
         {loading ? (

@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit"
 import { createTransform } from "redux-persist"
+
 import authSlice from "./authSlice.js"
 import postSlice from "./postSlice.js"
 import socketSlice from "./socketSlice.js"

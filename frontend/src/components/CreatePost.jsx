@@ -33,10 +33,11 @@ const CreatePost = ({ open, setOpen }) => {
     const formData = new FormData()
     formData.append("caption", caption)
     if (imagePreview) formData.append("image", file)
+
     try {
       setLoading(true)
       const res = await axios.post(
-        "http://localhost:3000/api/v1/post/addpost",
+        `${import.meta.env.VITE_BASE_URL}/api/v1/post/addpost`,
         formData,
         {
           headers: {
@@ -51,6 +52,7 @@ const CreatePost = ({ open, setOpen }) => {
         setOpen(false)
       }
     } catch (error) {
+      console.log(error.response.data.message)
       toast.error(error.response.data.message)
     } finally {
       setLoading(false)

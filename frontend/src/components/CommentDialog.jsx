@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { MoreHorizontal } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
+import { toast } from "sonner"
+import axios from "axios"
+
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { Link } from "react-router-dom"
-import { MoreHorizontal } from "lucide-react"
-import { Button } from "./ui/button"
-import { useDispatch, useSelector } from "react-redux"
-import Comment from "./Comment"
-import axios from "axios"
-import { toast } from "sonner"
 import { setPosts } from "@/redux/postSlice"
+import { Button } from "./ui/button"
+import Comment from "./Comment"
 
 const CommentDialog = ({ open, setOpen }) => {
   const [text, setText] = useState("")
