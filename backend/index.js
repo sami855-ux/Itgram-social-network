@@ -14,14 +14,13 @@ import { app, server } from "./socket/socket.js"
 
 dotenv.config()
 
-const PORT = process.env.PORT || 3000
-
-const __dirname = path.resolve()
-
-//middlewares
+// CONFIGURATION
 app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
+
+const PORT = process.env.PORT || 3000
+const __dirname = path.resolve()
 
 const corsOptions = {
   origin: "http://localhost:5173",
@@ -30,8 +29,10 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
+//MONGOOSE
 connectDB()
 
+//ROUTES
 app.use("/api/v1/user", userRoute)
 app.use("/api/v1/post", postRoute)
 app.use("/api/v1/message", messageRoute)

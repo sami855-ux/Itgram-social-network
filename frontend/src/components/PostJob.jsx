@@ -153,7 +153,7 @@ export default function PostJob() {
       <form onSubmit={handelCreateJob}>
         <h2 className="py-4 text-xl font-semibold text-gray-800">Post a Job</h2>
         <div className="flex w-full gap-2 h-fit">
-          <div className="border border-gray-200 rounded-lg  w-[70%] min-h-[550px] p-4">
+          <div className="border border-gray-200 rounded-lg w-full lg:w-[60%] min-h-[550px] p-4">
             <section className="">
               <h2 className="text-lg font-semibold">Basic Information</h2>
             </section>
@@ -409,7 +409,7 @@ export default function PostJob() {
               </div>
             </div>
           </div>
-          <section className="flex flex-col p-3 py-5 bg-[#d3dae3] rounded-lg h-44 w-80 ml-4">
+          <section className="hidden lg:flex flex-col p-3 py-5 bg-[#d3dae3] rounded-lg h-44 w-80 ml-4">
             <h2 className="font-semibold text-[15px] text-gray-900">
               Place of work if accepted into this job vacancy
             </h2>

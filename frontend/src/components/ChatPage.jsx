@@ -15,6 +15,7 @@ const ChatPage = () => {
   const [suggestedUsers, setSuggestedUsers] = useState([])
   const { user, selectedUser } = useSelector((store) => store.auth)
   const { onlineUsers, messages } = useSelector((store) => store.chat)
+
   const dispatch = useDispatch()
 
   const sendMessageHandler = async (receiverId) => {
@@ -67,8 +68,8 @@ const ChatPage = () => {
   }, [])
 
   return (
-    <div className="flex ml-[16%] h-screen">
-      <section className="w-full py-8 pl-4 border-r border-gray-200 md:w-1/4">
+    <div className="flex md:ml-[16%] h-screen">
+      <section className="w-56 py-8 pl-4 border-r border-gray-200 md:w-1/4">
         <h1 className="px-3 mb-4 text-xl font-bold text-gray-800 capitalize">
           {user?.username}
         </h1>
@@ -78,7 +79,6 @@ const ChatPage = () => {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </div>
-        {/* <hr className="mb-4 border-gray-300" /> */}
         <div className="overflow-y-auto h-[80vh]">
           <h1 className="px-3 mb-4 text-xl font-bold text-gray-800 capitalize">
             Messages

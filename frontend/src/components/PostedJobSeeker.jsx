@@ -22,6 +22,7 @@ export default function PostedJobSeeker() {
   const [isLoading, setIsLoading] = useState(false)
   const [jobId, setJobId] = useState("")
   const [allJobs, setAllJobs] = useState([])
+  const [filteredJobs, setFilteredJobs] = useState([])
   const [filters, setFilters] = useState({
     jobType: "",
     salary: {
@@ -98,14 +99,33 @@ export default function PostedJobSeeker() {
     }
   }
 
+  const handleSearch = (e) => {
+    setQuery(e.target.value)
+
+    e.preventDefault()
+
+    if (!query) {
+      setFilteredJobs(allJobs)
+      return
+    }
+
+    const data = allJobs.filter((job) => {
+      return `${job.jobTitle}${job.companyName}`.includes(query)
+    })
+
+    console.log(query, data)
+
+    setFilteredJobs(data)
+  }
+
   useEffect(() => {
     const getJobs = async () => {
       const data = await handleGetAllJobs()
       setAllJobs(data)
+      setFilteredJobs(data)
     }
 
     getJobs()
-    console.log(allJobs)
   }, [])
 
   return (
@@ -119,9 +139,7 @@ export default function PostedJobSeeker() {
         <input
           type="text"
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value)
-          }}
+          onChange={handleSearch}
           placeholder="Job title or keywords..."
           className="bg-transparent h-full w-[80%] px-4 text-[15px] outline-none"
         />
@@ -282,8 +300,8 @@ export default function PostedJobSeeker() {
             </section>
             {/* Job lister container */}
             <div className="flex flex-col w-[85%] gap-2 h-fit">
-              {allJobs && allJobs.length > 0 ? (
-                allJobs.map((job, jobIndex) => (
+              {filteredJobs && filteredJobs.length > 0 ? (
+                filteredJobs.map((job, jobIndex) => (
                   <Job
                     onOpen={setOpen}
                     job={job}

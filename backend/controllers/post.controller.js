@@ -183,7 +183,7 @@ export const dislikePost = async (req, res) => {
 export const addComment = async (req, res) => {
   try {
     const postId = req.params.id
-    const commentKrneWalaUserKiId = req.id
+    const userId = req.id
 
     const { text } = req.body
 
@@ -196,7 +196,7 @@ export const addComment = async (req, res) => {
 
     const comment = await Comment.create({
       text,
-      author: commentKrneWalaUserKiId,
+      author: userId,
       post: postId,
     })
 
@@ -236,6 +236,7 @@ export const getCommentsOfPost = async (req, res) => {
     console.log(error)
   }
 }
+
 export const deletePost = async (req, res) => {
   try {
     const postId = req.params.id
@@ -268,6 +269,7 @@ export const deletePost = async (req, res) => {
     console.log(error)
   }
 }
+
 export const bookmarkPost = async (req, res) => {
   try {
     const postId = req.params.id

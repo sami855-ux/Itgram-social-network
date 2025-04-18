@@ -4,6 +4,7 @@ import {
   CalendarCheck,
   Clock,
   Heart,
+  Loader,
   MapPin,
   MessageCircle,
   Plus,
@@ -40,6 +41,10 @@ const Profile = () => {
   const [editOpen, setEditOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [enterdSkill, setEnterdSkill] = useState("")
+  const [editedJob, setEditedJob] = useState([])
+  const [editLoading, setEditLoading] = useState(false)
+  const [resumeOpen, setResumeOpen] = useState(false)
+  const [resume, setResume] = useState("")
   const navigate = useNavigate()
 
   const { userProfile, user } = useSelector((store) => store.auth)
@@ -255,9 +260,53 @@ const Profile = () => {
       if (res.data.success) {
         toast.success(res.data.message)
         setUnapplyOpen(false)
+        setJobId("")
       }
     } catch (error) {
       console.log(error.message)
+    }
+  }
+
+  const handleGetSingleJob = async () => {
+    setEditLoading(true)
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/job/getJob/${jobId}`,
+        {
+          withCredentials: true,
+        }
+      )
+
+      if (res.data.success) {
+        toast.success(res.data.message)
+        setEditedJob(res.data.job)
+        setJobId("")
+      }
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setEditLoading(false)
+    }
+  }
+
+  const handleUpdateJob = async (e) => {
+    e.preventDefault()
+
+    try {
+      const res = await axios.put(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/job/update/${jobId}`,
+        jobInput,
+        {
+          withCredentials: true,
+        }
+      )
+
+      if (res.data.success) {
+        toast.success(res.data.message)
+        setJobId("")
+      }
+    } catch (error) {
+      toast.error(error.message)
     }
   }
 
@@ -274,10 +323,12 @@ const Profile = () => {
     checkIfFollowed()
     handlePostedJobs()
     handleGetAppliedJobs()
+
+    console.log(postedJob)
   }, [])
 
   return (
-    <div className="flex justify-center max-w-5xl pl-10 mx-auto">
+    <div className="flex justify-center max-w-5xl mx-auto">
       <div className="flex flex-col gap-20 p-8">
         <div className="grid grid-cols-2">
           <section className="flex items-center justify-center">
@@ -437,6 +488,9 @@ const Profile = () => {
                       setDeleteOpen={setDeleteOpen}
                       setJobId={setJobId}
                       setEditOpen={setEditOpen}
+                      handleGetSingleJob={handleGetSingleJob}
+                      setResumeOpen={setResumeOpen}
+                      setResume={setResume}
                     />
                   )
                 }
@@ -522,6 +576,22 @@ const Profile = () => {
         </>
       )}
 
+      <Dialog open={resumeOpen}>
+        <DialogContent
+          onInteractOutside={() => {
+            setResumeOpen(false)
+            setResume("")
+          }}
+        >
+          <DialogHeader className="font-semibold text-center">
+            Resume Preview
+          </DialogHeader>
+          <div className="flex items-center gap-3">
+            <img src={resume} alt="resume" className="w-full h-fit" />
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={isOpen}>
         <DialogContent onInteractOutside={() => setIsOpen(false)}>
           <DialogHeader className="font-semibold text-center">
@@ -602,272 +672,324 @@ const Profile = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={editOpen}>
-        <DialogContent
-          className="min-h-screen py-8 overflow-scroll border-blue-700 max-w-[550px]"
-          onInteractOutside={() => setEditOpen(false)}
-        >
-          <DialogHeader className="text-lg font-semibold text-center">
-            Edit Job
-          </DialogHeader>
-          <div className="flex items-center gap-3 w-fit">
-            <div className="border border-gray-200 rounded-lg  w-[100%] min-h-[550px] p-4">
-              <div className="w-full py-4 h-fit">
-                <div className="w-[90%] flex flex-col gpa-1 my-2">
-                  <InputOne
-                    label="job description"
-                    value={jobInput.jobDescription}
-                    onHandleChange={handleChange}
-                  />
-                </div>
-              </div>
+      {editOpen && (
+        <div
+          className="fixed z-10 w-screen h-screen bg-gray-900/75"
+          onClick={() => {
+            setEditOpen(false)
+            setJobId("")
+            setEditLoading(false)
+          }}
+        ></div>
+      )}
 
-              {/* Additional Information */}
-
-              <div className="w-full py-4 h-fit">
-                <section className="flex flex-col">
-                  <label className="text-[14px] text-gray-800 mb-1">
-                    Employment type
-                  </label>
-                  <div className="flex h-12 gap-2">
-                    <section
-                      className={`${
-                        jobInput.employmentType === "fulltime"
-                          ? "border-blue-600 bg-blue-300"
-                          : null
-                      } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                      onClick={() => {
-                        handleEmployment("fulltime")
-                      }}
-                    >
-                      <CalendarCheck size={19} />
-                      <span className="text-[14px]">Fulltime</span>
-                    </section>
-                    <section
-                      className={`${
-                        jobInput.employmentType === "freelance"
-                          ? "border-blue-600 bg-blue-300"
-                          : null
-                      } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                      onClick={() => {
-                        handleEmployment("freelance")
-                      }}
-                    >
-                      <Clock size={19} />
-                      <span className="text-[14px]">Freelance</span>
-                    </section>
-                    <section
-                      className={`${
-                        jobInput.employmentType === "contract"
-                          ? "border-blue-600 bg-blue-300"
-                          : null
-                      } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                      onClick={() => {
-                        handleEmployment("contract")
-                      }}
-                    >
-                      <Clock size={19} />
-                      <span className="text-[14px]">Contract</span>
-                    </section>
-                    <section
-                      className={`${
-                        jobInput.employmentType === "internship"
-                          ? "border-blue-600 bg-blue-300"
-                          : null
-                      } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                      onClick={() => {
-                        handleEmployment("internship")
-                      }}
-                    >
-                      <Clock size={19} />
-                      <span className="text-[14px]">Internship</span>
-                    </section>
-                  </div>
-                </section>
-
-                {/* Job placement */}
-                <div className="w-[90%] flex gap-2 my-2">
-                  <section className="flex flex-col w-1/2 gap-1">
-                    <span className="text-[14px] text-gray-800 mb-1">
-                      Job placement
-                    </span>
-                    <select
-                      name="Job placement"
-                      value={jobInput.jobPlacement}
-                      onChange={handleChange}
-                      className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
-                    >
-                      <option value="">Select option</option>
-                      <option value="onsite">Onsite</option>
-                      <option value="remote">Remote</option>
-                      <option value="hybrid">Hybrid</option>
-                    </select>
+      {editLoading ? (
+        <div className="fixed top-0 right-0 z-20 h-screen bg-white w-[50%] p-6 overflow-scroll flex items-center justify-center">
+          <Loader className="animate-spin w-14 h-14" />
+        </div>
+      ) : (
+        editOpen && (
+          <div className="fixed top-0 right-0 z-20 h-screen bg-white w-[50%] p-6 overflow-scroll">
+            <form onSubmit={handleUpdateJob}>
+              <h2 className="py-4 text-xl font-semibold text-gray-800">
+                Edit a Job
+              </h2>
+              <div className="flex w-full gap-2 h-fit">
+                <div className="w-[100%] min-h-[550px] p-4">
+                  <section className="">
+                    <h2 className="text-lg font-semibold">Basic Information</h2>
                   </section>
 
-                  <section className="flex flex-col w-1/2 gap-1">
-                    <span className="text-[14px] text-gray-800 mb-1">
-                      Job experience
-                    </span>
-                    <select
-                      name="Job experience"
-                      value={jobInput.jobExperience}
-                      onChange={handleChange}
-                      className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
-                    >
-                      <option value="">Select option</option>
-                      <option value="no">No experience</option>
-                      <option value="1-2">1-2 years</option>
-                      <option value="2-4">2-4 years</option>
-                      <option value="4-8">4-8 years</option>
-                      <option value=">8">more than 8 years</option>
-                    </select>
-                  </section>
-                </div>
-
-                {/* Company Information */}
-                <h2 className="pt-5 text-lg font-semibold">
-                  Company Information
-                </h2>
-
-                <div className="w-full py-4 h-fit">
-                  <div className="w-[90%] flex flex-col gpa-1 my-2">
-                    <InputOne
-                      label="company name"
-                      value={jobInput.companyName}
-                      onHandleChange={handleChange}
-                    />
-                  </div>
-                  <h2 className="font-semibold text-[16px] py-2 text-gray-900">
-                    Location
-                  </h2>
-
-                  <div className="w-[90%] flex gap-2 my-2">
-                    <section className="flex flex-col w-1/2 gap-1">
-                      <span className="text-[14px] text-gray-800 mb-1">
-                        City
-                      </span>
-                      <select
-                        name="city"
-                        value={jobInput.city}
-                        onChange={handleChange}
-                        className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
-                      >
-                        <option value="">Select option</option>
-                        <option value="addis abeba">Addis abeba</option>
-                        <option value="bhair dar">Bhair dar</option>
-                        <option value="debre brihan">Debre brihan</option>
-                      </select>
-                    </section>
-
-                    <section className="flex flex-col w-1/2 gap-1">
-                      <span className="text-[14px] text-gray-800 mb-1">
-                        Country
-                      </span>
-                      <select
-                        name="country"
-                        value={jobInput.country}
-                        onChange={handleChange}
-                        className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
-                      >
-                        <option value="">Select option</option>
-                        <option value="ethiopia">Ethiopia</option>
-                        <option value="kenya">Kenya</option>
-                        <option value="sudan">Sudan</option>
-                        <option value="egypt">Egypt</option>
-                        <option value="other">other</option>
-                      </select>
-                    </section>
-                  </div>
-                  <h2 className="font-semibold text-[16px] pt-5 pb-2 text-gray-900">
-                    About job
-                  </h2>
-                  <section className="flex flex-col w-full gap-1 pt-3">
-                    <span className="text-[14px] text-gray-800">
-                      Skill required
-                    </span>
-                    <div className="flex flex-wrap items-center w-full gap-2 min-h-14">
-                      <section
-                        className="w-7 h-7 bg-[#618bd3] flex items-center justify-center rounded-full capitalize cursor-pointer"
-                        onClick={() => setIsModalOpen(true)}
-                      >
-                        <Plus size={15} />
-                      </section>
-                      {jobInput.skills && jobInput.skills.length > 0
-                        ? jobInput.skills.map((skill, skillIndex) => (
-                            <Skills skill={skill} key={skillIndex} />
-                          ))
-                        : null}
+                  <div className="w-full py-4 h-fit">
+                    <div className="w-[90%] flex flex-col gpa-1 my-2">
+                      <InputOne
+                        label="job title"
+                        value={jobInput.jobTitle}
+                        onHandleChange={handleChange}
+                      />
                     </div>
+                    <div className="w-[90%] flex gap-2 my-2">
+                      <section className="flex flex-col w-1/2 gap-1">
+                        <InputOne
+                          label="role"
+                          value={jobInput.role}
+                          onHandleChange={handleChange}
+                        />
+                      </section>
+                      <section className="flex flex-col w-1/2 gap-1">
+                        <InputOne
+                          label="category"
+                          value={jobInput.category}
+                          onHandleChange={handleChange}
+                        />
+                      </section>
+                    </div>
+                    <div className="w-[90%] flex flex-col gpa-1 my-2">
+                      <InputOne
+                        label="job description"
+                        value={jobInput.jobDescription}
+                        onHandleChange={handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Additional Information */}
+                  <section className="">
+                    <h2 className="text-lg font-semibold">
+                      Additional Information
+                    </h2>
                   </section>
-                  <section className="flex flex-col w-full gap-1 pt-3">
-                    <span className="text-[14px] text-gray-800 font-semibold">
-                      Salary range
-                    </span>
-                    <section className="flex items-center w-full gap-3 h-fit">
-                      <span className="font-medium text-[14px] text-gray-800 capitalize">
-                        Max salary
-                      </span>
-                      <input
-                        type="number"
-                        name={"max salary"}
-                        value={jobInput.salary.max}
-                        onChange={handleChange}
-                        className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
-                      />
-                      <span className="font-medium text-[14px] text-gray-800 capitalize">
-                        Min salary
-                      </span>
-                      <input
-                        type="number"
-                        name={"min salary"}
-                        value={jobInput.salary.min}
-                        onChange={handleChange}
-                        className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
-                      />
+
+                  <div className="w-full py-4 h-fit">
+                    <section className="flex flex-col">
+                      <label className="text-[14px] text-gray-800 mb-1">
+                        Employment type
+                      </label>
+                      <div className="flex h-12 gap-2">
+                        <section
+                          className={`${
+                            jobInput.employmentType === "fulltime"
+                              ? "border-blue-600 bg-blue-300"
+                              : null
+                          } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
+                          onClick={() => {
+                            handleEmployment("fulltime")
+                          }}
+                        >
+                          <CalendarCheck size={19} />
+                          <span className="text-[14px]">Fulltime</span>
+                        </section>
+                        <section
+                          className={`${
+                            jobInput.employmentType === "freelance"
+                              ? "border-blue-600 bg-blue-300"
+                              : null
+                          } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
+                          onClick={() => {
+                            handleEmployment("freelance")
+                          }}
+                        >
+                          <Clock size={19} />
+                          <span className="text-[14px]">Freelance</span>
+                        </section>
+                        <section
+                          className={`${
+                            jobInput.employmentType === "contract"
+                              ? "border-blue-600 bg-blue-300"
+                              : null
+                          } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
+                          onClick={() => {
+                            handleEmployment("contract")
+                          }}
+                        >
+                          <Clock size={19} />
+                          <span className="text-[14px]">Contract</span>
+                        </section>
+                        <section
+                          className={`${
+                            jobInput.employmentType === "internship"
+                              ? "border-blue-600 bg-blue-300"
+                              : null
+                          } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
+                          onClick={() => {
+                            handleEmployment("internship")
+                          }}
+                        >
+                          <Clock size={19} />
+                          <span className="text-[14px]">Internship</span>
+                        </section>
+                      </div>
                     </section>
-                  </section>
-                  <span className="font-medium text-[14px] text-gray-800 capitalize block pt-4">
-                    Deadline date
-                  </span>
-                  <input
-                    type="date"
-                    name={"deadline"}
-                    value={jobInput.deadline}
-                    onChange={handleChange}
-                    className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
-                  />
+
+                    {/* Job placement */}
+                    <div className="w-[90%] flex gap-2 my-2">
+                      <section className="flex flex-col w-1/2 gap-1">
+                        <span className="text-[14px] text-gray-800 mb-1">
+                          Job placement
+                        </span>
+                        <select
+                          name="Job placement"
+                          value={jobInput.jobPlacement}
+                          onChange={handleChange}
+                          className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
+                        >
+                          <option value="">Select option</option>
+                          <option value="onsite">Onsite</option>
+                          <option value="remote">Remote</option>
+                          <option value="hybrid">Hybrid</option>
+                        </select>
+                      </section>
+
+                      <section className="flex flex-col w-1/2 gap-1">
+                        <span className="text-[14px] text-gray-800 mb-1">
+                          Job experience
+                        </span>
+                        <select
+                          name="Job experience"
+                          value={jobInput.jobExperience}
+                          onChange={handleChange}
+                          className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
+                        >
+                          <option value="">Select option</option>
+                          <option value="no">No experience</option>
+                          <option value="1-2">1-2 years</option>
+                          <option value="2-4">2-4 years</option>
+                          <option value="4-8">4-8 years</option>
+                          <option value=">8">more than 8 years</option>
+                        </select>
+                      </section>
+                    </div>
+
+                    {/* Company Information */}
+                    <h2 className="pt-5 text-lg font-semibold">
+                      Company Information
+                    </h2>
+
+                    <div className="w-full py-4 h-fit">
+                      <div className="w-[90%] flex flex-col gpa-1 my-2">
+                        <InputOne
+                          label="company name"
+                          value={jobInput.companyName}
+                          onHandleChange={handleChange}
+                        />
+                      </div>
+                      <h2 className="font-semibold text-[16px] py-2 text-gray-900">
+                        Location
+                      </h2>
+
+                      <div className="w-[90%] flex gap-2 my-2">
+                        <section className="flex flex-col w-1/2 gap-1">
+                          <span className="text-[14px] text-gray-800 mb-1">
+                            City
+                          </span>
+                          <select
+                            name="city"
+                            value={jobInput.city}
+                            onChange={handleChange}
+                            className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
+                          >
+                            <option value="">Select option</option>
+                            <option value="addis abeba">Addis abeba</option>
+                            <option value="bhair dar">Bhair dar</option>
+                            <option value="debre brihan">Debre brihan</option>
+                          </select>
+                        </section>
+
+                        <section className="flex flex-col w-1/2 gap-1">
+                          <span className="text-[14px] text-gray-800 mb-1">
+                            Country
+                          </span>
+                          <select
+                            name="country"
+                            value={jobInput.country}
+                            onChange={handleChange}
+                            className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
+                          >
+                            <option value="">Select option</option>
+                            <option value="ethiopia">Ethiopia</option>
+                            <option value="kenya">Kenya</option>
+                            <option value="sudan">Sudan</option>
+                            <option value="egypt">Egypt</option>
+                            <option value="other">other</option>
+                          </select>
+                        </section>
+                      </div>
+                      <h2 className="font-semibold text-[16px] pt-5 pb-2 text-gray-900">
+                        About job
+                      </h2>
+                      <section className="flex flex-col w-full gap-1 pt-3">
+                        <span className="text-[14px] text-gray-800">
+                          Skill required
+                        </span>
+                        <div className="flex flex-wrap items-center w-full gap-2 min-h-14">
+                          <section
+                            className="w-7 h-7 bg-[#618bd3] flex items-center justify-center rounded-full capitalize cursor-pointer"
+                            onClick={() => setIsModalOpen(true)}
+                          >
+                            <Plus size={15} />
+                          </section>
+                          {jobInput.skills && jobInput.skills.length > 0
+                            ? jobInput.skills.map((skill, skillIndex) => (
+                                <Skills skill={skill} key={skillIndex} />
+                              ))
+                            : null}
+                        </div>
+                      </section>
+                      <section className="flex flex-col w-full gap-1 pt-3">
+                        <span className="text-[14px] text-gray-800 font-semibold">
+                          Salary range
+                        </span>
+                        <section className="flex items-center w-full gap-3 h-fit">
+                          <span className="font-medium text-[14px] text-gray-800 capitalize">
+                            Max salary
+                          </span>
+                          <input
+                            type="number"
+                            name={"max salary"}
+                            value={jobInput.salary.max}
+                            onChange={handleChange}
+                            className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
+                          />
+                          <span className="font-medium text-[14px] text-gray-800 capitalize">
+                            Min salary
+                          </span>
+                          <input
+                            type="number"
+                            name={"min salary"}
+                            value={jobInput.salary.min}
+                            onChange={handleChange}
+                            className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
+                          />
+                        </section>
+                      </section>
+                      <span className="font-medium text-[14px] text-gray-800 capitalize block pt-4">
+                        Deadline date
+                      </span>
+                      <input
+                        type="date"
+                        name={"deadline"}
+                        value={jobInput.deadline}
+                        onChange={handleChange}
+                        className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <Button
-              className="mt-4 mr-4 text-gray-900 bg-gray-200 h-7"
-              onClick={() => setEditOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="mt-4 text-red-900 bg-gray-200 h-7"
-              onClick={handleRemoveUser}
-            >
-              Edit
-            </Button>
+              <div className="flex items-center justify-between w-[100%] h-16 py-4">
+                <Button
+                  className="px-10 text-gray-900 bg-gray-400 hover:bg-gray-300"
+                  onClick={() => setEditOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="px-10 bg-blue-600 hover:bg-blue-500"
+                >
+                  Edit a job
+                </Button>
+              </div>
+            </form>
           </div>
-        </DialogContent>
-      </Dialog>
+        )
+      )}
     </div>
   )
 }
 
-const Job = ({ onOpen, job, setDeleteOpen, setJobId, setEditOpen }) => {
+const Job = ({
+  job,
+  setDeleteOpen,
+  setJobId,
+  setEditOpen,
+  setResume,
+  setResumeOpen,
+}) => {
   return (
     <>
-      <section
-        className="flex flex-col w-full px-4 py-5 mt-4 border cursor-pointer bg-slate-100 h-fit rounded-xl hover:bg-gray-100"
-        onClick={() => {
-          onOpen(true)
-        }}
-      >
+      <section className="flex flex-col w-full px-4 py-5 mt-4 border bg-slate-100 h-fit rounded-xl hover:bg-gray-100">
         <div className="flex w-full gap-2 h-fit">
           <article className="w-[420px]">
             <h2 className="py-1 text-lg font-semibold text-gray-800">
@@ -877,13 +999,13 @@ const Job = ({ onOpen, job, setDeleteOpen, setJobId, setEditOpen }) => {
           </article>
         </div>
         <div className="flex w-full gap-1 pt-4 h-fit">
-          <span className="text-[14px] px-3 py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold capitalize">
+          <span className="text-[14px] md:px-3 md:py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold capitalize">
             {job.employmentType}
           </span>
           <span className="text-[14px] px-3 py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold">
             Onsite
           </span>
-          <span className="text-[14px] capitalize flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#173e8a] font-semibold">
+          <span className=" text-[14px] capitalize flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#173e8a] font-semibold">
             <MapPin color="#4b75df" size={18} />
             {job.city}, {job.country}
           </span>
@@ -906,10 +1028,46 @@ const Job = ({ onOpen, job, setDeleteOpen, setJobId, setEditOpen }) => {
                 {" "}
                 {job.applicants.length} applicants
               </span>
-              {job.applicants.map((user, userIndex) => {
+              {job.applicants.map((message, userIndex) => {
                 return (
-                  <section className="" key={userIndex}>
-                    {user.message}
+                  <section
+                    className="flex items-center w-full h-fit gap-3 px-6 py-4 my-2 rounded-lg bg-slate-200"
+                    key={userIndex}
+                  >
+                    <a
+                      className="pr-4 w-fit"
+                      href={`/profile/${message.user?._id}`}
+                    >
+                      <Avatar className="w-14 h-14">
+                        <AvatarImage
+                          src={message.user?.profilePicture}
+                          alt="profilephoto"
+                        />
+                        <AvatarFallback>
+                          <img src={person} alt="default image" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <p className="py-1 font-semibold text-center capitalize">
+                        {message.user.username}
+                      </p>
+                    </a>
+                    <div className="items-start h-full">
+                      <h2 className="font-semibold text-[15px] pb-1">
+                        Message
+                      </h2>
+                      <p className="">
+                        {message.message} <br />
+                        <span
+                          className="text-green-600 cursor-pointer"
+                          onClick={() => {
+                            setResumeOpen(true)
+                            setResume(message.resume)
+                          }}
+                        >
+                          See the resume
+                        </span>
+                      </p>
+                    </div>
                   </section>
                 )
               })}

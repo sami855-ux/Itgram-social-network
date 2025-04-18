@@ -9,7 +9,9 @@ import {
   getAllJobs,
   getAppliedJobsByUser,
   getJobsByUser,
+  getSingleJob,
   unapplyFromJob,
+  updateJob,
 } from "../controllers/job.controller.js"
 
 const router = express.Router()
@@ -36,5 +38,11 @@ router.delete("/unapply/:jobId", isAuthenticated, unapplyFromJob)
 
 //Get user applied jobs
 router.get("/getUserJob", isAuthenticated, getAppliedJobsByUser)
+
+//Get a single job
+router.get("/getJob/:jobId", isAuthenticated, getSingleJob)
+
+//update job
+router.put("/update/:jobId", isAuthenticated, updateJob)
 
 export default router

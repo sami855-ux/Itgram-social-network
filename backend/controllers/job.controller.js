@@ -21,7 +21,7 @@ export const createJob = async (req, res) => {
       skills, // from frontend
     } = req.body
 
-    const author = req.id // Ensure author is correctly fetched
+    const author = req.id
 
     // Validate required fields
     if (
@@ -120,8 +120,12 @@ export const getJobsByUser = async (req, res) => {
       return res.status(400).json({ error: "Invalid user ID" })
     }
 
-    const jobs = await Job.find({ author: userId })
-    res.status(200).json({ success: true, jobs: jobs })
+    const jobs = await Job.find({ author: userId }).populate(
+      "applicants.user",
+      "username profilePicture"
+    ) // <-- populating name & profile from User
+
+    res.status(200).json({ success: true, jobs })
   } catch (error) {
     console.error("Error fetching user jobs:", error)
     res.status(500).json({ error: "Server error while fetching user jobs" })
@@ -198,8 +202,6 @@ export const applyToJob = async (req, res) => {
       message: message || "",
       resume: cloudResponse.secure_url,
     }
-
-    console.log("Final applicant to push:", applicant)
 
     job.applicants.push(applicant)
 
@@ -329,5 +331,138 @@ export const unapplyFromJob = async (req, res) => {
   } catch (error) {
     console.error("Error unapplying from job:", error)
     res.status(500).json({ error: "Server error while unapplying from job" })
+  }
+}
+
+// Job update
+export const updateJob = async (req, res) => {
+  try {
+    const userId = req.id
+    const { jobId } = req.params
+
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      return res.status(400).json({ error: "Invalid job ID" })
+    }
+
+    const job = await Job.findById(jobId)
+
+    if (!job) {
+      return res.status(404).json({ error: "Job not found" })
+    }
+
+    if (job.author.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to update this job" })
+    }
+
+    const {
+      jobTitle,
+      role,
+      category,
+      companyName,
+      jobDescription,
+      city,
+      country,
+      employmentType,
+      deadline,
+      salaryRange,
+      skillsRequired,
+    } = req.body
+
+    // Basic validation
+    if (jobTitle && typeof jobTitle !== "string") {
+      return res.status(400).json({ error: "Job title must be a string" })
+    }
+
+    if (role && typeof role !== "string") {
+      return res.status(400).json({ error: "Role must be a string" })
+    }
+
+    if (category && typeof category !== "string") {
+      return res.status(400).json({ error: "Category must be a string" })
+    }
+
+    if (companyName && typeof companyName !== "string") {
+      return res.status(400).json({ error: "Company name must be a string" })
+    }
+
+    if (jobDescription && typeof jobDescription !== "string") {
+      return res.status(400).json({ error: "Job description must be a string" })
+    }
+
+    if (city && typeof city !== "string") {
+      return res.status(400).json({ error: "City must be a string" })
+    }
+
+    if (country && typeof country !== "string") {
+      return res.status(400).json({ error: "Country must be a string" })
+    }
+
+    if (
+      employmentType &&
+      !["fulltime", "freelance", "contract", "internship"].includes(
+        employmentType
+      )
+    ) {
+      return res.status(400).json({ error: "Invalid employment type" })
+    }
+
+    if (deadline) {
+      const deadlineDate = new Date(deadline)
+      if (isNaN(deadlineDate.getTime()) || deadlineDate <= new Date()) {
+        return res
+          .status(400)
+          .json({ error: "Deadline must be a valid future date" })
+      }
+      job.deadline = deadlineDate
+    }
+
+    if (salaryRange) {
+      const { min, max } = salaryRange
+      if (min !== undefined && typeof min !== "number") {
+        return res.status(400).json({ error: "Salary min must be a number" })
+      }
+      if (max !== undefined && typeof max !== "number") {
+        return res.status(400).json({ error: "Salary max must be a number" })
+      }
+      if (min !== undefined && max !== undefined && min > max) {
+        return res
+          .status(400)
+          .json({ error: "Salary min must not be greater than max" })
+      }
+      job.salaryRange = { min, max }
+    }
+
+    if (skillsRequired) {
+      if (
+        !Array.isArray(skillsRequired) ||
+        !skillsRequired.every((skill) => typeof skill === "string")
+      ) {
+        return res
+          .status(400)
+          .json({ error: "Skills must be an array of strings" })
+      }
+      job.skillsRequired = skillsRequired
+    }
+
+    // Apply valid updates
+    if (jobTitle) job.jobTitle = jobTitle
+    if (role) job.role = role
+    if (category) job.category = category
+    if (companyName) job.companyName = companyName
+    if (jobDescription) job.jobDescription = jobDescription
+    if (city) job.city = city
+    if (country) job.country = country
+    if (employmentType) job.employmentType = employmentType
+
+    await job.save()
+
+    res
+      .status(200)
+      .json({ success: true, message: "Job updated successfully", job })
+  } catch (error) {
+    console.error("Error updating job:", error)
+    res.status(500).json({ error: "Server error while updating job" })
   }
 }
