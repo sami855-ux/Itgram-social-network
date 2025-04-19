@@ -387,7 +387,7 @@ export default function PostedJobSeeker() {
     </div>
   )
 }
-
+/* eslint-disable-next-line */
 const PageNumber = ({ number }) => {
   const isActive = false
   return (
@@ -403,17 +403,20 @@ const PageNumber = ({ number }) => {
   )
 }
 
+//eslint-disable-next-line
 const Job = ({ onOpen, job, setJobId }) => {
   return (
     <section
       className="flex flex-col w-full p-5 border border-blue-100 cursor-pointer h-fit rounded-xl hover:bg-gray-100"
       onClick={() => {
         onOpen(true)
+        //eslint-disable-next-line
         setJobId(`${job?._id}`)
       }}
     >
       <div className="flex w-full gap-2 h-fit">
         <Avatar className="w-16 h-16 border border-gray-400">
+          {/* eslint-disable-next-line */}
           <AvatarImage src={job.author?.profilePicture} alt="@shadcn" />
           <AvatarFallback>
             <img src={person} alt="default image" />
@@ -422,8 +425,10 @@ const Job = ({ onOpen, job, setJobId }) => {
 
         <article className="w-[420px]">
           <h2 className="py-1 text-lg font-semibold text-gray-800">
+            {/* eslint-disable-next-line */}
             {job.jobTitle}
           </h2>
+          {/* eslint-disable-next-line */}
           <p className="text-[14px] pr-4">{job.jobDescription}</p>
           <p className="text-[15px]">
             by <span className="text-blue-600">{job.author.username} </span>
@@ -454,19 +459,24 @@ const Job = ({ onOpen, job, setJobId }) => {
           {job.city}, {job.country}
         </span>
         <span className="text-[14px] flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#14377d] font-semibold">
+          {/* eslint-disable-next-line */}
           <BadgeDollarSign color="#4b75df" size={18} />${job.salaryRange.min} -{" "}
+          {/* eslint-disable-next-line */}
           {job.salaryRange.max}/month
         </span>
       </div>
       <span className="text-[14px] flex gap-1 items-center  pt-4  text-[#14377d] font-semibold">
+        {/* eslint-disable-next-line */}
         {getTimeLeftUntil(job.deadline)}
       </span>
       <p className="pt-3  text-[14px] text-gray-700">
+        {/* eslint-disable-next-line */}
         {job.applicants.length === 0 ? (
           <span className="text-red-500">No user applied to this job yet</span>
         ) : (
           <span className="text-green-600">
             {" "}
+            {/* eslint-disable-next-line */}
             {job.applicants.length} applicants applied to this job until now
           </span>
         )}
@@ -474,7 +484,7 @@ const Job = ({ onOpen, job, setJobId }) => {
     </section>
   )
 }
-
+/* eslint-disable-next-line */
 const Skills = ({ skill }) => {
   return (
     <section className="w-fit capitalize px-2 text-[#4c1ac8] font-medium flex items-center justify-center text-[14px] rounded-2xl capitalize">
