@@ -19,6 +19,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { setPosts, setSelectedPost } from "@/redux/postSlice"
+import { TranslatableText } from "@/utils/TranslatableText"
+import { useLanguage } from "@/context/LanaguageContext"
 import { setAuthUser } from "@/redux/authSlice"
 import person from "../assets/person.png"
 import logo from "../assets/logo2.png"
@@ -26,17 +28,21 @@ import CreatePost from "./CreatePost"
 import { Button } from "./ui/button"
 
 const LeftSidebar = () => {
-  const navigate = useNavigate()
   const { user } = useSelector((store) => store.auth)
   const { likeNotification } = useSelector(
     (store) => store.realTimeNotification
   )
+  const { language } = useLanguage()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const [open, setOpen] = useState(false)
   const [isSearchClicked, setSearchClicked] = useState(false)
   const [query, setQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [searchResult, setSearchResult] = useState([])
+  const [searchText] = useState(
+    language == "am" ? "ተጠቃሚ ፍልግ" : "Search a user..."
+  )
 
   const logoutHandler = async () => {
     try {
@@ -171,7 +177,7 @@ const LeftSidebar = () => {
               >
                 <span>{item.icon}</span>
                 <span className="hidden lg:flex text-slate-100">
-                  {item.text}
+                  <TranslatableText text={item.text} language={language} />
                 </span>
 
                 {item.text === "Notifications" &&
@@ -188,7 +194,12 @@ const LeftSidebar = () => {
                       <PopoverContent>
                         <div>
                           {likeNotification.length === 0 ? (
-                            <p>No new notification</p>
+                            <p>
+                              <TranslatableText
+                                text={"No new notification"}
+                                language={language}
+                              />
+                            </p>
                           ) : (
                             likeNotification.map((notification) => {
                               return (
@@ -213,9 +224,17 @@ const LeftSidebar = () => {
 
                                   <p className="text-sm">
                                     <span className="font-bold">
-                                      {notification.userDetails?.username}
+                                      <TranslatableText
+                                        text={
+                                          notification.userDetails?.username
+                                        }
+                                        language={language}
+                                      />
                                     </span>{" "}
-                                    liked your post
+                                    <TranslatableText
+                                      text={"liked your post"}
+                                      language={language}
+                                    />
                                   </p>
                                 </div>
                               )
@@ -244,7 +263,9 @@ const LeftSidebar = () => {
       )}
       {isSearchClicked && (
         <div className="absolute top-16 left-24 md:left-52 lg:left-96 bg-white w-[60dvw] h-[85dvh] z-40 rounded-md p-7">
-          <h2 className="pb-5 text-xl font-semibold">Search for a user</h2>
+          <h2 className="pb-5 text-xl font-semibold">
+            <TranslatableText text={"Search for a user"} language={language} />
+          </h2>
 
           <form
             className="flex items-center w-full gap-4"
@@ -254,7 +275,7 @@ const LeftSidebar = () => {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Enter the username..."
+              placeholder={searchText}
               className="px-3 py-2 text-[15px] font-light border border-gray-200 rounded-lg outline-none bg-gray-50 w-[70%]"
             />
 
@@ -264,7 +285,9 @@ const LeftSidebar = () => {
                 Please wait
               </Button>
             ) : (
-              <Button type="submit">Search</Button>
+              <Button type="submit">
+                <TranslatableText text={"Search"} language={language} />
+              </Button>
             )}
           </form>
           <hr className="w-full my-4 border border-gray-100" />
@@ -303,11 +326,17 @@ const LeftSidebar = () => {
                       <div>
                         <h1 className="text-sm font-semibold text-gray-800 capitalize">
                           <Link to={`/profile/${user?._id}`}>
-                            {user?.username}
+                            <TranslatableText
+                              text={user?.username}
+                              language={language}
+                            />
                           </Link>
                         </h1>
                         <span className="text-[13px] text-gray-600">
-                          Suggested for you
+                          <TranslatableText
+                            text="Suggested for you"
+                            language={language}
+                          />
                         </span>
                       </div>
                     </div>

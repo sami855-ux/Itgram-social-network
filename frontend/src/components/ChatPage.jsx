@@ -9,12 +9,15 @@ import { setMessages } from "@/redux/chatSlice"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import Messages from "./Messages"
+import { useLanguage } from "@/context/LanaguageContext"
+import { TranslatableText } from "@/utils/TranslatableText"
 
 const ChatPage = () => {
   const [textMessage, setTextMessage] = useState("")
   const [suggestedUsers, setSuggestedUsers] = useState([])
   const { user, selectedUser } = useSelector((store) => store.auth)
   const { onlineUsers, messages } = useSelector((store) => store.chat)
+  const { language } = useLanguage()
 
   const dispatch = useDispatch()
 
@@ -60,6 +63,7 @@ const ChatPage = () => {
       const loadUsers = async () => {
         const allUsers = await fetchUsersForMessaging()
         setSuggestedUsers(allUsers)
+        console.log(allUsers)
       }
 
       loadUsers()
@@ -71,7 +75,7 @@ const ChatPage = () => {
     <div className="flex md:ml-[16%] h-screen">
       <section className="w-56 py-8 pl-4 border-r border-gray-200 md:w-1/4">
         <h1 className="px-3 mb-4 text-xl font-bold text-gray-800 capitalize">
-          {user?.username}
+          <TranslatableText text={user?.username} language={language} />
         </h1>
         <div className="pb-7">
           <Avatar className="w-16 h-16 m-3 border">
@@ -81,7 +85,7 @@ const ChatPage = () => {
         </div>
         <div className="overflow-y-auto h-[80vh]">
           <h1 className="px-3 mb-4 text-xl font-bold text-gray-800 capitalize">
-            Messages
+            <TranslatableText text={" Messages"} language={language} />
           </h1>
           {suggestedUsers.map((suggestedUser, id) => {
             const isOnline = onlineUsers.includes(suggestedUser?._id)
@@ -97,14 +101,21 @@ const ChatPage = () => {
                 </Avatar>
                 <div className="flex flex-col">
                   <span className="font-medium capitalize">
-                    {suggestedUser?.username}
+                    <TranslatableText
+                      text={suggestedUser?.username}
+                      language={language}
+                    />
                   </span>
                   <span
                     className={`text-xs font-[400] ${
                       isOnline ? "text-green-600" : "text-red-600"
                     } `}
                   >
-                    {isOnline ? "online" : "offline"}
+                    {isOnline ? (
+                      <TranslatableText text={"online"} language={language} />
+                    ) : (
+                      <TranslatableText text={"offline"} language={language} />
+                    )}
                   </span>
                 </div>
               </div>
@@ -121,7 +132,10 @@ const ChatPage = () => {
             </Avatar>
             <div className="flex flex-col py-1 capitalize">
               <span className="text-lg capitalize">
-                {selectedUser?.username}
+                <TranslatableText
+                  text={selectedUser?.username}
+                  language={language}
+                />
               </span>
             </div>
           </div>
@@ -138,15 +152,22 @@ const ChatPage = () => {
               className="px-16"
               onClick={() => sendMessageHandler(selectedUser?._id)}
             >
-              Send
+              <TranslatableText text={" Send"} language={language} />
             </Button>
           </div>
         </section>
       ) : (
         <div className="flex flex-col items-center justify-center mx-auto">
           <MessageCircleCode className="w-32 h-32 my-4" />
-          <h1 className="font-medium">Your messages</h1>
-          <span>Send a message to start a chat.</span>
+          <h1 className="font-medium">
+            <TranslatableText text={"Your messages"} language={language} />
+          </h1>
+          <span>
+            <TranslatableText
+              text={"Send a message to start a chat."}
+              language={language}
+            />
+          </span>
         </div>
       )}
     </div>

@@ -23,6 +23,8 @@ import koala from "../assets/koala.png"
 import { Dialog, DialogContent, DialogHeader } from "./ui/dialog"
 import { toast } from "sonner"
 import { Input } from "./ui/input"
+import { useLanguage } from "@/context/LanaguageContext"
+import { TranslatableText } from "@/utils/TranslatableText"
 
 const Profile = () => {
   const params = useParams()
@@ -49,7 +51,7 @@ const Profile = () => {
 
   const { userProfile, user } = useSelector((store) => store.auth)
   const isLoggedInUserProfile = user?._id === userProfile?._id
-
+  const { language } = useLanguage()
   const isFollowing = false
 
   const [jobInput, setJobInput] = useState({
@@ -325,8 +327,6 @@ const Profile = () => {
     checkIfFollowed()
     handlePostedJobs()
     handleGetAppliedJobs()
-
-    console.log(postedJob)
   }, [])
 
   return (
@@ -347,9 +347,17 @@ const Profile = () => {
           <section>
             <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2">
-                <span className="px-4 text-xl">{userProfile?.username}</span>
+                <span className="px-4 text-xl">
+                  <TranslatableText
+                    text={userProfile?.username}
+                    language={language}
+                  />
+                </span>
                 <p className="h-8 capitalize hover:bg-gray-200 bg-[#c8ddf4] font-medium text-gray-800 text-[15px] pt-1 px-4 rounded-3xl ">
-                  {userProfile.role}
+                  <TranslatableText
+                    text={userProfile.role}
+                    language={language}
+                  />
                 </p>
                 {isLoggedInUserProfile ? (
                   <>
@@ -358,17 +366,20 @@ const Profile = () => {
                         variant="secondary"
                         className="h-8 hover:bg-gray-200"
                       >
-                        Edit profile
+                        <TranslatableText
+                          text={" Edit profile"}
+                          language={language}
+                        />
                       </Button>
                     </Link>
                   </>
                 ) : isFollowing ? (
                   <>
                     <Button variant="secondary" className="h-8">
-                      Unfollow
+                      <TranslatableText text={"Follow"} language={language} />
                     </Button>
                     <Button variant="secondary" className="h-8">
-                      Message
+                      <TranslatableText text={"Message"} language={language} />
                     </Button>
                   </>
                 ) : (
@@ -379,7 +390,11 @@ const Profile = () => {
                         followOrUnfollowUser(userId)
                       }}
                     >
-                      {follow ? "unfollow" : "follow"}
+                      {follow ? (
+                        <TranslatableText text="unfollow" language={language} />
+                      ) : (
+                        <TranslatableText text="follow" language={language} />
+                      )}
                     </Button>
 
                     <Button
@@ -388,7 +403,7 @@ const Profile = () => {
                         navigate("/chat")
                       }}
                     >
-                      Message
+                      <TranslatableText text={"Message"} language={language} />
                     </Button>
                   </>
                 )}
@@ -398,19 +413,25 @@ const Profile = () => {
                   <span className="font-semibold">
                     {userProfile?.posts.length}{" "}
                   </span>
-                  <span className="text-gray-700">posts</span>
+                  <span className="text-gray-700">
+                    <TranslatableText text={"posts"} language={language} />
+                  </span>
                 </p>
                 <p>
                   <span className="font-semibold">
                     {userProfile?.followers.length}{" "}
                   </span>
-                  <span className="text-gray-700">followers</span>
+                  <span className="text-gray-700">
+                    <TranslatableText text="followers" language={language} />
+                  </span>
                 </p>
                 <p>
                   <span className="font-semibold">
                     {userProfile?.following.length}{" "}
                   </span>
-                  <span className="text-gray-700">following</span>
+                  <span className="text-gray-700">
+                    <TranslatableText text="following" language={language} />
+                  </span>
                 </p>
               </div>
               <div className="flex flex-col gap-1">
@@ -419,7 +440,12 @@ const Profile = () => {
                 </span>
                 <Badge className="w-fit" variant="secondary">
                   <AtSign />{" "}
-                  <span className="pl-1">{userProfile?.username}</span>{" "}
+                  <span className="pl-1">
+                    <TranslatableText
+                      text={userProfile?.username}
+                      language={language}
+                    />
+                  </span>{" "}
                 </Badge>
               </div>
             </div>
@@ -435,7 +461,7 @@ const Profile = () => {
               }`}
               onClick={() => handleTabChange("posts")}
             >
-              POSTS
+              <TranslatableText text="POSTS" language={language} />
             </span>
             <span
               className={`py-2 my-1 cursor-pointer ${
@@ -445,7 +471,7 @@ const Profile = () => {
               }`}
               onClick={() => handleTabChange("saved")}
             >
-              SAVED
+              <TranslatableText text="SAVED" language={language} />
             </span>
             {user?.role === "recruiter" && user?._id === userId && (
               <span
@@ -456,7 +482,10 @@ const Profile = () => {
                 }`}
                 onClick={() => handleTabChange("Jobs Posted by you")}
               >
-                Jobs Posted by you
+                <TranslatableText
+                  text="Jobs Posted by you"
+                  language={language}
+                />
               </span>
             )}{" "}
             {user?.role === "job seeker" && user?._id === userId && (
@@ -468,7 +497,10 @@ const Profile = () => {
                 }`}
                 onClick={() => handleTabChange("Jobs you have applied")}
               >
-                Jobs you have applied
+                <TranslatableText
+                  text="Jobs you have applied"
+                  language={language}
+                />
               </span>
             )}
           </div>
@@ -534,7 +566,12 @@ const Profile = () => {
               })
             ) : (
               <>
-                <p className=" text-ray-700">There is no data</p>
+                <p className=" text-ray-700">
+                  <TranslatableText
+                    text={"There is no data"}
+                    language={language}
+                  />
+                </p>
                 <img
                   src={koala}
                   alt=""
@@ -557,7 +594,10 @@ const Profile = () => {
           <Dialog open={isModalOpen}>
             <DialogContent onInteractOutside={() => setIsModalOpen(false)}>
               <DialogHeader className="font-semibold text-center">
-                Add the skill you want
+                <TranslatableText
+                  text={" Add the skill you want"}
+                  language={language}
+                />
               </DialogHeader>
               <div className="flex items-center gap-3"></div>
               <Input
@@ -571,7 +611,7 @@ const Profile = () => {
                 className="w-fit mx-auto bg-[#0095F6] hover:bg-[#258bcf] px-7"
                 onClick={handleAddSkill}
               >
-                Add
+                <TranslatableText text={"Add"} language={language} />
               </Button>
             </DialogContent>
           </Dialog>
@@ -586,7 +626,7 @@ const Profile = () => {
           }}
         >
           <DialogHeader className="font-semibold text-center">
-            Resume Preview
+            <TranslatableText text={"Resume Preview"} language={language} />
           </DialogHeader>
           <div className="flex items-center gap-3">
             <img src={resume} alt="resume" className="w-full h-fit" />
@@ -597,7 +637,7 @@ const Profile = () => {
       <Dialog open={isOpen}>
         <DialogContent onInteractOutside={() => setIsOpen(false)}>
           <DialogHeader className="font-semibold text-center">
-            Applied user
+            <TranslatableText text={" Applied user"} language={language} />
           </DialogHeader>
           <div className="flex items-center gap-3">
             <Avatar>
@@ -605,8 +645,12 @@ const Profile = () => {
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-xs font-semibold">{user?.username}</h1>
-              <span className="text-xs text-gray-600">Bio here...</span>
+              <h1 className="text-xs font-semibold">
+                <TranslatableText text={user?.username} language={language} />
+              </h1>
+              <span className="text-xs text-gray-600">
+                <TranslatableText text="Bio here.." language={language} />.
+              </span>
             </div>
           </div>
         </DialogContent>
@@ -618,25 +662,28 @@ const Profile = () => {
           onInteractOutside={() => setDeleteOpen(false)}
         >
           <DialogHeader className="font-semibold text-center text-red-600">
-            Delete Job
+            <TranslatableText text={"Delete Job"} language={language} />
           </DialogHeader>
           <div className="flex items-center gap-3">
             <div>
               <p className="py-4 text-xs font-semibold">
-                Do you want to delete this job ?
+                <TranslatableText
+                  text={" Do you want to delete this job ?"}
+                  language={language}
+                />
               </p>
 
               <Button
                 className="mt-4 text-gray-900 bg-gray-200 h-7"
                 onClick={() => setDeleteOpen(false)}
               >
-                Cancel
+                <TranslatableText text="Cancel" language={language} />
               </Button>
               <Button
                 className="mt-4 text-red-900 bg-gray-200 h-7"
                 onClick={handleDeleteJob}
               >
-                Delete
+                <TranslatableText text="Delete" language={language} />
               </Button>
             </div>
           </div>
@@ -649,25 +696,31 @@ const Profile = () => {
           onInteractOutside={() => setUnapplyOpen(false)}
         >
           <DialogHeader className="font-semibold text-center text-red-600">
-            Unapply from this job
+            <TranslatableText
+              text={"Unapply from this job"}
+              language={language}
+            />
           </DialogHeader>
           <div className="flex items-center gap-3">
             <div>
               <p className="py-4 text-[14px] font-semibold">
-                Do you want to Unapply from this job ?
+                <TranslatableText
+                  text=" Do you want to Unapply from this job ?"
+                  language={language}
+                />
               </p>
 
               <Button
                 className="mt-4 mr-4 text-gray-900 bg-gray-200 h-7"
                 onClick={() => setUnapplyOpen(false)}
               >
-                Cancel
+                <TranslatableText text="Cancel" language={language} />
               </Button>
               <Button
                 className="mt-4 text-red-900 bg-gray-200 h-7"
                 onClick={handleRemoveUser}
               >
-                Unapply
+                <TranslatableText text="Unapply" language={language} />
               </Button>
             </div>
           </div>
@@ -694,12 +747,17 @@ const Profile = () => {
           <div className="fixed top-0 right-0 z-20 h-screen bg-white w-[50%] p-6 overflow-scroll">
             <form onSubmit={handleUpdateJob}>
               <h2 className="py-4 text-xl font-semibold text-gray-800">
-                Edit a Job
+                <TranslatableText text="Edit a Job" language={language} />
               </h2>
               <div className="flex w-full gap-2 h-fit">
                 <div className="w-[100%] min-h-[550px] p-4">
                   <section className="">
-                    <h2 className="text-lg font-semibold">Basic Information</h2>
+                    <h2 className="text-lg font-semibold">
+                      <TranslatableText
+                        text="Basic Information"
+                        language={language}
+                      />
+                    </h2>
                   </section>
 
                   <div className="w-full py-4 h-fit">
@@ -738,14 +796,20 @@ const Profile = () => {
                   {/* Additional Information */}
                   <section className="">
                     <h2 className="text-lg font-semibold">
-                      Additional Information
+                      <TranslatableText
+                        text="Additional Information"
+                        language={language}
+                      />
                     </h2>
                   </section>
 
                   <div className="w-full py-4 h-fit">
                     <section className="flex flex-col">
                       <label className="text-[14px] text-gray-800 mb-1">
-                        Employment type
+                        <TranslatableText
+                          text="Employment type"
+                          language={language}
+                        />
                       </label>
                       <div className="flex h-12 gap-2">
                         <section
@@ -759,7 +823,12 @@ const Profile = () => {
                           }}
                         >
                           <CalendarCheck size={19} />
-                          <span className="text-[14px]">Fulltime</span>
+                          <span className="text-[14px]">
+                            <TranslatableText
+                              text="Fulltime"
+                              language={language}
+                            />
+                          </span>
                         </section>
                         <section
                           className={`${
@@ -772,7 +841,12 @@ const Profile = () => {
                           }}
                         >
                           <Clock size={19} />
-                          <span className="text-[14px]">Freelance</span>
+                          <span className="text-[14px]">
+                            <TranslatableText
+                              text="Freelance"
+                              language={language}
+                            />
+                          </span>
                         </section>
                         <section
                           className={`${
@@ -785,7 +859,12 @@ const Profile = () => {
                           }}
                         >
                           <Clock size={19} />
-                          <span className="text-[14px]">Contract</span>
+                          <span className="text-[14px]">
+                            <TranslatableText
+                              text="Contract"
+                              language={language}
+                            />
+                          </span>
                         </section>
                         <section
                           className={`${
@@ -798,7 +877,12 @@ const Profile = () => {
                           }}
                         >
                           <Clock size={19} />
-                          <span className="text-[14px]">Internship</span>
+                          <span className="text-[14px]">
+                            <TranslatableText
+                              text="Internship"
+                              language={language}
+                            />
+                          </span>
                         </section>
                       </div>
                     </section>
@@ -807,7 +891,10 @@ const Profile = () => {
                     <div className="w-[90%] flex gap-2 my-2">
                       <section className="flex flex-col w-1/2 gap-1">
                         <span className="text-[14px] text-gray-800 mb-1">
-                          Job placement
+                          <TranslatableText
+                            text="Job placement"
+                            language={language}
+                          />
                         </span>
                         <select
                           name="Job placement"
@@ -815,16 +902,39 @@ const Profile = () => {
                           onChange={handleChange}
                           className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
                         >
-                          <option value="">Select option</option>
-                          <option value="onsite">Onsite</option>
-                          <option value="remote">Remote</option>
-                          <option value="hybrid">Hybrid</option>
+                          <option value="">
+                            <TranslatableText
+                              text="Select option"
+                              language={language}
+                            />
+                          </option>
+                          <option value="onsite">
+                            <TranslatableText
+                              text="Onsite"
+                              language={language}
+                            />
+                          </option>
+                          <option value="remote">
+                            <TranslatableText
+                              text="Remote"
+                              language={language}
+                            />
+                          </option>
+                          <option value="hybrid">
+                            <TranslatableText
+                              text="Hybrid"
+                              language={language}
+                            />
+                          </option>
                         </select>
                       </section>
 
                       <section className="flex flex-col w-1/2 gap-1">
                         <span className="text-[14px] text-gray-800 mb-1">
-                          Job experience
+                          <TranslatableText
+                            text="Job experience"
+                            language={language}
+                          />
                         </span>
                         <select
                           name="Job experience"
@@ -832,19 +942,52 @@ const Profile = () => {
                           onChange={handleChange}
                           className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
                         >
-                          <option value="">Select option</option>
-                          <option value="no">No experience</option>
-                          <option value="1-2">1-2 years</option>
-                          <option value="2-4">2-4 years</option>
-                          <option value="4-8">4-8 years</option>
-                          <option value=">8">more than 8 years</option>
+                          <option value="">
+                            <TranslatableText
+                              text="Select option"
+                              language={language}
+                            />
+                          </option>
+                          <option value="no">
+                            <TranslatableText
+                              text="No experience"
+                              language={language}
+                            />
+                          </option>
+                          <option value="1-2">
+                            <TranslatableText
+                              text="1-2 years"
+                              language={language}
+                            />
+                          </option>
+                          <option value="2-4">
+                            <TranslatableText
+                              text="2-4 years"
+                              language={language}
+                            />
+                          </option>
+                          <option value="4-8">
+                            <TranslatableText
+                              text="4-8 years"
+                              language={language}
+                            />
+                          </option>
+                          <option value=">8">
+                            <TranslatableText
+                              text="more than 8 years"
+                              language={language}
+                            />
+                          </option>
                         </select>
                       </section>
                     </div>
 
                     {/* Company Information */}
                     <h2 className="pt-5 text-lg font-semibold">
-                      Company Information
+                      <TranslatableText
+                        text="Company Information"
+                        language={language}
+                      />
                     </h2>
 
                     <div className="w-full py-4 h-fit">
@@ -856,13 +999,13 @@ const Profile = () => {
                         />
                       </div>
                       <h2 className="font-semibold text-[16px] py-2 text-gray-900">
-                        Location
+                        <TranslatableText text="Location" language={language} />
                       </h2>
 
                       <div className="w-[90%] flex gap-2 my-2">
                         <section className="flex flex-col w-1/2 gap-1">
                           <span className="text-[14px] text-gray-800 mb-1">
-                            City
+                            <TranslatableText text="City" language={language} />
                           </span>
                           <select
                             name="city"
@@ -870,16 +1013,39 @@ const Profile = () => {
                             onChange={handleChange}
                             className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
                           >
-                            <option value="">Select option</option>
-                            <option value="addis abeba">Addis abeba</option>
-                            <option value="bhair dar">Bhair dar</option>
-                            <option value="debre brihan">Debre brihan</option>
+                            <option value="">
+                              <TranslatableText
+                                text="Select option"
+                                language={language}
+                              />
+                            </option>
+                            <option value="addis abeba">
+                              <TranslatableText
+                                text="Addis abeba"
+                                language={language}
+                              />
+                            </option>
+                            <option value="bhair dar">
+                              <TranslatableText
+                                text="Bhair dar"
+                                language={language}
+                              />
+                            </option>
+                            <option value="debre brihan">
+                              <TranslatableText
+                                text="Debre brihan"
+                                language={language}
+                              />
+                            </option>
                           </select>
                         </section>
 
                         <section className="flex flex-col w-1/2 gap-1">
                           <span className="text-[14px] text-gray-800 mb-1">
-                            Country
+                            <TranslatableText
+                              text="Country"
+                              language={language}
+                            />
                           </span>
                           <select
                             name="country"
@@ -887,21 +1053,57 @@ const Profile = () => {
                             onChange={handleChange}
                             className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
                           >
-                            <option value="">Select option</option>
-                            <option value="ethiopia">Ethiopia</option>
-                            <option value="kenya">Kenya</option>
-                            <option value="sudan">Sudan</option>
-                            <option value="egypt">Egypt</option>
-                            <option value="other">other</option>
+                            <option value="">
+                              <TranslatableText
+                                text="Select option"
+                                language={language}
+                              />
+                            </option>
+                            <option value="ethiopia">
+                              <TranslatableText
+                                text="Ethiopia"
+                                language={language}
+                              />
+                            </option>
+                            <option value="kenya">
+                              <TranslatableText
+                                text="Kenya"
+                                language={language}
+                              />
+                            </option>
+                            <option value="sudan">
+                              <TranslatableText
+                                text="Sudan"
+                                language={language}
+                              />
+                            </option>
+                            <option value="egypt">
+                              <TranslatableText
+                                text="Egypt"
+                                language={language}
+                              />
+                            </option>
+                            <option value="other">
+                              <TranslatableText
+                                text="other"
+                                language={language}
+                              />
+                            </option>
                           </select>
                         </section>
                       </div>
                       <h2 className="font-semibold text-[16px] pt-5 pb-2 text-gray-900">
-                        About job
+                        <TranslatableText
+                          text="About job"
+                          language={language}
+                        />
                       </h2>
                       <section className="flex flex-col w-full gap-1 pt-3">
                         <span className="text-[14px] text-gray-800">
-                          Skill required
+                          <TranslatableText
+                            text={"Skill required"}
+                            language={language}
+                          />
                         </span>
                         <div className="flex flex-wrap items-center w-full gap-2 min-h-14">
                           <section
@@ -919,11 +1121,17 @@ const Profile = () => {
                       </section>
                       <section className="flex flex-col w-full gap-1 pt-3">
                         <span className="text-[14px] text-gray-800 font-semibold">
-                          Salary range
+                          <TranslatableText
+                            text="Salary range"
+                            language={language}
+                          />
                         </span>
                         <section className="flex items-center w-full gap-3 h-fit">
                           <span className="font-medium text-[14px] text-gray-800 capitalize">
-                            Max salary
+                            <TranslatableText
+                              text="Max salary"
+                              language={language}
+                            />
                           </span>
                           <input
                             type="number"
@@ -933,7 +1141,10 @@ const Profile = () => {
                             className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
                           />
                           <span className="font-medium text-[14px] text-gray-800 capitalize">
-                            Min salary
+                            <TranslatableText
+                              text="Min salary"
+                              language={language}
+                            />
                           </span>
                           <input
                             type="number"
@@ -945,7 +1156,10 @@ const Profile = () => {
                         </section>
                       </section>
                       <span className="font-medium text-[14px] text-gray-800 capitalize block pt-4">
-                        Deadline date
+                        <TranslatableText
+                          text="Deadline date"
+                          language={language}
+                        />
                       </span>
                       <input
                         type="date"
@@ -964,13 +1178,13 @@ const Profile = () => {
                   className="px-10 text-gray-900 bg-gray-400 hover:bg-gray-300"
                   onClick={() => setEditOpen(false)}
                 >
-                  Cancel
+                  <TranslatableText text="Cancel" language={language} />{" "}
                 </Button>
                 <Button
                   type="submit"
                   className="px-10 bg-blue-600 hover:bg-blue-500"
                 >
-                  Edit a job
+                  <TranslatableText text="Edit a job" language={language} />
                 </Button>
               </div>
             </form>
@@ -989,46 +1203,59 @@ const Job = ({
   setResume,
   setResumeOpen,
 }) => {
+  const { language } = useLanguage()
+
   return (
     <>
       <section className="flex flex-col w-full px-4 py-5 mt-4 border bg-slate-100 h-fit rounded-xl hover:bg-gray-100">
         <div className="flex w-full gap-2 h-fit">
           <article className="w-[420px]">
             <h2 className="py-1 text-lg font-semibold text-gray-800">
-              {job.jobTitle}
+              <TranslatableText text={job.jobTitle} language={language} />
             </h2>
-            <p className="text-[14px] pr-4">{job.jobDescription}</p>
+            <p className="text-[14px] pr-4">
+              <TranslatableText text={job.jobDescription} language={language} />
+            </p>
           </article>
         </div>
         <div className="flex w-full gap-1 pt-4 h-fit">
           <span className="text-[14px] md:px-3 md:py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold capitalize">
-            {job.employmentType}
+            <TranslatableText text={job.employmentType} language={language} />
           </span>
           <span className="text-[14px] px-3 py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold">
-            Onsite
+            <TranslatableText text="Onsite" language={language} />
           </span>
           <span className=" text-[14px] capitalize flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#173e8a] font-semibold">
             <MapPin color="#4b75df" size={18} />
-            {job.city}, {job.country}
+            <TranslatableText text={job.city} language={language} />,{" "}
+            <TranslatableText text={job.country} language={language} />
           </span>
           <span className="text-[14px] flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#14377d] font-semibold">
-            <BadgeDollarSign color="#4b75df" size={18} />${job.salaryRange.min}{" "}
-            - {job.salaryRange.max}/month
+            <BadgeDollarSign color="#4b75df" size={18} />${job.salaryRange.max}{" "}
+            - {job.salaryRange.min}/
+            <TranslatableText text={"month"} language={language} />
           </span>
           <span className="text-[14px] flex gap-1  items-center px-4 py-1  text-[#14377d] font-semibold">
-            {getTimeLeftUntil(job.deadline)}
+            <TranslatableText
+              text={getTimeLeftUntil(job.deadline)}
+              language={language}
+            />
           </span>
         </div>
         <p className="pt-3  text-[14px] text-gray-700">
           {job.applicants.length === 0 ? (
             <span className="text-red-500">
-              No user applied to your job yet
+              <TranslatableText
+                text={"No user applied to your job yet"}
+                language={language}
+              />
             </span>
           ) : (
             <div className="flex flex-col gap-2">
               <span className="font-bold text-[15px] text-green-600 capitalize hover:underline">
                 {" "}
-                {job.applicants.length} applicants
+                {job.applicants.length}{" "}
+                <TranslatableText text={"applicants"} language={language} />
               </span>
               {job.applicants.map((message, userIndex) => {
                 return (
@@ -1050,12 +1277,18 @@ const Job = ({
                         </AvatarFallback>
                       </Avatar>
                       <p className="py-1 font-semibold text-center capitalize">
-                        {message.user.username}
+                        <TranslatableText
+                          text={message.user.username}
+                          language={language}
+                        />
                       </p>
                     </a>
                     <div className="items-start h-full">
                       <h2 className="font-semibold text-[15px] pb-1">
-                        Message
+                        <TranslatableText
+                          text={"Message"}
+                          language={language}
+                        />
                       </h2>
                       <p className="">
                         {message.message} <br />
@@ -1066,7 +1299,10 @@ const Job = ({
                             setResume(message.resume)
                           }}
                         >
-                          See the resume
+                          <TranslatableText
+                            text="  See the resume"
+                            language={language}
+                          />
                         </span>
                       </p>
                     </div>
@@ -1084,7 +1320,7 @@ const Job = ({
           setJobId(job?._id)
         }}
       >
-        Delete the Job
+        <TranslatableText text="Delete the Job" language={language} />
       </Button>
       <Button
         className="mt-4 bg-blue-500 mb-7 h-9 "
@@ -1094,16 +1330,17 @@ const Job = ({
         }}
       >
         {" "}
-        Edit the Job
+        <TranslatableText text={"Edit the Job"} language={language} />
       </Button>
     </>
   )
 }
 
 const Skills = ({ skill }) => {
+  const { language } = useLanguage()
   return (
     <section className="w-fit capitalize px-2 text-[#4c1ac8] font-medium flex items-center justify-center text-[14px] rounded-2xl capitalize">
-      {skill}
+      <TranslatableText text={skill} language={language} />
     </section>
   )
 }
@@ -1128,34 +1365,42 @@ export const getTimeLeftUntil = (futureDate) => {
 }
 
 const JobApplied = ({ job, setJobId, setUnapplyOpen }) => {
+  const { language } = useLanguage()
   return (
     <>
       <section className="flex flex-col w-full p-5 my-4 border cursor-pointer bg-slate-100 h-fit rounded-xl hover:bg-gray-100">
         <div className="flex w-full gap-2 h-fit">
           <article className="w-[420px]">
             <h2 className="py-1 text-lg font-semibold text-gray-800">
-              {job.jobTitle}
+              <TranslatableText text={job.jobTitle} language={language} />
             </h2>
-            <p className="text-[14px] pr-4">{job.jobDescription}</p>
+            <p className="text-[14px] pr-4">
+              <TranslatableText text={job.jobDescription} language={language} />
+            </p>
           </article>
         </div>
         <div className="flex w-full gap-1 pt-4 h-fit">
           <span className="text-[14px] px-3 py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold capitalize">
-            {job.employmentType}
+            <TranslatableText text={job.employmentType} language={language} />
           </span>
           <span className="text-[14px] px-3 py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold">
-            Onsite
+            <TranslatableText text="Onsite" language={language} />
           </span>
           <span className="text-[14px] capitalize flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#173e8a] font-semibold">
             <MapPin color="#4b75df" size={18} />
-            {job.city}, {job.country}
+            <TranslatableText text={job.city} language={language} />,{" "}
+            <TranslatableText text={job.country} language={language} />
           </span>
           <span className="text-[14px] flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#14377d] font-semibold">
             <BadgeDollarSign color="#4b75df" size={18} />${job.salaryRange.min}{" "}
-            - {job.salaryRange.max}/month
+            - {job.salaryRange.max}/
+            <TranslatableText text={"month"} language={language} />
           </span>
           <span className="text-[14px] flex gap-1  items-center px-4 py-1  text-[#14377d] font-semibold">
-            {getTimeLeftUntil(job.deadline)}
+            <TranslatableText
+              text={getTimeLeftUntil(job.deadline)}
+              language={language}
+            />
           </span>
         </div>
       </section>
@@ -1168,21 +1413,22 @@ const JobApplied = ({ job, setJobId, setUnapplyOpen }) => {
         }}
       >
         {" "}
-        Remove from applicants
+        <TranslatableText text="Remove from applicants" language={language} />
       </Button>
     </>
   )
 }
 
 const InputOne = ({ label, value, onHandleChange }) => {
+  const { language } = useLanguage()
   return (
     <>
       <span className="font-medium text-[14px] text-gray-800 capitalize">
-        {label}
+        <TranslatableText text={label} language={language} />
       </span>
       <input
         type="text"
-        name={label}
+        name={<TranslatableText text={label} language={language} />}
         value={value}
         onChange={onHandleChange}
         className="w-full text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"

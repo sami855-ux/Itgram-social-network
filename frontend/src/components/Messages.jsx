@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import useGetAllMessage from "@/hooks/useGetAllMessage"
 import useGetRTM from "@/hooks/useGetRTM"
 import { Button } from "./ui/button"
+import { useLanguage } from "@/context/LanaguageContext"
+import { TranslatableText } from "@/utils/TranslatableText"
 
 const Messages = ({ selectedUser }) => {
   useGetRTM()
@@ -12,6 +14,7 @@ const Messages = ({ selectedUser }) => {
 
   const { messages } = useSelector((store) => store.chat)
   const { user } = useSelector((store) => store.auth)
+  const { language } = useLanguage()
 
   return (
     <div className="flex-1 p-4 overflow-y-auto">
@@ -21,10 +24,15 @@ const Messages = ({ selectedUser }) => {
             <AvatarImage src={selectedUser?.profilePicture} alt="profile" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <span className="py-2">{selectedUser?.username}</span>
+          <span className="py-2">
+            <TranslatableText
+              text={selectedUser?.username}
+              language={language}
+            />
+          </span>
           <Link to={`/profile/${selectedUser?._id}`}>
             <Button className="h-8 px-10 my-2" variant="secondary">
-              View profile
+              <TranslatableText text="View profile" language={language} />
             </Button>
           </Link>
         </div>
@@ -46,7 +54,7 @@ const Messages = ({ selectedUser }) => {
                       : "bg-gray-200 text-black"
                   }`}
                 >
-                  {msg.message}
+                  <TranslatableText text={msg.message} language={language} />
                 </div>
               </div>
             )

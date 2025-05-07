@@ -2,10 +2,12 @@ import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { TranslatableText } from "@/utils/TranslatableText"
 import SuggestedUsersWork from "./SuggestedUsersWork"
 import SuggestedUsers from "./SuggestedUsers"
 import person from "@/assets/person.png"
 import LanguageSelector from "./LanguageSelector"
+import { useLanguage } from "@/context/LanaguageContext"
 
 const sliceText = (string) => {
   const sliceString = string.slice(0, 20)
@@ -14,6 +16,7 @@ const sliceText = (string) => {
 }
 
 const RightSidebar = () => {
+  const { language } = useLanguage()
   const { user } = useSelector((store) => store.auth)
   return (
     <div className="hidden pr-24 my-10 w-[420px] lg:block">
@@ -30,10 +33,17 @@ const RightSidebar = () => {
         </Link>
         <div>
           <h1 className="text-[15px] font-semibold capitalize">
-            <Link to={`/profile/${user?._id}`}>{user?.username}</Link>
+            <Link to={`/profile/${user?._id}`}>
+              <TranslatableText text={user?.username} language={language} />
+            </Link>
           </h1>
           <span className="text-sm text-gray-600 capitalize">
-            {sliceText(user?.bio) || "Bio here..."}
+            {(
+              <TranslatableText
+                text={sliceText(user?.bio)}
+                language={language}
+              />
+            ) || "Bio here..."}
           </span>
         </div>
       </div>

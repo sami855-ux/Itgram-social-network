@@ -1,16 +1,26 @@
 import axios from "axios"
 
-export const autoTranslate = async (text, toLang = "am", fromLang = "en") => {
+export default async function getTranslation(text, srcLang, destLang) {
   try {
-    const res = await axios.post(import.meta.env.VITE_BASE_URL_TRANSLATE, {
-      q: text,
-      source: fromLang,
-      target: toLang,
-      format: "text",
-    })
-    return res.data.translatedText
-  } catch (err) {
-    console.error("Translation failed:", err.message)
-    return text
+    const response = await axios.post(
+      import.meta.env.VITE_BASE_URL_TRANSLATE,
+      {
+        text: text,
+        src: srcLang,
+        dest: destLang,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+
+    // The translated text is in response.data.translated_text
+    console.log("Translated text:", response.data.translated_text)
+    return response.data.translated_text
+  } catch (error) {
+    console.error("Translation error:", error.response?.data || error.message)
+    throw error // Re-throw if you want calling code to handle it
   }
 }

@@ -10,11 +10,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { setPosts } from "@/redux/postSlice"
 import { Button } from "./ui/button"
 import Comment from "./Comment"
+import { useLanguage } from "@/context/LanaguageContext"
+import { TranslatableText } from "@/utils/TranslatableText"
 
 const CommentDialog = ({ open, setOpen }) => {
   const [text, setText] = useState("")
   const { selectedPost, posts } = useSelector((store) => store.post)
   const [comment, setComment] = useState([])
+  const { language } = useLanguage()
+  const [commentStyle] = useState(
+    language === "am" ? "አስተያየት ይስቱ" : "Add comments"
+  )
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -90,9 +96,11 @@ const CommentDialog = ({ open, setOpen }) => {
                 </Link>
                 <div>
                   <Link className="text-xs font-semibold">
-                    {selectedPost?.author?.username}
+                    <TranslatableText
+                      text={selectedPost?.author?.username}
+                      language={language}
+                    />
                   </Link>
-                  {/* <span className='text-sm text-gray-600'>Bio here...</span> */}
                 </div>
               </div>
 
@@ -102,9 +110,11 @@ const CommentDialog = ({ open, setOpen }) => {
                 </DialogTrigger>
                 <DialogContent className="flex flex-col items-center text-sm text-center">
                   <div className="cursor-pointer w-full text-[#ED4956] font-bold">
-                    Unfollow
+                    <TranslatableText text={"Unfollow"} language={language} />
                   </div>
-                  <div className="w-full cursor-pointer">Add to favorites</div>
+                  <div className="w-full cursor-pointer">
+                    <TranslatableText text="Unfollow" language={language} />
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
@@ -120,7 +130,7 @@ const CommentDialog = ({ open, setOpen }) => {
                   type="text"
                   value={text}
                   onChange={changeEventHandler}
-                  placeholder="Add a comment..."
+                  placeholder={commentStyle}
                   className="w-full p-2 text-sm border border-gray-300 rounded outline-none"
                 />
                 <Button
@@ -128,7 +138,7 @@ const CommentDialog = ({ open, setOpen }) => {
                   onClick={sendMessageHandler}
                   variant="outline"
                 >
-                  Send
+                  <TranslatableText text={"Send"} language={language} />
                 </Button>
               </div>
             </div>

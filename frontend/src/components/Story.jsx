@@ -12,6 +12,8 @@ import { readFileAsDataURL } from "@/lib/utils"
 import { setStory } from "@/redux/storySlice"
 import { Textarea } from "./ui/textarea"
 import { Button } from "./ui/button"
+import { useLanguage } from "@/context/LanaguageContext"
+import { TranslatableText } from "@/utils/TranslatableText"
 
 export default function Story() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -23,6 +25,7 @@ export default function Story() {
   const [imagePreview, setImagePreview] = useState("")
   const [loading, setLoading] = useState(false)
   const { stories } = useSelector((store) => store.story)
+  const { language } = useLanguage()
   const dispatch = useDispatch()
 
   const handleModal = () => {
@@ -45,7 +48,7 @@ export default function Story() {
     try {
       setLoading(true)
       const res = await axios.post(
-        "http://localhost:3000/api/v1/story/add-story",
+        `${import.meta.env.VITE_BASE_URL}/api/v1/story/add-story`,
         formData,
         {
           headers: {
@@ -104,7 +107,7 @@ export default function Story() {
           <Plus />
         </section>
 
-        {allStories.map((story) => (
+        {allStories.slice(0, 7).map((story) => (
           <ReelSingle key={story._id} story={story} />
         ))}
       </div>
@@ -115,7 +118,10 @@ export default function Story() {
           <Dialog open={isModalOpen}>
             <DialogContent onInteractOutside={() => setIsModalOpen(false)}>
               <DialogHeader className="font-semibold text-center">
-                Create New Story
+                <TranslatableText
+                  text={"Create New Story"}
+                  language={language}
+                />
               </DialogHeader>
               <div className="flex items-center gap-3">
                 <Avatar>
@@ -123,8 +129,15 @@ export default function Story() {
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h1 className="text-xs font-semibold">{user?.username}</h1>
-                  <span className="text-xs text-gray-600">Bio here...</span>
+                  <h1 className="text-xs font-semibold">
+                    <TranslatableText
+                      text={user?.username}
+                      language={language}
+                    />
+                  </h1>
+                  <span className="text-xs text-gray-600">
+                    <TranslatableText text="Bio here..." language={language} />
+                  </span>
                 </div>
               </div>
               <Textarea
@@ -152,13 +165,19 @@ export default function Story() {
                 onClick={() => imageRef.current.click()}
                 className="w-fit mx-auto bg-[#0095F6] hover:bg-[#258bcf] "
               >
-                Select from computer
+                <TranslatableText
+                  text={" Select from computer"}
+                  language={language}
+                />
               </Button>
               {imagePreview &&
                 (loading ? (
                   <Button>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Please wait
+                    <TranslatableText
+                      text={" Please wait"}
+                      language={language}
+                    />
                   </Button>
                 ) : (
                   <Button
@@ -166,7 +185,7 @@ export default function Story() {
                     type="submit"
                     className="w-full"
                   >
-                    Post
+                    <TranslatableText text={"Post"} language={language} />
                   </Button>
                 ))}
             </DialogContent>

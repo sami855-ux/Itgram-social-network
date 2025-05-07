@@ -9,6 +9,8 @@ import { toast } from "sonner"
 import axios from "axios"
 import { useDispatch, useSelector } from "react-redux"
 import { setPosts } from "@/redux/postSlice"
+import { useLanguage } from "@/context/LanaguageContext"
+import { TranslatableText } from "@/utils/TranslatableText"
 
 const CreatePost = ({ open, setOpen }) => {
   const imageRef = useRef()
@@ -18,6 +20,7 @@ const CreatePost = ({ open, setOpen }) => {
   const [loading, setLoading] = useState(false)
   const { user } = useSelector((store) => store.auth)
   const { posts } = useSelector((store) => store.post)
+  const { language } = useLanguage()
   const dispatch = useDispatch()
 
   const fileChangeHandler = async (e) => {
@@ -65,7 +68,7 @@ const CreatePost = ({ open, setOpen }) => {
     <Dialog open={open}>
       <DialogContent onInteractOutside={() => setOpen(false)}>
         <DialogHeader className="font-semibold text-center">
-          Create New Post
+          <TranslatableText text={"Create New Post"} language={language} />
         </DialogHeader>
         <div className="flex items-center gap-3">
           <Avatar>
@@ -73,15 +76,19 @@ const CreatePost = ({ open, setOpen }) => {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-xs font-semibold">{user?.username}</h1>
-            <span className="text-xs text-gray-600">Bio here...</span>
+            <h1 className="text-xs font-semibold">
+              <TranslatableText text={user?.username} language={language} />
+            </h1>
+            <span className="text-xs text-gray-600">
+              <TranslatableText text={"Bio here..."} language={language} />
+            </span>
           </div>
         </div>
         <Textarea
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
           className="border-none focus-visible:ring-transparent"
-          placeholder="Write a caption..."
+          placeholder={language == "am" ? "መግለጫ ጣፍ" : "Write a caption..."}
         />
         {imagePreview && (
           <div className="flex items-center justify-center w-full h-64">
@@ -102,13 +109,13 @@ const CreatePost = ({ open, setOpen }) => {
           onClick={() => imageRef.current.click()}
           className="w-fit mx-auto bg-[#0095F6] hover:bg-[#258bcf] "
         >
-          Select from computer
+          <TranslatableText text={"Select from computer"} language={language} />
         </Button>
         {imagePreview &&
           (loading ? (
             <Button>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Please wait
+              <TranslatableText text={" Please wait..."} language={language} />
             </Button>
           ) : (
             <Button
@@ -116,7 +123,7 @@ const CreatePost = ({ open, setOpen }) => {
               type="submit"
               className="w-full"
             >
-              Post
+              <TranslatableText text={"Post"} language={language} />
             </Button>
           ))}
       </DialogContent>

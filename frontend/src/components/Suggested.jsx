@@ -5,8 +5,11 @@ import { toast } from "sonner"
 import axios from "axios"
 
 import person from "@/assets/person.png"
+import { useLanguage } from "@/context/LanaguageContext"
+import { TranslatableText } from "@/utils/TranslatableText"
 
 export default function Suggested({ user }) {
+  const { language } = useLanguage()
   const [isClickedLoading, setIsClcikedLoading] = useState(false)
   const [isFollowing, setIsFollowing] = useState(false)
 
@@ -80,9 +83,15 @@ export default function Suggested({ user }) {
         </Link>
         <div>
           <h1 className="text-sm font-semibold text-gray-800 capitalize">
-            <Link to={`/profile/${user?._id}`}>{user?.username}</Link>
+            <Link to={`/profile/${user?._id}`}>
+              {" "}
+              <TranslatableText text={user?.username} language={language} />
+            </Link>
           </h1>
-          <span className="text-[13px] text-gray-600">Suggested for you</span>
+          <span className="text-[13px] text-gray-600">
+            {" "}
+            <TranslatableText text={"Suggested for you"} language={language} />
+          </span>
         </div>
       </div>
 
@@ -97,7 +106,11 @@ export default function Suggested({ user }) {
             followOrUnfollowUser(user._id)
           }}
         >
-          {isFollowing ? "Unfollow" : "Follow"}
+          {isFollowing ? (
+            <TranslatableText text={"Unfollow"} language={language} />
+          ) : (
+            <TranslatableText text={"Follow"} language={language} />
+          )}
         </span>
       )}
     </div>

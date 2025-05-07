@@ -286,17 +286,14 @@ export const getUsersForMessaging = async (req, res) => {
 
     const followingIds = currentUser.following || []
 
-    // Get followed users
     const followedUsers = await User.find({
       _id: { $in: followingIds },
     }).select("-password")
 
-    // Get unfollowed users (excluding self and followed users)
     const unfollowedUsers = await User.find({
       _id: { $ne: userId, $nin: followingIds },
     }).select("-password")
 
-    // Combine both lists: followed first
     const allUsers = [...followedUsers, ...unfollowedUsers]
 
     return res.status(200).json({
@@ -305,7 +302,7 @@ export const getUsersForMessaging = async (req, res) => {
     })
   } catch (error) {
     console.error("Error getting users for messaging:", error)
-    res.status(500).json({ message: "Server Error" })
+    res.status(500).json({ message: "Server Error", success: false })
   }
 }
 

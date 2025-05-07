@@ -2,9 +2,12 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 
 import Suggested from "./Suggested"
+import { TranslatableText } from "@/utils/TranslatableText"
+import { useLanguage } from "@/context/LanaguageContext"
 
 const SuggestedUsers = () => {
   const [suggestedUsers, setSuggestedUsers] = useState([])
+  const { language } = useLanguage()
 
   const getRecruiters = async () => {
     try {
@@ -29,7 +32,7 @@ const SuggestedUsers = () => {
     <div className="mt-24 mb-10">
       <div className="flex items-center justify-between text-sm">
         <h1 className="font-semibold text-[15px] text-gray-800">
-          Suggested for work
+          <TranslatableText text={"Suggested for you"} language={language} />
         </h1>
       </div>
       {suggestedUsers.slice(0, 5).map((user, userId) => (

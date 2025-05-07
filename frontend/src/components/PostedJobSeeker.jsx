@@ -10,6 +10,8 @@ import { readFileAsDataURL } from "@/lib/utils"
 import person from "../assets/person.png"
 import { Textarea } from "./ui/textarea"
 import { Button } from "./ui/button"
+import { useLanguage } from "@/context/LanaguageContext"
+import { TranslatableText } from "@/utils/TranslatableText"
 
 export default function PostedJobSeeker() {
   const imageRef = useRef()
@@ -26,6 +28,7 @@ export default function PostedJobSeeker() {
   const [jobId, setJobId] = useState("")
   const [allJobs, setAllJobs] = useState([])
   const [filteredJobs, setFilteredJobs] = useState([])
+  const { language } = useLanguage()
   const [filters, setFilters] = useState({
     jobType: "",
     salary: {
@@ -212,7 +215,7 @@ export default function PostedJobSeeker() {
   return (
     <div className="w-full min-h-screen pl-[18%] py-10 pr-7">
       <h2 className="text-xl font-semibold text-gray-900 capitalize">
-        Find you dream job
+        <TranslatableText text="Find you dream job" language={language} />
       </h2>
       {/* Search Bar */}
       <form className="w-[80%] h-14 flex gap-2 items-center bg-slate-100 px-4 rounded-[34px] my-5">
@@ -231,13 +234,13 @@ export default function PostedJobSeeker() {
             setFilteredJobs(allJobs)
           }}
         >
-          Clear
+          <TranslatableText text="Clear" language={language} />
         </p>
         <button
           type="submit"
           className="h-10 px-6 bg-blue-700 text-white rounded-3xl cursor-pointer text-[15px]"
         >
-          Search
+          <TranslatableText text="Search" language={language} />
         </button>
       </form>
 
@@ -245,7 +248,10 @@ export default function PostedJobSeeker() {
       <div className="flex w-full gap-4 h-fit">
         {/* Filter div */}
         <div className=" w-80 min-h-96 p-7">
-          <p className="py-4 text-gray-800">Filter</p>
+          <p className="py-4 text-gray-800">
+            {" "}
+            <TranslatableText text={"Filter"} language={language} />
+          </p>
 
           <section className="w-full">
             <p
@@ -254,7 +260,7 @@ export default function PostedJobSeeker() {
                 setFilters({ ...filters, jobType: "" })
               }}
             >
-              job type
+              <TranslatableText text="job type" language={language} />
             </p>
             <div className="flex flex-col gap-2">
               {[
@@ -271,12 +277,15 @@ export default function PostedJobSeeker() {
                     onChange={() => handleChange(type)}
                   />
                   <span className={`${styles.checkmark}`}></span>
-                  <span className="capitalize">{type}</span>
+                  <span className="capitalize">
+                    {" "}
+                    <TranslatableText text={type} language={language} />
+                  </span>
                 </label>
               ))}
             </div>
             <p className="uppercase text-gray-800 text-[14px] font-semibold pb-5 pt-7">
-              salary
+              <TranslatableText text={"salary"} language={language} />
             </p>
             <div className="flex items-center gap-3">
               <select
@@ -293,7 +302,9 @@ export default function PostedJobSeeker() {
                 }}
                 className="w-24 py-2 border rounded-md border-gray-300 px-1 outline-none text-[14px]"
               >
-                <option value="">Max</option>
+                <option value="">
+                  <TranslatableText text={"Max"} language={language} />{" "}
+                </option>
                 <option value="500">500</option>
                 <option value="1000">1000</option>
                 <option value="1500">15000</option>
@@ -313,7 +324,10 @@ export default function PostedJobSeeker() {
                 }}
                 className="w-24 py-2 border rounded-md border-gray-300 px-1 outline-none text-[14px]"
               >
-                <option value="">Min</option>
+                <option value="">
+                  {" "}
+                  <TranslatableText text={"Mai"} language={language} />
+                </option>
                 <option value="100">100</option>
                 <option value="500">500</option>
                 <option value="1600">1600</option>
@@ -332,7 +346,8 @@ export default function PostedJobSeeker() {
             <section className="flex items-center justify-between w-[85%] h-10 px-2">
               {allJobs.length > 0 && (
                 <p className="font-semibold text-[15px]">
-                  {allJobs.length} jobs
+                  {allJobs.length}{" "}
+                  <TranslatableText text={"jobs"} language={language} />
                 </p>
               )}
               {allJobs.length > 0 && (
@@ -341,7 +356,7 @@ export default function PostedJobSeeker() {
                     htmlFor="sort"
                     className="text-[15px] mr-3 text-gray-700"
                   >
-                    Sort by
+                    <TranslatableText text={"Sort by"} language={language} />
                   </label>
                   <select
                     id="sort"
@@ -349,10 +364,19 @@ export default function PostedJobSeeker() {
                     onChange={handleSort}
                     className="text-[15px] py-1 border border-gray-200 rounded-md px-4 outline-none"
                   >
-                    <option value="newest">Newest</option>
-                    <option value="oldest">Oldest</option>
-                    <option value="a-z">A → Z</option>
-                    <option value="z-a">Z → A</option>
+                    <option value="newest">
+                      <TranslatableText text={"Newest"} language={language} />{" "}
+                    </option>
+                    <option value="oldest">
+                      <TranslatableText text={"Oldest"} language={language} />
+                    </option>
+                    <option value="a-z">
+                      {language == "am" ? "ሀ ->ፐ" : "A → Z"}
+                    </option>
+                    <option value="z-a">
+                      {" "}
+                      {language == "am" ? "ፐ -> ሀ" : "Z → A"}
+                    </option>
                   </select>
                 </div>
               )}
@@ -369,7 +393,12 @@ export default function PostedJobSeeker() {
                   />
                 ))
               ) : (
-                <p className="py-4 text-gray-800">There is no jobs now</p>
+                <p className="py-4 text-gray-800">
+                  <TranslatableText
+                    text={"There is no jobs now"}
+                    language={language}
+                  />
+                </p>
               )}
 
               <div className="flex items-center w-full h-16 gap-4">
@@ -378,11 +407,14 @@ export default function PostedJobSeeker() {
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((prev) => prev - 1)}
                 >
-                  Previous
+                  <TranslatableText text={"Previous"} language={language} />
                 </button>
 
                 <span>
-                  Page {currentPage} of {totalPages}
+                  <TranslatableText text="Page" language={language} />{" "}
+                  {currentPage}{" "}
+                  <TranslatableText text="of" language={language} />{" "}
+                  {totalPages}
                 </span>
 
                 <button
@@ -390,7 +422,7 @@ export default function PostedJobSeeker() {
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((prev) => prev + 1)}
                 >
-                  Next
+                  <TranslatableText text="Next" language={language} />
                 </button>
               </div>
             </div>
@@ -408,10 +440,10 @@ export default function PostedJobSeeker() {
           }}
         >
           <DialogHeader className="py-4 text-xl font-semibold text-center">
-            Apply to the job
+            <TranslatableText text={"Apply to the job"} language={language} />
           </DialogHeader>
           <label htmlFor="" className="text-[14px] block">
-            Write Your message
+            <TranslatableText text={"Write Your message"} language={language} />
           </label>
           <Textarea
             value={message}
@@ -438,13 +470,13 @@ export default function PostedJobSeeker() {
             onClick={() => imageRef.current.click()}
             className="w-fit mx-auto bg-[#0095F6] hover:bg-[#258bcf] "
           >
-            Attach your resume
+            <TranslatableText text={"Attach your resume"} language={language} />
           </Button>
           {imagePreview &&
             (loadingApply ? (
               <Button>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Please wait...
+                <TranslatableText text={"Please wait..."} language={language} />
               </Button>
             ) : (
               <Button
@@ -452,7 +484,7 @@ export default function PostedJobSeeker() {
                 type="submit"
                 className="w-full"
               >
-                Apply Now
+                <TranslatableText text={"Apply Now"} language={language} />
               </Button>
             ))}
         </DialogContent>
@@ -478,6 +510,7 @@ const PageNumber = ({ number }) => {
 
 //eslint-disable-next-line
 const Job = ({ onOpen, job, setJobId }) => {
+  const { language } = useLanguage()
   return (
     <section
       className="flex flex-col w-full p-5 border border-blue-100 cursor-pointer h-fit rounded-xl hover:bg-gray-100"
@@ -499,58 +532,83 @@ const Job = ({ onOpen, job, setJobId }) => {
         <article className="w-[420px]">
           <h2 className="py-1 text-lg font-semibold text-gray-800">
             {/* eslint-disable-next-line */}
-            {job.jobTitle}
+            <TranslatableText text={job.jobTitle} language={language} />
           </h2>
           {/* eslint-disable-next-line */}
-          <p className="text-[14px] pr-4">{job.jobDescription}</p>
+          <p className="text-[14px] pr-4">
+            <TranslatableText text={job.jobDescription} language={language} />
+          </p>
           <p className="text-[15px]">
-            by <span className="text-blue-600">{job.author.username} </span>
+            <TranslatableText text="by" language={language} />{" "}
+            <span className="text-blue-600">
+              <TranslatableText
+                text={job.author.username}
+                language={language}
+              />{" "}
+            </span>
           </p>
         </article>
         <article className="py-9 pl-7">
           <p className="text-[14px] text-gray-700">
-            Company name:{" "}
-            <span className="text-blue-600 capitalize">{job.companyName} </span>
+            <TranslatableText text="Company name:" language={language} />{" "}
+            <span className="text-blue-600 capitalize">
+              <TranslatableText text={job.companyName} language={language} />{" "}
+            </span>
           </p>
         </article>
       </div>
       <div className="flex items-center w-full gap-2 pt-5 h-fit">
-        <p className="text-[14px] text-gray-700">Skills required</p>
+        <p className="text-[14px] text-gray-700">
+          <TranslatableText text="Skills required" language={language} />
+        </p>
         {job.skillsRequired.map((skill, skillIndex) => (
           <Skills skill={skill} key={skillIndex} />
         ))}
       </div>
       <div className="flex w-full gap-1 pt-4 h-fit">
         <span className="text-[14px] px-3 py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold capitalize">
-          {job.employmentType}
+          <TranslatableText text={job.employmentType} language={language} />
         </span>
         <span className="text-[14px] px-3 py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold">
-          Onsite
+          <TranslatableText text="Onsite" language={language} />
         </span>
         <span className="text-[14px] capitalize flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#173e8a] font-semibold">
           <MapPin color="#4b75df" size={18} />
-          {job.city}, {job.country}
+          <TranslatableText text={job.city} language={language} />,{" "}
+          <TranslatableText text={job.country} language={language} />
         </span>
         <span className="text-[14px] flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#14377d] font-semibold">
           {/* eslint-disable-next-line */}
-          <BadgeDollarSign color="#4b75df" size={18} />${job.salaryRange.min} -{" "}
-          {/* eslint-disable-next-line */}
-          {job.salaryRange.max}/month
+          <BadgeDollarSign color="#4b75df" size={18} />${job.salaryRange.max}{" "}
+          birr - {/* eslint-disable-next-line */}
+          {job.salaryRange.min} birr/month
         </span>
       </div>
       <span className="text-[14px] flex gap-1 items-center  pt-4  text-[#14377d] font-semibold">
         {/* eslint-disable-next-line */}
-        {getTimeLeftUntil(job.deadline)}
+        <TranslatableText
+          text={getTimeLeftUntil(job.deadline)}
+          language={language}
+        />
       </span>
       <p className="pt-3  text-[14px] text-gray-700">
         {/* eslint-disable-next-line */}
         {job.applicants.length === 0 ? (
-          <span className="text-red-500">No user applied to this job yet</span>
+          <span className="text-red-500">
+            <TranslatableText
+              text="No user applied to this job yet"
+              language={language}
+            />
+          </span>
         ) : (
           <span className="text-green-600">
             {" "}
             {/* eslint-disable-next-line */}
-            {job.applicants.length} applicants applied to this job until now
+            {job.applicants.length}{" "}
+            <TranslatableText
+              text="applicants applied to this job until now"
+              language={language}
+            />
           </span>
         )}
       </p>
@@ -559,9 +617,10 @@ const Job = ({ onOpen, job, setJobId }) => {
 }
 /* eslint-disable-next-line */
 const Skills = ({ skill }) => {
+  const { language } = useLanguage()
   return (
     <section className="w-fit capitalize px-2 text-[#4c1ac8] font-medium flex items-center justify-center text-[14px] rounded-2xl capitalize">
-      {skill}
+      <TranslatableText text={skill} language={language} />
     </section>
   )
 }

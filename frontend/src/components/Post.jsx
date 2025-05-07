@@ -18,6 +18,8 @@ import CommentDialog from "./CommentDialog"
 import { Button } from "./ui/button"
 import { Badge } from "./ui/badge"
 import { Link } from "react-router-dom"
+import { useLanguage } from "@/context/LanaguageContext"
+import { TranslatableText } from "@/utils/TranslatableText"
 
 const Post = ({ post }) => {
   const [text, setText] = useState("")
@@ -30,6 +32,10 @@ const Post = ({ post }) => {
   const [isFollowing, setIsFollowing] = useState(false)
   const [isClickedLoading, setIsClcikedLoading] = useState(false)
   const [isPostBookmarked, setIsPostBookmarked] = useState(false)
+  const { language } = useLanguage()
+  const [commentStyle] = useState(
+    language === "am" ? "አስተያየት ይስቱ" : "Add comments"
+  )
   const dispatch = useDispatch()
 
   const changeEventHandler = (e) => {
@@ -226,14 +232,17 @@ const Post = ({ post }) => {
           </Link>
           <div className="flex items-center gap-3">
             <h1 className="font-semibold capitalize text-[14px]">
-              {post.author?.username}
+              <TranslatableText
+                text={post.author?.username}
+                language={language}
+              />
             </h1>
             {user?._id === post.author?._id && (
               <Badge
                 variant="secondary"
                 className="pt-1 border border-gray-200"
               >
-                Author
+                <TranslatableText text={"Author"} language={language} />
               </Badge>
             )}
           </div>
@@ -262,7 +271,7 @@ const Post = ({ post }) => {
               ))}
 
             <Button variant="ghost" className="cursor-pointer w-fit">
-              Add to favorites
+              <TranslatableText text={"Add to favorites"} language={language} />
             </Button>
             {user && user?._id === post?.author?._id && (
               <Button
@@ -270,7 +279,7 @@ const Post = ({ post }) => {
                 variant="ghost"
                 className="cursor-pointer w-fit"
               >
-                Delete
+                <TranslatableText text={" Delete"} language={language} />
               </Button>
             )}
           </DialogContent>
@@ -319,10 +328,16 @@ const Post = ({ post }) => {
           />
         )}
       </div>
-      <span className="block mb-2 font-medium">{postLike} likes</span>
+      <span className="block mb-2 font-medium">
+        {postLike} <TranslatableText text="likes" language={language} />
+      </span>
       <p>
-        <span className="mr-2 font-semibold">{post.author?.username}</span>
-        <span className="text-[15px]">{post?.caption}</span>
+        <span className="mr-2 font-semibold">
+          <TranslatableText text={post.author?.username} language={language} />
+        </span>
+        <span className="text-[15px]">
+          <TranslatableText text={post?.caption} language={language} />
+        </span>
       </p>
       {comment.length > 0 && (
         <span
@@ -332,14 +347,16 @@ const Post = ({ post }) => {
           }}
           className="py-2 text-sm text-gray-400 cursor-pointer"
         >
-          View all {comment.length} comments
+          <TranslatableText text={"View all"} language={language} />{" "}
+          {comment.length}{" "}
+          <TranslatableText text={"comments"} language={language} />
         </span>
       )}
       <CommentDialog open={open} setOpen={setOpen} />
       <div className="flex items-center justify-between py-2">
         <input
           type="text"
-          placeholder="Add a comment..."
+          placeholder={commentStyle}
           value={text}
           onChange={changeEventHandler}
           className="w-full text-sm outline-none"
@@ -349,7 +366,7 @@ const Post = ({ post }) => {
             onClick={commentHandler}
             className="text-[#3BADF8] cursor-pointer"
           >
-            Post
+            <TranslatableText text={"Post"} language={language} />
           </span>
         )}
       </div>
