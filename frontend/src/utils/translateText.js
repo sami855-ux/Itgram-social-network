@@ -1,26 +1,16 @@
 import axios from "axios"
 
-const key = "YOUR_TRANSLATOR_KEY"
-const endpoint = "https://api.cognitive.microsofttranslator.com"
-const region = "YOUR_RESOURCE_REGION" // e.g. "eastus"
-
-export const translateText = async (text, to = "am") => {
+export const autoTranslate = async (text, toLang = "am", fromLang = "en") => {
   try {
-    const response = await axios.post(
-      `${endpoint}/translate?api-version=3.0&to=${to}`,
-      [{ Text: text }],
-      {
-        headers: {
-          "Ocp-Apim-Subscription-Key": key,
-          "Ocp-Apim-Subscription-Region": region,
-          "Content-Type": "application/json",
-        },
-      }
-    )
-
-    return response.data[0].translations[0].text
+    const res = await axios.post(import.meta.env.VITE_BASE_URL_TRANSLATE, {
+      q: text,
+      source: fromLang,
+      target: toLang,
+      format: "text",
+    })
+    return res.data.translatedText
   } catch (err) {
-    console.error("Translation error:", err)
+    console.error("Translation failed:", err.message)
     return text
   }
 }

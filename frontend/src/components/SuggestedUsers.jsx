@@ -22,7 +22,7 @@ const SuggestedUsers = () => {
           See all
         </span>
       </div>
-      {suggestedUsers.slice(0, 5).map((user, userId) => (
+      {suggestedUsers.slice(0, 6).map((user, userId) => (
         <Suggested user={user} key={userId} />
       ))}
     </div>

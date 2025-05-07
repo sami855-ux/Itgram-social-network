@@ -1,11 +1,29 @@
-import { useNavigate } from "react-router-dom"
-import { useSelector } from "react-redux"
+import { useEffect, useState } from "react"
+import axios from "axios"
 
 import Suggested from "./Suggested"
 
 const SuggestedUsers = () => {
-  const { suggestedUsers } = useSelector((store) => store.auth)
-  const navigate = useNavigate()
+  const [suggestedUsers, setSuggestedUsers] = useState([])
+
+  const getRecruiters = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/getRecruiters`,
+        { withCredentials: true }
+      )
+      if (response.data.success) {
+        setSuggestedUsers(response.data.user.slice(0, 6))
+      }
+    } catch (error) {
+      console.error("Error fetching recruiters:", error)
+      throw error
+    }
+  }
+
+  useEffect(() => {
+    getRecruiters()
+  }, [])
 
   return (
     <div className="mt-24 mb-10">
@@ -13,9 +31,6 @@ const SuggestedUsers = () => {
         <h1 className="font-semibold text-[15px] text-gray-800">
           Suggested for work
         </h1>
-        <span className="px-4 py-1 font-medium transition-all duration-150 ease-in-out border border-transparent cursor-pointer hover:border-gray-200 rounded-2xl hover:bg-gray-200">
-          See all
-        </span>
       </div>
       {suggestedUsers.slice(0, 5).map((user, userId) => (
         <Suggested user={user} key={userId} />

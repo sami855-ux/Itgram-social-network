@@ -50,7 +50,7 @@ const Signup = () => {
         }
       )
       if (res.data.success) {
-        navigate("/login")
+        navigate("/")
         toast.success(res.data.message)
         setInput({
           username: "",

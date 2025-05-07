@@ -109,14 +109,14 @@ const LeftSidebar = () => {
   }
 
   const sidebarItems = [
-    { icon: <Home />, text: "Home" },
-    { icon: <Search />, text: "Search" },
-    { icon: <TrendingUp />, text: "Explore" },
-    { icon: <Briefcase />, text: "Posted Job" },
-    { icon: <ClipboardPlus />, text: "Post a Job" },
-    { icon: <MessageCircle />, text: "Messages" },
-    { icon: <Heart />, text: "Notifications" },
-    { icon: <PlusSquare />, text: "Create" },
+    { icon: <Home color="#f2f2f2" />, text: "Home" },
+    { icon: <Search color="#f2f2f2" />, text: "Search" },
+    { icon: <TrendingUp color="#f2f2f2" />, text: "Explore" },
+    { icon: <Briefcase color="#f2f2f2" />, text: "Posted Job" },
+    { icon: <ClipboardPlus color="#f2f2f2" />, text: "Post a Job" },
+    { icon: <MessageCircle color="#f2f2f2" />, text: "Messages" },
+    { icon: <Heart color="#f2f2f2" />, text: "Notifications" },
+    { icon: <PlusSquare color="#f2f2f2" />, text: "Create" },
     {
       icon: (
         <Avatar className="w-8 h-8 border border-gray-400">
@@ -128,7 +128,7 @@ const LeftSidebar = () => {
       ),
       text: "Profile",
     },
-    { icon: <LogOut />, text: "Logout" },
+    { icon: <LogOut color="#f2f2f2" />, text: "Logout" },
   ]
 
   useEffect(() => {
@@ -137,7 +137,7 @@ const LeftSidebar = () => {
   }, [isSearchClicked])
 
   return (
-    <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 hidden md:block lg:w-[16%] md:w-24 h-screen bg-slate-200 transition-all ease duration-200">
+    <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 hidden md:block lg:w-[16%] md:w-24 h-screen bg-gray-900 transition-all ease duration-200">
       <div className="flex flex-col">
         <div className="flex items-center justify-center my-2">
           <img
@@ -167,10 +167,12 @@ const LeftSidebar = () => {
                   }
                 }}
                 key={index}
-                className={`flex relative items-center gap-3 p-3 my-3 cursor-pointer rounded-xl hover:bg-slate-100`}
+                className={`flex relative items-center gap-3 p-3 my-3 cursor-pointer rounded-xl hover:bg-gray-800`}
               >
                 <span>{item.icon}</span>
-                <span className="hidden lg:flex">{item.text}</span>
+                <span className="hidden lg:flex text-slate-100">
+                  {item.text}
+                </span>
 
                 {item.text === "Notifications" &&
                   likeNotification.length > 0 && (

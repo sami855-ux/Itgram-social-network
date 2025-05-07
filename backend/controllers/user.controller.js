@@ -28,6 +28,7 @@ export const register = async (req, res) => {
       })
     }
     const hashedPassword = await bcrypt.hash(password, 10)
+
     await User.create({
       username,
       email,
@@ -66,7 +67,7 @@ export const login = async (req, res) => {
       })
     }
 
-    const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
       expiresIn: "1d",
     })
 
@@ -331,5 +332,20 @@ export const searchUser = async (req, res) => {
   } catch (error) {
     console.error(error)
     return res.status(500).json({ message: "Server error" })
+  }
+}
+export const getRecruiters = async (req, res) => {
+  try {
+    const currentUserId = req.id
+
+    const recruiters = await User.find({
+      role: "recruiter",
+      _id: { $ne: currentUserId }, // exclude current user
+    }).select("-password")
+
+    res.status(200).json({ user: recruiters, success: true })
+  } catch (error) {
+    console.error("Failed to fetch recruiters:", error)
+    res.status(500).json({ message: "Server error while fetching recruiters" })
   }
 }

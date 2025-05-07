@@ -20,6 +20,7 @@ import { setSocket } from "./redux/socketSlice"
 import { setOnlineUsers } from "./redux/chatSlice"
 import { setLikeNotification } from "./redux/rtnSlice"
 import PostedJobSeeker from "./components/PostedJobSeeker"
+import { LanguageProvider } from "./context/LanaguageContext"
 
 const browserRouter = createBrowserRouter([
   {
@@ -117,7 +118,7 @@ function App() {
 
   useEffect(() => {
     if (user) {
-      const socketio = io("http://localhost:3000", {
+      const socketio = io(import.meta.env.VITE_BASE_URL, {
         query: {
           userId: user?._id,
         },
@@ -152,9 +153,9 @@ function App() {
   }, [user, dispatch])
 
   return (
-    <>
+    <LanguageProvider>
       <RouterProvider router={browserRouter} />
-    </>
+    </LanguageProvider>
   )
 }
 

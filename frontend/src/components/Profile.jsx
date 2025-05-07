@@ -306,7 +306,9 @@ const Profile = () => {
         setJobId("")
       }
     } catch (error) {
-      toast.error(error.message)
+      toast.error(
+        error.response?.data?.error || error.message || "Something went wrong"
+      )
     }
   }
 
@@ -1031,7 +1033,7 @@ const Job = ({
               {job.applicants.map((message, userIndex) => {
                 return (
                   <section
-                    className="flex items-center w-full h-fit gap-3 px-6 py-4 my-2 rounded-lg bg-slate-200"
+                    className="flex items-center w-full gap-3 px-6 py-4 my-2 rounded-lg h-fit bg-slate-200"
                     key={userIndex}
                   >
                     <a
