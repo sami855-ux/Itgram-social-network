@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion"
 import {
   AtSign,
   BadgeDollarSign,
@@ -8,6 +9,8 @@ import {
   MapPin,
   MessageCircle,
   Plus,
+  Send,
+  X,
 } from "lucide-react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { useSelector } from "react-redux"
@@ -330,871 +333,890 @@ const Profile = () => {
   }, [])
 
   return (
-    <div className="flex justify-center max-w-5xl mx-auto">
-      <div className="flex flex-col gap-20 p-8">
-        <div className="grid grid-cols-2">
-          <section className="flex items-center justify-center">
-            <Avatar className="w-32 h-32">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="flex justify-center max-w-5xl mx-auto"
+    >
+      <div className="flex flex-col w-full gap-10 p-6">
+        {/* Profile Header */}
+        <motion.div
+          className="grid grid-cols-1 gap-8 p-6 bg-white shadow-sm md:grid-cols-2 rounded-xl"
+          initial={{ y: -20 }}
+          animate={{ y: 0 }}
+        >
+          <motion.section
+            className="flex items-center justify-center"
+            whileHover={{ scale: 1.02 }}
+          >
+            <Avatar className="w-32 h-32 border-4 border-blue-100">
               <AvatarImage
                 src={userProfile?.profilePicture}
                 alt="profilephoto"
               />
               <AvatarFallback>
-                <img src={person} alt="default image" />
+                <img src={person} alt="default" className="w-full h-full" />
               </AvatarFallback>
             </Avatar>
-          </section>
-          <section>
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-2">
-                <span className="px-4 text-xl">
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <motion.span
+                  className="text-2xl font-bold"
+                  whileHover={{ x: 2 }}
+                >
                   <TranslatableText
                     text={userProfile?.username}
                     language={language}
                   />
-                </span>
-                <p className="h-8 capitalize hover:bg-gray-200 bg-[#c8ddf4] font-medium text-gray-800 text-[15px] pt-1 px-4 rounded-3xl ">
-                  <TranslatableText
-                    text={userProfile.role}
-                    language={language}
-                  />
-                </p>
+                </motion.span>
+
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Badge className="h-8 text-blue-700 capitalize bg-blue-100">
+                    <TranslatableText
+                      text={userProfile.role}
+                      language={language}
+                    />
+                  </Badge>
+                </motion.div>
+
                 {isLoggedInUserProfile ? (
-                  <>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     <Link to="/account/edit">
-                      <Button
-                        variant="secondary"
-                        className="h-8 hover:bg-gray-200"
-                      >
+                      <Button variant="outline" className="h-8">
                         <TranslatableText
-                          text={" Edit profile"}
+                          text="Edit profile"
                           language={language}
                         />
                       </Button>
                     </Link>
-                  </>
-                ) : isFollowing ? (
-                  <>
-                    <Button variant="secondary" className="h-8">
-                      <TranslatableText text={"Follow"} language={language} />
-                    </Button>
-                    <Button variant="secondary" className="h-8">
-                      <TranslatableText text={"Message"} language={language} />
-                    </Button>
-                  </>
+                  </motion.div>
                 ) : (
                   <>
-                    <Button
-                      className="bg-[#c9dce9] hover:bg-[#3192d2] h-8 text-gray-800"
-                      onClick={() => {
-                        followOrUnfollowUser(userId)
-                      }}
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      {follow ? (
-                        <TranslatableText text="unfollow" language={language} />
-                      ) : (
-                        <TranslatableText text="follow" language={language} />
-                      )}
-                    </Button>
-
-                    <Button
-                      className="bg-[#eff2f3] text-gray-800 hover:bg-[#ccdbe5] h-8"
-                      onClick={() => {
-                        navigate("/chat")
-                      }}
+                      <Button
+                        className={`h-8 ${
+                          follow
+                            ? "bg-gray-100 text-gray-800"
+                            : "bg-blue-100 text-blue-700"
+                        }`}
+                        onClick={() => followOrUnfollowUser(userId)}
+                      >
+                        {follow ? (
+                          <TranslatableText
+                            text="Unfollow"
+                            language={language}
+                          />
+                        ) : (
+                          <TranslatableText text="Follow" language={language} />
+                        )}
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      <TranslatableText text={"Message"} language={language} />
-                    </Button>
+                      <Button
+                        variant="outline"
+                        className="h-8"
+                        onClick={() => navigate("/chat")}
+                      >
+                        <TranslatableText text="Message" language={language} />
+                      </Button>
+                    </motion.div>
                   </>
                 )}
               </div>
-              <div className="flex items-center gap-10">
-                <p>
-                  <span className="font-semibold">
-                    {userProfile?.posts.length}{" "}
-                  </span>
-                  <span className="text-gray-700">
-                    <TranslatableText text={"posts"} language={language} />
-                  </span>
-                </p>
-                <p>
-                  <span className="font-semibold">
-                    {userProfile?.followers.length}{" "}
-                  </span>
-                  <span className="text-gray-700">
-                    <TranslatableText text="followers" language={language} />
-                  </span>
-                </p>
-                <p>
-                  <span className="font-semibold">
-                    {userProfile?.following.length}{" "}
-                  </span>
-                  <span className="text-gray-700">
-                    <TranslatableText text="following" language={language} />
-                  </span>
-                </p>
+
+              <div className="flex items-center gap-6">
+                {[
+                  { count: userProfile?.posts.length, text: "posts" },
+                  { count: userProfile?.followers.length, text: "followers" },
+                  { count: userProfile?.following.length, text: "following" },
+                ].map((item, index) => (
+                  <motion.p
+                    key={index}
+                    whileHover={{ scale: 1.05 }}
+                    className="flex items-center gap-1"
+                  >
+                    <span className="font-semibold">{item.count}</span>
+                    <span className="text-gray-600">
+                      <TranslatableText text={item.text} language={language} />
+                    </span>
+                  </motion.p>
+                ))}
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-light capitalize">
-                  {userProfile?.bio || "bio here..."}
+
+              <div className="flex flex-col gap-2">
+                <span className="text-sm text-gray-700">
+                  {userProfile?.bio || (
+                    <TranslatableText text="No bio yet" language={language} />
+                  )}
                 </span>
-                <Badge className="w-fit" variant="secondary">
-                  <AtSign />{" "}
-                  <span className="pl-1">
-                    <TranslatableText
-                      text={userProfile?.username}
-                      language={language}
-                    />
-                  </span>{" "}
-                </Badge>
+                <motion.div whileHover={{ x: 2 }}>
+                  <Badge variant="outline" className="w-fit">
+                    <AtSign size={14} />
+                    <span className="ml-1">
+                      <TranslatableText
+                        text={userProfile?.username}
+                        language={language}
+                      />
+                    </span>
+                  </Badge>
+                </motion.div>
               </div>
             </div>
-          </section>
-        </div>
-        <div className="border-t border-t-gray-200">
-          <div className="flex items-center justify-center gap-10 text-sm">
-            <span
-              className={`py-2 my-1 cursor-pointer ${
-                activeTab === "posts"
-                  ? "font-bold border border-gray-200 rounded-3xl bg-blue-400 px-4 text-white py-1"
-                  : ""
-              }`}
-              onClick={() => handleTabChange("posts")}
-            >
-              <TranslatableText text="POSTS" language={language} />
-            </span>
-            <span
-              className={`py-2 my-1 cursor-pointer ${
-                activeTab === "saved"
-                  ? "font-bold border border-gray-200 rounded-3xl bg-blue-400 px-4 text-white py-1"
-                  : ""
-              }`}
-              onClick={() => handleTabChange("saved")}
-            >
-              <TranslatableText text="SAVED" language={language} />
-            </span>
-            {user?.role === "recruiter" && user?._id === userId && (
-              <span
-                className={`py-2 my-1 cursor-pointer uppercase ${
-                  activeTab === "Jobs Posted by you"
-                    ? "font-bold border border-gray-200 rounded-3xl bg-blue-400 px-4 text-white py-1"
-                    : ""
+          </motion.section>
+        </motion.div>
+
+        {/* Tabs */}
+        <motion.div
+          className="sticky top-0 z-10 bg-white border-b border-gray-200"
+          initial={{ y: -10 }}
+          animate={{ y: 0 }}
+        >
+          <div className="flex items-center justify-center gap-4 py-3 overflow-x-auto">
+            {[
+              "posts",
+              "saved",
+              ...(user?.role === "recruiter" && user?._id === userId
+                ? ["Jobs Posted by you"]
+                : []),
+              ...(user?.role === "job seeker" && user?._id === userId
+                ? ["Jobs you have applied"]
+                : []),
+            ].map((tab) => (
+              <motion.span
+                key={tab}
+                className={`px-4 py-1 text-sm cursor-pointer rounded-full whitespace-nowrap ${
+                  activeTab === tab
+                    ? "bg-blue-600 text-white font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
                 }`}
-                onClick={() => handleTabChange("Jobs Posted by you")}
+                onClick={() => handleTabChange(tab)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <TranslatableText
-                  text="Jobs Posted by you"
-                  language={language}
-                />
-              </span>
-            )}{" "}
-            {user?.role === "job seeker" && user?._id === userId && (
-              <span
-                className={`py-2 my-1 cursor-pointer uppercase ${
-                  activeTab === "Jobs you have applied"
-                    ? "font-bold border border-gray-200 rounded-3xl bg-blue-400 px-4 text-white py-1"
-                    : ""
-                }`}
-                onClick={() => handleTabChange("Jobs you have applied")}
-              >
-                <TranslatableText
-                  text="Jobs you have applied"
-                  language={language}
-                />
-              </span>
-            )}
+                <TranslatableText text={tab} language={language} />
+              </motion.span>
+            ))}
           </div>
-          <div
-            className={`${
-              activeTab === "Jobs Posted by you" ||
-              activeTab === "Jobs you have applied"
-                ? '"flex flex-col w-[100%] gap-2 h-fit'
-                : "grid grid-cols-3 gap-1"
-            } mt-2`}
-          >
+        </motion.div>
+
+        {/* Content */}
+        <motion.div
+          className={`${
+            activeTab === "Jobs Posted by you" ||
+            activeTab === "Jobs you have applied"
+              ? "w-full h-fit flex flex-col gap-3"
+              : "grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+          } `}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          <AnimatePresence>
             {displayedPost && displayedPost.length > 0 ? (
-              displayedPost?.map((post, postIndex) => {
+              displayedPost.map((post, postIndex) => {
                 if (activeTab === "Jobs Posted by you") {
                   return (
-                    <Job
+                    <motion.div
                       key={postIndex}
-                      job={post}
-                      setDeleteOpen={setDeleteOpen}
-                      setJobId={setJobId}
-                      setEditOpen={setEditOpen}
-                      handleGetSingleJob={handleGetSingleJob}
-                      setResumeOpen={setResumeOpen}
-                      setResume={setResume}
-                    />
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: postIndex * 0.05 }}
+                    >
+                      <Job
+                        job={post}
+                        setDeleteOpen={setDeleteOpen}
+                        setJobId={setJobId}
+                        setEditOpen={setEditOpen}
+                        handleGetSingleJob={handleGetSingleJob}
+                        setResumeOpen={setResumeOpen}
+                        setResume={setResume}
+                      />
+                    </motion.div>
                   )
                 }
                 if (activeTab === "Jobs you have applied") {
                   return (
-                    <JobApplied
+                    <motion.div
                       key={postIndex}
-                      job={post}
-                      setJobId={setJobId}
-                      setUnapplyOpen={setUnapplyOpen}
-                    />
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: postIndex * 0.05 }}
+                    >
+                      <JobApplied
+                        job={post}
+                        setJobId={setJobId}
+                        setUnapplyOpen={setUnapplyOpen}
+                      />
+                    </motion.div>
                   )
                 }
 
                 return (
-                  <div
+                  <motion.div
                     key={post?._id}
-                    className="relative cursor-pointer group"
+                    className="relative overflow-hidden rounded-lg aspect-square"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: postIndex * 0.05 }}
+                    whileHover={{ scale: 1.02 }}
                   >
                     <img
                       src={post.image}
-                      alt="postimage"
-                      className="object-cover w-full my-2 rounded-sm aspect-square"
+                      alt="post"
+                      className="object-cover w-full h-full"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100">
-                      <div className="flex items-center space-x-4 text-white">
-                        <button className="flex items-center gap-2 hover:text-gray-300">
-                          <Heart />
+                    <motion.div
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100"
+                      initial={{ opacity: 0 }}
+                      whileHover={{ opacity: 1 }}
+                    >
+                      <div className="flex items-center gap-6 text-white">
+                        <motion.div
+                          className="flex items-center gap-1"
+                          whileHover={{ scale: 1.1 }}
+                        >
+                          <Heart size={20} />
                           <span>{post?.likes.length}</span>
-                        </button>
-                        <button className="flex items-center gap-2 hover:text-gray-300">
-                          <MessageCircle />
+                        </motion.div>
+                        <motion.div
+                          className="flex items-center gap-1"
+                          whileHover={{ scale: 1.1 }}
+                        >
+                          <MessageCircle size={20} />
                           <span>{post?.comments.length}</span>
-                        </button>
+                        </motion.div>
                       </div>
-                    </div>
-                  </div>
+                    </motion.div>
+                  </motion.div>
                 )
               })
             ) : (
-              <>
-                <p className=" text-ray-700">
+              <motion.div
+                className="flex flex-col items-center justify-center py-12 col-span-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <motion.div
+                  animate={{
+                    y: [0, -10, 0],
+                    transition: { duration: 2, repeat: Infinity },
+                  }}
+                >
+                  <img
+                    src={koala}
+                    alt="No content"
+                    className="w-40 h-40 mx-auto"
+                  />
+                </motion.div>
+                <h3 className="mt-4 text-lg font-medium text-gray-700">
                   <TranslatableText
-                    text={"There is no data"}
+                    text="No content found"
+                    language={language}
+                  />
+                </h3>
+                <p className="mt-1 text-gray-500">
+                  <TranslatableText
+                    text="When you create content, it will appear here"
                     language={language}
                   />
                 </p>
-                <img
-                  src={koala}
-                  alt=""
-                  className={`${
-                    activeTab === "Jobs Posted by you" ||
-                    activeTab === "Jobs you have applied"
-                      ? "w-44 h-44 mx-auto"
-                      : "w-44 h-44 mt-7"
-                  }`}
-                />
-              </>
+              </motion.div>
             )}
-          </div>
-        </div>
-      </div>
+          </AnimatePresence>
+        </motion.div>
 
-      {isModalOpen && (
-        <>
-          {/* //overlay */}
-          <Dialog open={isModalOpen}>
-            <DialogContent onInteractOutside={() => setIsModalOpen(false)}>
-              <DialogHeader className="font-semibold text-center">
-                <TranslatableText
-                  text={" Add the skill you want"}
-                  language={language}
-                />
-              </DialogHeader>
-              <div className="flex items-center gap-3"></div>
-              <Input
-                value={enterdSkill}
-                onChange={(e) => setEnterdSkill(e.target.value)}
-                className="border-none focus-visible:ring-transparent"
-                placeholder="Enter the skill..."
-              />
-
-              <Button
-                className="w-fit mx-auto bg-[#0095F6] hover:bg-[#258bcf] px-7"
-                onClick={handleAddSkill}
-              >
-                <TranslatableText text={"Add"} language={language} />
-              </Button>
-            </DialogContent>
-          </Dialog>
-        </>
-      )}
-
-      <Dialog open={resumeOpen}>
-        <DialogContent
-          onInteractOutside={() => {
-            setResumeOpen(false)
-            setResume("")
-          }}
-        >
-          <DialogHeader className="font-semibold text-center">
-            <TranslatableText text={"Resume Preview"} language={language} />
-          </DialogHeader>
-          <div className="flex items-center gap-3">
-            <img src={resume} alt="resume" className="w-full h-fit" />
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isOpen}>
-        <DialogContent onInteractOutside={() => setIsOpen(false)}>
-          <DialogHeader className="font-semibold text-center">
-            <TranslatableText text={" Applied user"} language={language} />
-          </DialogHeader>
-          <div className="flex items-center gap-3">
-            <Avatar>
-              <AvatarImage src={user?.profilePicture} alt="img" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            <div>
-              <h1 className="text-xs font-semibold">
-                <TranslatableText text={user?.username} language={language} />
-              </h1>
-              <span className="text-xs text-gray-600">
-                <TranslatableText text="Bio here.." language={language} />.
-              </span>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={deleteOpen}>
-        <DialogContent
-          className="py-8 border-red-400 px-7"
-          onInteractOutside={() => setDeleteOpen(false)}
-        >
-          <DialogHeader className="font-semibold text-center text-red-600">
-            <TranslatableText text={"Delete Job"} language={language} />
-          </DialogHeader>
-          <div className="flex items-center gap-3">
-            <div>
-              <p className="py-4 text-xs font-semibold">
-                <TranslatableText
-                  text={" Do you want to delete this job ?"}
-                  language={language}
-                />
-              </p>
-
-              <Button
-                className="mt-4 text-gray-900 bg-gray-200 h-7"
-                onClick={() => setDeleteOpen(false)}
-              >
-                <TranslatableText text="Cancel" language={language} />
-              </Button>
-              <Button
-                className="mt-4 text-red-900 bg-gray-200 h-7"
-                onClick={handleDeleteJob}
-              >
-                <TranslatableText text="Delete" language={language} />
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={unapplyOpen}>
-        <DialogContent
-          className="py-8 border-red-400 px-7"
-          onInteractOutside={() => setUnapplyOpen(false)}
-        >
-          <DialogHeader className="font-semibold text-center text-red-600">
-            <TranslatableText
-              text={"Unapply from this job"}
-              language={language}
-            />
-          </DialogHeader>
-          <div className="flex items-center gap-3">
-            <div>
-              <p className="py-4 text-[14px] font-semibold">
-                <TranslatableText
-                  text=" Do you want to Unapply from this job ?"
-                  language={language}
-                />
-              </p>
-
-              <Button
-                className="mt-4 mr-4 text-gray-900 bg-gray-200 h-7"
-                onClick={() => setUnapplyOpen(false)}
-              >
-                <TranslatableText text="Cancel" language={language} />
-              </Button>
-              <Button
-                className="mt-4 text-red-900 bg-gray-200 h-7"
-                onClick={handleRemoveUser}
-              >
-                <TranslatableText text="Unapply" language={language} />
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {editOpen && (
-        <div
-          className="fixed z-10 w-screen h-screen bg-gray-900/75"
-          onClick={() => {
-            setEditOpen(false)
-            setJobId("")
-            setEditLoading(false)
-          }}
-        ></div>
-      )}
-
-      {editLoading ? (
-        <div className="fixed top-0 right-0 z-20 h-screen bg-white w-[50%] p-6 overflow-scroll flex items-center justify-center">
-          <Loader className="animate-spin w-14 h-14" />
-        </div>
-      ) : (
-        editOpen && (
-          <div className="fixed top-0 right-0 z-20 h-screen bg-white w-[50%] p-6 overflow-scroll">
-            <form onSubmit={handleUpdateJob}>
-              <h2 className="py-4 text-xl font-semibold text-gray-800">
-                <TranslatableText text="Edit a Job" language={language} />
-              </h2>
-              <div className="flex w-full gap-2 h-fit">
-                <div className="w-[100%] min-h-[550px] p-4">
-                  <section className="">
-                    <h2 className="text-lg font-semibold">
-                      <TranslatableText
-                        text="Basic Information"
-                        language={language}
-                      />
-                    </h2>
-                  </section>
-
-                  <div className="w-full py-4 h-fit">
-                    <div className="w-[90%] flex flex-col gpa-1 my-2">
-                      <InputOne
-                        label="job title"
-                        value={jobInput.jobTitle}
-                        onHandleChange={handleChange}
-                      />
-                    </div>
-                    <div className="w-[90%] flex gap-2 my-2">
-                      <section className="flex flex-col w-1/2 gap-1">
-                        <InputOne
-                          label="role"
-                          value={jobInput.role}
-                          onHandleChange={handleChange}
-                        />
-                      </section>
-                      <section className="flex flex-col w-1/2 gap-1">
-                        <InputOne
-                          label="category"
-                          value={jobInput.category}
-                          onHandleChange={handleChange}
-                        />
-                      </section>
-                    </div>
-                    <div className="w-[90%] flex flex-col gpa-1 my-2">
-                      <InputOne
-                        label="job description"
-                        value={jobInput.jobDescription}
-                        onHandleChange={handleChange}
-                      />
-                    </div>
+        {/* Modals */}
+        <AnimatePresence>
+          {isModalOpen && (
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+              <DialogContent>
+                <DialogHeader className="text-lg font-semibold">
+                  <TranslatableText
+                    text="Add a new skill"
+                    language={language}
+                  />
+                </DialogHeader>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <Input
+                    value={enterdSkill}
+                    onChange={(e) => setEnterdSkill(e.target.value)}
+                    placeholder="Enter skill name..."
+                    className="focus-visible:ring-blue-500"
+                  />
+                  <div className="flex justify-end gap-2 mt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsModalOpen(false)}
+                    >
+                      <TranslatableText text="Cancel" language={language} />
+                    </Button>
+                    <Button onClick={handleAddSkill}>
+                      <TranslatableText text="Add" language={language} />
+                    </Button>
                   </div>
+                </motion.div>
+              </DialogContent>
+            </Dialog>
+          )}
 
-                  {/* Additional Information */}
-                  <section className="">
-                    <h2 className="text-lg font-semibold">
-                      <TranslatableText
-                        text="Additional Information"
-                        language={language}
-                      />
-                    </h2>
-                  </section>
+          {/* Resume Preview Modal */}
+          {resumeOpen && (
+            <Dialog open={resumeOpen} onOpenChange={setResumeOpen}>
+              <DialogContent className="max-w-3xl">
+                <DialogHeader className="text-lg font-semibold">
+                  <TranslatableText text="Resume Preview" language={language} />
+                </DialogHeader>
+                <img
+                  src={resume}
+                  alt="Resume"
+                  className="w-full border rounded-lg"
+                />
+              </DialogContent>
+            </Dialog>
+          )}
 
-                  <div className="w-full py-4 h-fit">
-                    <section className="flex flex-col">
-                      <label className="text-[14px] text-gray-800 mb-1">
-                        <TranslatableText
-                          text="Employment type"
-                          language={language}
-                        />
-                      </label>
-                      <div className="flex h-12 gap-2">
-                        <section
-                          className={`${
-                            jobInput.employmentType === "fulltime"
-                              ? "border-blue-600 bg-blue-300"
-                              : null
-                          } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                          onClick={() => {
-                            handleEmployment("fulltime")
-                          }}
-                        >
-                          <CalendarCheck size={19} />
-                          <span className="text-[14px]">
-                            <TranslatableText
-                              text="Fulltime"
-                              language={language}
-                            />
-                          </span>
-                        </section>
-                        <section
-                          className={`${
-                            jobInput.employmentType === "freelance"
-                              ? "border-blue-600 bg-blue-300"
-                              : null
-                          } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                          onClick={() => {
-                            handleEmployment("freelance")
-                          }}
-                        >
-                          <Clock size={19} />
-                          <span className="text-[14px]">
-                            <TranslatableText
-                              text="Freelance"
-                              language={language}
-                            />
-                          </span>
-                        </section>
-                        <section
-                          className={`${
-                            jobInput.employmentType === "contract"
-                              ? "border-blue-600 bg-blue-300"
-                              : null
-                          } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                          onClick={() => {
-                            handleEmployment("contract")
-                          }}
-                        >
-                          <Clock size={19} />
-                          <span className="text-[14px]">
-                            <TranslatableText
-                              text="Contract"
-                              language={language}
-                            />
-                          </span>
-                        </section>
-                        <section
-                          className={`${
-                            jobInput.employmentType === "internship"
-                              ? "border-blue-600 bg-blue-300"
-                              : null
-                          } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                          onClick={() => {
-                            handleEmployment("internship")
-                          }}
-                        >
-                          <Clock size={19} />
-                          <span className="text-[14px]">
-                            <TranslatableText
-                              text="Internship"
-                              language={language}
-                            />
-                          </span>
-                        </section>
-                      </div>
-                    </section>
-
-                    {/* Job placement */}
-                    <div className="w-[90%] flex gap-2 my-2">
-                      <section className="flex flex-col w-1/2 gap-1">
-                        <span className="text-[14px] text-gray-800 mb-1">
-                          <TranslatableText
-                            text="Job placement"
-                            language={language}
-                          />
-                        </span>
-                        <select
-                          name="Job placement"
-                          value={jobInput.jobPlacement}
-                          onChange={handleChange}
-                          className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
-                        >
-                          <option value="">
-                            <TranslatableText
-                              text="Select option"
-                              language={language}
-                            />
-                          </option>
-                          <option value="onsite">
-                            <TranslatableText
-                              text="Onsite"
-                              language={language}
-                            />
-                          </option>
-                          <option value="remote">
-                            <TranslatableText
-                              text="Remote"
-                              language={language}
-                            />
-                          </option>
-                          <option value="hybrid">
-                            <TranslatableText
-                              text="Hybrid"
-                              language={language}
-                            />
-                          </option>
-                        </select>
-                      </section>
-
-                      <section className="flex flex-col w-1/2 gap-1">
-                        <span className="text-[14px] text-gray-800 mb-1">
-                          <TranslatableText
-                            text="Job experience"
-                            language={language}
-                          />
-                        </span>
-                        <select
-                          name="Job experience"
-                          value={jobInput.jobExperience}
-                          onChange={handleChange}
-                          className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
-                        >
-                          <option value="">
-                            <TranslatableText
-                              text="Select option"
-                              language={language}
-                            />
-                          </option>
-                          <option value="no">
-                            <TranslatableText
-                              text="No experience"
-                              language={language}
-                            />
-                          </option>
-                          <option value="1-2">
-                            <TranslatableText
-                              text="1-2 years"
-                              language={language}
-                            />
-                          </option>
-                          <option value="2-4">
-                            <TranslatableText
-                              text="2-4 years"
-                              language={language}
-                            />
-                          </option>
-                          <option value="4-8">
-                            <TranslatableText
-                              text="4-8 years"
-                              language={language}
-                            />
-                          </option>
-                          <option value=">8">
-                            <TranslatableText
-                              text="more than 8 years"
-                              language={language}
-                            />
-                          </option>
-                        </select>
-                      </section>
-                    </div>
-
-                    {/* Company Information */}
-                    <h2 className="pt-5 text-lg font-semibold">
-                      <TranslatableText
-                        text="Company Information"
-                        language={language}
-                      />
-                    </h2>
-
-                    <div className="w-full py-4 h-fit">
-                      <div className="w-[90%] flex flex-col gpa-1 my-2">
-                        <InputOne
-                          label="company name"
-                          value={jobInput.companyName}
-                          onHandleChange={handleChange}
-                        />
-                      </div>
-                      <h2 className="font-semibold text-[16px] py-2 text-gray-900">
-                        <TranslatableText text="Location" language={language} />
-                      </h2>
-
-                      <div className="w-[90%] flex gap-2 my-2">
-                        <section className="flex flex-col w-1/2 gap-1">
-                          <span className="text-[14px] text-gray-800 mb-1">
-                            <TranslatableText text="City" language={language} />
-                          </span>
-                          <select
-                            name="city"
-                            value={jobInput.city}
-                            onChange={handleChange}
-                            className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
-                          >
-                            <option value="">
-                              <TranslatableText
-                                text="Select option"
-                                language={language}
-                              />
-                            </option>
-                            <option value="addis abeba">
-                              <TranslatableText
-                                text="Addis abeba"
-                                language={language}
-                              />
-                            </option>
-                            <option value="bhair dar">
-                              <TranslatableText
-                                text="Bhair dar"
-                                language={language}
-                              />
-                            </option>
-                            <option value="debre brihan">
-                              <TranslatableText
-                                text="Debre brihan"
-                                language={language}
-                              />
-                            </option>
-                          </select>
-                        </section>
-
-                        <section className="flex flex-col w-1/2 gap-1">
-                          <span className="text-[14px] text-gray-800 mb-1">
-                            <TranslatableText
-                              text="Country"
-                              language={language}
-                            />
-                          </span>
-                          <select
-                            name="country"
-                            value={jobInput.country}
-                            onChange={handleChange}
-                            className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
-                          >
-                            <option value="">
-                              <TranslatableText
-                                text="Select option"
-                                language={language}
-                              />
-                            </option>
-                            <option value="ethiopia">
-                              <TranslatableText
-                                text="Ethiopia"
-                                language={language}
-                              />
-                            </option>
-                            <option value="kenya">
-                              <TranslatableText
-                                text="Kenya"
-                                language={language}
-                              />
-                            </option>
-                            <option value="sudan">
-                              <TranslatableText
-                                text="Sudan"
-                                language={language}
-                              />
-                            </option>
-                            <option value="egypt">
-                              <TranslatableText
-                                text="Egypt"
-                                language={language}
-                              />
-                            </option>
-                            <option value="other">
-                              <TranslatableText
-                                text="other"
-                                language={language}
-                              />
-                            </option>
-                          </select>
-                        </section>
-                      </div>
-                      <h2 className="font-semibold text-[16px] pt-5 pb-2 text-gray-900">
-                        <TranslatableText
-                          text="About job"
-                          language={language}
-                        />
-                      </h2>
-                      <section className="flex flex-col w-full gap-1 pt-3">
-                        <span className="text-[14px] text-gray-800">
-                          <TranslatableText
-                            text={"Skill required"}
-                            language={language}
-                          />
-                        </span>
-                        <div className="flex flex-wrap items-center w-full gap-2 min-h-14">
-                          <section
-                            className="w-7 h-7 bg-[#618bd3] flex items-center justify-center rounded-full capitalize cursor-pointer"
-                            onClick={() => setIsModalOpen(true)}
-                          >
-                            <Plus size={15} />
-                          </section>
-                          {jobInput.skills && jobInput.skills.length > 0
-                            ? jobInput.skills.map((skill, skillIndex) => (
-                                <Skills skill={skill} key={skillIndex} />
-                              ))
-                            : null}
-                        </div>
-                      </section>
-                      <section className="flex flex-col w-full gap-1 pt-3">
-                        <span className="text-[14px] text-gray-800 font-semibold">
-                          <TranslatableText
-                            text="Salary range"
-                            language={language}
-                          />
-                        </span>
-                        <section className="flex items-center w-full gap-3 h-fit">
-                          <span className="font-medium text-[14px] text-gray-800 capitalize">
-                            <TranslatableText
-                              text="Max salary"
-                              language={language}
-                            />
-                          </span>
-                          <input
-                            type="number"
-                            name={"max salary"}
-                            value={jobInput.salary.max}
-                            onChange={handleChange}
-                            className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
-                          />
-                          <span className="font-medium text-[14px] text-gray-800 capitalize">
-                            <TranslatableText
-                              text="Min salary"
-                              language={language}
-                            />
-                          </span>
-                          <input
-                            type="number"
-                            name={"min salary"}
-                            value={jobInput.salary.min}
-                            onChange={handleChange}
-                            className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
-                          />
-                        </section>
-                      </section>
-                      <span className="font-medium text-[14px] text-gray-800 capitalize block pt-4">
-                        <TranslatableText
-                          text="Deadline date"
-                          language={language}
-                        />
-                      </span>
-                      <input
-                        type="date"
-                        name={"deadline"}
-                        value={jobInput.deadline}
-                        onChange={handleChange}
-                        className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
-                      />
-                    </div>
-                  </div>
+          {/* Delete Job Modal */}
+          {deleteOpen && (
+            <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+              <DialogContent className="border-red-100">
+                <DialogHeader className="text-lg font-semibold text-red-600">
+                  <TranslatableText text="Delete Job" language={language} />
+                </DialogHeader>
+                <p className="py-4">
+                  <TranslatableText
+                    text="Are you sure you want to delete this job?"
+                    language={language}
+                  />
+                </p>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setDeleteOpen(false)}
+                  >
+                    <TranslatableText text="Cancel" language={language} />
+                  </Button>
+                  <Button variant="destructive" onClick={handleDeleteJob}>
+                    <TranslatableText text="Delete" language={language} />
+                  </Button>
                 </div>
-              </div>
+              </DialogContent>
+            </Dialog>
+          )}
 
-              <div className="flex items-center justify-between w-[100%] h-16 py-4">
-                <Button
-                  className="px-10 text-gray-900 bg-gray-400 hover:bg-gray-300"
-                  onClick={() => setEditOpen(false)}
-                >
-                  <TranslatableText text="Cancel" language={language} />{" "}
-                </Button>
-                <Button
-                  type="submit"
-                  className="px-10 bg-blue-600 hover:bg-blue-500"
-                >
-                  <TranslatableText text="Edit a job" language={language} />
-                </Button>
-              </div>
-            </form>
-          </div>
-        )
-      )}
-    </div>
+          {/* Edit Job Panel */}
+          {editOpen && (
+            <motion.div
+              className="fixed inset-0 z-50 bg-black bg-opacity-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onClick={() => {
+                setEditOpen(false)
+                setJobId("")
+                setEditLoading(false)
+              }}
+            />
+          )}
+
+          {editLoading ? (
+            <div className="fixed top-0 right-0 z-50 flex items-center justify-center w-full h-screen max-w-lg bg-white">
+              <Loader className="w-12 h-12 animate-spin" />
+            </div>
+          ) : (
+            editOpen && (
+              <motion.div
+                className="fixed top-0 right-0 z-50 w-full h-screen max-w-lg overflow-y-auto bg-white shadow-xl"
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ type: "spring", damping: 25 }}
+              >
+                <div className="fixed top-0 right-0 z-20 h-screen bg-white w-[50%] p-6 overflow-scroll">
+                  <form onSubmit={handleUpdateJob}>
+                    <h2 className="py-4 text-xl font-semibold text-gray-800">
+                      <TranslatableText text="Edit a Job" language={language} />
+                    </h2>
+                    <div className="flex w-full gap-2 h-fit">
+                      <div className="w-[100%] min-h-[550px] p-4">
+                        <section className="">
+                          <h2 className="text-lg font-semibold">
+                            <TranslatableText
+                              text="Basic Information"
+                              language={language}
+                            />
+                          </h2>
+                        </section>
+
+                        <div className="w-full py-4 h-fit">
+                          <div className="w-[90%] flex flex-col gpa-1 my-2">
+                            <InputOne
+                              label="job title"
+                              value={jobInput.jobTitle}
+                              onHandleChange={handleChange}
+                            />
+                          </div>
+                          <div className="w-[90%] flex gap-2 my-2">
+                            <section className="flex flex-col w-1/2 gap-1">
+                              <InputOne
+                                label="role"
+                                value={jobInput.role}
+                                onHandleChange={handleChange}
+                              />
+                            </section>
+                            <section className="flex flex-col w-1/2 gap-1">
+                              <InputOne
+                                label="category"
+                                value={jobInput.category}
+                                onHandleChange={handleChange}
+                              />
+                            </section>
+                          </div>
+                          <div className="w-[90%] flex flex-col gpa-1 my-2">
+                            <InputOne
+                              label="job description"
+                              value={jobInput.jobDescription}
+                              onHandleChange={handleChange}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Additional Information */}
+                        <section className="">
+                          <h2 className="text-lg font-semibold">
+                            <TranslatableText
+                              text="Additional Information"
+                              language={language}
+                            />
+                          </h2>
+                        </section>
+
+                        <div className="w-full py-4 h-fit">
+                          <section className="flex flex-col">
+                            <label className="text-[14px] text-gray-800 mb-1">
+                              <TranslatableText
+                                text="Employment type"
+                                language={language}
+                              />
+                            </label>
+                            <div className="flex h-12 gap-2">
+                              <section
+                                className={`${
+                                  jobInput.employmentType === "fulltime"
+                                    ? "border-blue-600 bg-blue-300"
+                                    : null
+                                } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
+                                onClick={() => {
+                                  handleEmployment("fulltime")
+                                }}
+                              >
+                                <CalendarCheck size={19} />
+                                <span className="text-[14px]">
+                                  <TranslatableText
+                                    text="Fulltime"
+                                    language={language}
+                                  />
+                                </span>
+                              </section>
+                              <section
+                                className={`${
+                                  jobInput.employmentType === "freelance"
+                                    ? "border-blue-600 bg-blue-300"
+                                    : null
+                                } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
+                                onClick={() => {
+                                  handleEmployment("freelance")
+                                }}
+                              >
+                                <Clock size={19} />
+                                <span className="text-[14px]">
+                                  <TranslatableText
+                                    text="Freelance"
+                                    language={language}
+                                  />
+                                </span>
+                              </section>
+                              <section
+                                className={`${
+                                  jobInput.employmentType === "contract"
+                                    ? "border-blue-600 bg-blue-300"
+                                    : null
+                                } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
+                                onClick={() => {
+                                  handleEmployment("contract")
+                                }}
+                              >
+                                <Clock size={19} />
+                                <span className="text-[14px]">
+                                  <TranslatableText
+                                    text="Contract"
+                                    language={language}
+                                  />
+                                </span>
+                              </section>
+                              <section
+                                className={`${
+                                  jobInput.employmentType === "internship"
+                                    ? "border-blue-600 bg-blue-300"
+                                    : null
+                                } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
+                                onClick={() => {
+                                  handleEmployment("internship")
+                                }}
+                              >
+                                <Clock size={19} />
+                                <span className="text-[14px]">
+                                  <TranslatableText
+                                    text="Internship"
+                                    language={language}
+                                  />
+                                </span>
+                              </section>
+                            </div>
+                          </section>
+
+                          {/* Job placement */}
+                          <div className="w-[90%] flex gap-2 my-2">
+                            <section className="flex flex-col w-1/2 gap-1">
+                              <span className="text-[14px] text-gray-800 mb-1">
+                                <TranslatableText
+                                  text="Job placement"
+                                  language={language}
+                                />
+                              </span>
+                              <select
+                                name="Job placement"
+                                value={jobInput.jobPlacement}
+                                onChange={handleChange}
+                                className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
+                              >
+                                <option value="">
+                                  <TranslatableText
+                                    text="Select option"
+                                    language={language}
+                                  />
+                                </option>
+                                <option value="onsite">
+                                  <TranslatableText
+                                    text="Onsite"
+                                    language={language}
+                                  />
+                                </option>
+                                <option value="remote">
+                                  <TranslatableText
+                                    text="Remote"
+                                    language={language}
+                                  />
+                                </option>
+                                <option value="hybrid">
+                                  <TranslatableText
+                                    text="Hybrid"
+                                    language={language}
+                                  />
+                                </option>
+                              </select>
+                            </section>
+
+                            <section className="flex flex-col w-1/2 gap-1">
+                              <span className="text-[14px] text-gray-800 mb-1">
+                                <TranslatableText
+                                  text="Job experience"
+                                  language={language}
+                                />
+                              </span>
+                              <select
+                                name="Job experience"
+                                value={jobInput.jobExperience}
+                                onChange={handleChange}
+                                className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
+                              >
+                                <option value="">
+                                  <TranslatableText
+                                    text="Select option"
+                                    language={language}
+                                  />
+                                </option>
+                                <option value="no">
+                                  <TranslatableText
+                                    text="No experience"
+                                    language={language}
+                                  />
+                                </option>
+                                <option value="1-2">
+                                  <TranslatableText
+                                    text="1-2 years"
+                                    language={language}
+                                  />
+                                </option>
+                                <option value="2-4">
+                                  <TranslatableText
+                                    text="2-4 years"
+                                    language={language}
+                                  />
+                                </option>
+                                <option value="4-8">
+                                  <TranslatableText
+                                    text="4-8 years"
+                                    language={language}
+                                  />
+                                </option>
+                                <option value=">8">
+                                  <TranslatableText
+                                    text="more than 8 years"
+                                    language={language}
+                                  />
+                                </option>
+                              </select>
+                            </section>
+                          </div>
+
+                          {/* Company Information */}
+                          <h2 className="pt-5 text-lg font-semibold">
+                            <TranslatableText
+                              text="Company Information"
+                              language={language}
+                            />
+                          </h2>
+
+                          <div className="w-full py-4 h-fit">
+                            <div className="w-[90%] flex flex-col gpa-1 my-2">
+                              <InputOne
+                                label="company name"
+                                value={jobInput.companyName}
+                                onHandleChange={handleChange}
+                              />
+                            </div>
+                            <h2 className="font-semibold text-[16px] py-2 text-gray-900">
+                              <TranslatableText
+                                text="Location"
+                                language={language}
+                              />
+                            </h2>
+
+                            <div className="w-[90%] flex gap-2 my-2">
+                              <section className="flex flex-col w-1/2 gap-1">
+                                <span className="text-[14px] text-gray-800 mb-1">
+                                  <TranslatableText
+                                    text="City"
+                                    language={language}
+                                  />
+                                </span>
+                                <select
+                                  name="city"
+                                  value={jobInput.city}
+                                  onChange={handleChange}
+                                  className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
+                                >
+                                  <option value="">
+                                    <TranslatableText
+                                      text="Select option"
+                                      language={language}
+                                    />
+                                  </option>
+                                  <option value="addis abeba">
+                                    <TranslatableText
+                                      text="Addis abeba"
+                                      language={language}
+                                    />
+                                  </option>
+                                  <option value="bhair dar">
+                                    <TranslatableText
+                                      text="Bhair dar"
+                                      language={language}
+                                    />
+                                  </option>
+                                  <option value="debre brihan">
+                                    <TranslatableText
+                                      text="Debre brihan"
+                                      language={language}
+                                    />
+                                  </option>
+                                </select>
+                              </section>
+
+                              <section className="flex flex-col w-1/2 gap-1">
+                                <span className="text-[14px] text-gray-800 mb-1">
+                                  <TranslatableText
+                                    text="Country"
+                                    language={language}
+                                  />
+                                </span>
+                                <select
+                                  name="country"
+                                  value={jobInput.country}
+                                  onChange={handleChange}
+                                  className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
+                                >
+                                  <option value="">
+                                    <TranslatableText
+                                      text="Select option"
+                                      language={language}
+                                    />
+                                  </option>
+                                  <option value="ethiopia">
+                                    <TranslatableText
+                                      text="Ethiopia"
+                                      language={language}
+                                    />
+                                  </option>
+                                  <option value="kenya">
+                                    <TranslatableText
+                                      text="Kenya"
+                                      language={language}
+                                    />
+                                  </option>
+                                  <option value="sudan">
+                                    <TranslatableText
+                                      text="Sudan"
+                                      language={language}
+                                    />
+                                  </option>
+                                  <option value="egypt">
+                                    <TranslatableText
+                                      text="Egypt"
+                                      language={language}
+                                    />
+                                  </option>
+                                  <option value="other">
+                                    <TranslatableText
+                                      text="other"
+                                      language={language}
+                                    />
+                                  </option>
+                                </select>
+                              </section>
+                            </div>
+                            <h2 className="font-semibold text-[16px] pt-5 pb-2 text-gray-900">
+                              <TranslatableText
+                                text="About job"
+                                language={language}
+                              />
+                            </h2>
+                            <section className="flex flex-col w-full gap-1 pt-3">
+                              <span className="text-[14px] text-gray-800">
+                                <TranslatableText
+                                  text={"Skill required"}
+                                  language={language}
+                                />
+                              </span>
+                              <div className="flex flex-wrap items-center w-full gap-2 min-h-14">
+                                <section
+                                  className="w-7 h-7 bg-[#618bd3] flex items-center justify-center rounded-full capitalize cursor-pointer"
+                                  onClick={() => setIsModalOpen(true)}
+                                >
+                                  <Plus size={15} />
+                                </section>
+                                {jobInput.skills && jobInput.skills.length > 0
+                                  ? jobInput.skills.map((skill, skillIndex) => (
+                                      <Skills skill={skill} key={skillIndex} />
+                                    ))
+                                  : null}
+                              </div>
+                            </section>
+                            <section className="flex flex-col w-full gap-1 pt-3">
+                              <span className="text-[14px] text-gray-800 font-semibold">
+                                <TranslatableText
+                                  text="Salary range"
+                                  language={language}
+                                />
+                              </span>
+                              <section className="flex items-center w-full gap-3 h-fit">
+                                <span className="font-medium text-[14px] text-gray-800 capitalize">
+                                  <TranslatableText
+                                    text="Max salary"
+                                    language={language}
+                                  />
+                                </span>
+                                <input
+                                  type="number"
+                                  name={"max salary"}
+                                  value={jobInput.salary.max}
+                                  onChange={handleChange}
+                                  className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
+                                />
+                                <span className="font-medium text-[14px] text-gray-800 capitalize">
+                                  <TranslatableText
+                                    text="Min salary"
+                                    language={language}
+                                  />
+                                </span>
+                                <input
+                                  type="number"
+                                  name={"min salary"}
+                                  value={jobInput.salary.min}
+                                  onChange={handleChange}
+                                  className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
+                                />
+                              </section>
+                            </section>
+                            <span className="font-medium text-[14px] text-gray-800 capitalize block pt-4">
+                              <TranslatableText
+                                text="Deadline date"
+                                language={language}
+                              />
+                            </span>
+                            <input
+                              type="date"
+                              name={"deadline"}
+                              value={jobInput.deadline}
+                              onChange={handleChange}
+                              className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between w-[100%] h-16 py-4">
+                      <Button
+                        className="px-10 text-gray-900 bg-gray-400 hover:bg-gray-300"
+                        onClick={() => setEditOpen(false)}
+                      >
+                        <TranslatableText text="Cancel" language={language} />{" "}
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="px-10 bg-blue-600 hover:bg-blue-500"
+                      >
+                        <TranslatableText
+                          text="Edit a job"
+                          language={language}
+                        />
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              </motion.div>
+            )
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
   )
 }
 
+// Enhanced Job Component with animations
 const Job = ({
   job,
   setDeleteOpen,
@@ -1206,142 +1228,137 @@ const Job = ({
   const { language } = useLanguage()
 
   return (
-    <>
-      <section className="flex flex-col w-full px-4 py-5 mt-4 border bg-slate-100 h-fit rounded-xl hover:bg-gray-100">
-        <div className="flex w-full gap-2 h-fit">
-          <article className="w-[420px]">
-            <h2 className="py-1 text-lg font-semibold text-gray-800">
-              <TranslatableText text={job.jobTitle} language={language} />
-            </h2>
-            <p className="text-[14px] pr-4">
-              <TranslatableText text={job.jobDescription} language={language} />
-            </p>
-          </article>
-        </div>
-        <div className="flex w-full gap-1 pt-4 h-fit">
-          <span className="text-[14px] md:px-3 md:py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold capitalize">
+    <motion.div
+      className="w-full p-6 bg-white border border-gray-100 shadow-sm w-fit rounded-xl"
+      whileHover={{ y: -5 }}
+    >
+      <div className="flex flex-col gap-4">
+        <motion.h2
+          className="text-xl font-bold text-gray-800 transition-colors hover:text-blue-600"
+          whileHover={{ x: 2 }}
+        >
+          <TranslatableText text={job.jobTitle} language={language} />
+        </motion.h2>
+
+        <p className="text-gray-600">
+          <TranslatableText text={job.jobDescription} language={language} />
+        </p>
+
+        <div className="flex flex-wrap gap-2">
+          <Badge className="text-blue-700 bg-blue-100">
             <TranslatableText text={job.employmentType} language={language} />
-          </span>
-          <span className="text-[14px] px-3 py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold">
+          </Badge>
+          <Badge className="text-blue-700 bg-blue-100">
             <TranslatableText text="Onsite" language={language} />
-          </span>
-          <span className=" text-[14px] capitalize flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#173e8a] font-semibold">
-            <MapPin color="#4b75df" size={18} />
+          </Badge>
+          <Badge className="text-blue-700 bg-blue-100">
+            <MapPin size={16} className="mr-1" />
             <TranslatableText text={job.city} language={language} />,{" "}
             <TranslatableText text={job.country} language={language} />
-          </span>
-          <span className="text-[14px] flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#14377d] font-semibold">
-            <BadgeDollarSign color="#4b75df" size={18} />${job.salaryRange.max}{" "}
-            - {job.salaryRange.min}/
-            <TranslatableText text={"month"} language={language} />
-          </span>
-          <span className="text-[14px] flex gap-1  items-center px-4 py-1  text-[#14377d] font-semibold">
+          </Badge>
+          <Badge className="text-blue-700 bg-blue-100">
+            <BadgeDollarSign size={16} className="mr-1" />${job.salaryRange.min}{" "}
+            - ${job.salaryRange.max}/
+            <TranslatableText text="month" language={language} />
+          </Badge>
+          <Badge className="text-blue-700 bg-blue-100">
+            <Clock size={16} className="mr-1" />
             <TranslatableText
               text={getTimeLeftUntil(job.deadline)}
               language={language}
             />
-          </span>
+          </Badge>
         </div>
-        <p className="pt-3  text-[14px] text-gray-700">
-          {job.applicants.length === 0 ? (
-            <span className="text-red-500">
-              <TranslatableText
-                text={"No user applied to your job yet"}
-                language={language}
-              />
-            </span>
-          ) : (
-            <div className="flex flex-col gap-2">
-              <span className="font-bold text-[15px] text-green-600 capitalize hover:underline">
-                {" "}
-                {job.applicants.length}{" "}
-                <TranslatableText text={"applicants"} language={language} />
-              </span>
-              {job.applicants.map((message, userIndex) => {
-                return (
-                  <section
-                    className="flex items-center w-full gap-3 px-6 py-4 my-2 rounded-lg h-fit bg-slate-200"
-                    key={userIndex}
-                  >
-                    <a
-                      className="pr-4 w-fit"
-                      href={`/profile/${message.user?._id}`}
+
+        {job.applicants.length > 0 && (
+          <motion.div
+            className="mt-4 space-y-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <h3 className="font-semibold text-green-600">
+              {job.applicants.length}{" "}
+              <TranslatableText text="applicants" language={language} />
+            </h3>
+
+            {job.applicants.map((message, index) => (
+              <motion.div
+                key={index}
+                className="p-4 rounded-lg bg-gray-50"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <div className="flex items-center gap-3">
+                  <Link to={`/profile/${message.user?._id}`}>
+                    <Avatar className="w-12 h-12">
+                      <AvatarImage src={message.user?.profilePicture} />
+                      <AvatarFallback>
+                        <img src={person} alt="default" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
+                  <div>
+                    <h4 className="font-medium">
+                      <TranslatableText
+                        text={message.user.username}
+                        language={language}
+                      />
+                    </h4>
+                    <p className="text-sm text-gray-600">{message.message}</p>
+                    <button
+                      className="mt-1 text-sm text-blue-600 hover:underline"
+                      onClick={() => {
+                        setResume(message.resume)
+                        setResumeOpen(true)
+                      }}
                     >
-                      <Avatar className="w-14 h-14">
-                        <AvatarImage
-                          src={message.user?.profilePicture}
-                          alt="profilephoto"
-                        />
-                        <AvatarFallback>
-                          <img src={person} alt="default image" />
-                        </AvatarFallback>
-                      </Avatar>
-                      <p className="py-1 font-semibold text-center capitalize">
-                        <TranslatableText
-                          text={message.user.username}
-                          language={language}
-                        />
-                      </p>
-                    </a>
-                    <div className="items-start h-full">
-                      <h2 className="font-semibold text-[15px] pb-1">
-                        <TranslatableText
-                          text={"Message"}
-                          language={language}
-                        />
-                      </h2>
-                      <p className="">
-                        {message.message} <br />
-                        <span
-                          className="text-green-600 cursor-pointer"
-                          onClick={() => {
-                            setResumeOpen(true)
-                            setResume(message.resume)
-                          }}
-                        >
-                          <TranslatableText
-                            text="  See the resume"
-                            language={language}
-                          />
-                        </span>
-                      </p>
-                    </div>
-                  </section>
-                )
-              })}
-            </div>
-          )}
-        </p>
-      </section>
-      <Button
-        className="ml-4 mr-4 bg-red-500 h-9"
-        onClick={() => {
-          setDeleteOpen(true)
-          setJobId(job?._id)
-        }}
-      >
-        <TranslatableText text="Delete the Job" language={language} />
-      </Button>
-      <Button
-        className="mt-4 bg-blue-500 mb-7 h-9 "
-        onClick={() => {
-          setJobId(job?._id)
-          setEditOpen(true)
-        }}
-      >
-        {" "}
-        <TranslatableText text={"Edit the Job"} language={language} />
-      </Button>
-    </>
+                      <TranslatableText
+                        text="View resume"
+                        language={language}
+                      />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        <div className="flex gap-3 mt-4">
+          <Button
+            variant="destructive"
+            onClick={() => {
+              setJobId(job._id)
+              setDeleteOpen(true)
+            }}
+          >
+            <TranslatableText text="Delete Job" language={language} />
+          </Button>
+          <Button
+            onClick={() => {
+              setJobId(job._id)
+              setEditOpen(true)
+            }}
+          >
+            <TranslatableText text="Edit Job" language={language} />
+          </Button>
+        </div>
+      </div>
+    </motion.div>
   )
 }
 
+// Enhanced Skills Component
 const Skills = ({ skill }) => {
   const { language } = useLanguage()
   return (
-    <section className="w-fit capitalize px-2 text-[#4c1ac8] font-medium flex items-center justify-center text-[14px] rounded-2xl capitalize">
+    <motion.span
+      className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full w-fit"
+      whileHover={{ scale: 1.05 }}
+    >
       <TranslatableText text={skill} language={language} />
-    </section>
+    </motion.span>
   )
 }
 

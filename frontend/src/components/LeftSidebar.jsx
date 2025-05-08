@@ -15,6 +15,7 @@ import {
   Briefcase,
   ClipboardPlus,
 } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
@@ -139,7 +140,6 @@ const LeftSidebar = () => {
 
   useEffect(() => {
     setSearchResult([])
-    console.log(user)
   }, [isSearchClicked])
 
   return (
@@ -176,7 +176,7 @@ const LeftSidebar = () => {
                 className={`flex relative items-center gap-3 p-3 my-3 cursor-pointer rounded-xl hover:bg-gray-800`}
               >
                 <span>{item.icon}</span>
-                <span className="hidden lg:flex text-slate-100">
+                <span className="hidden font-semibold lg:flex text-slate-100">
                   <TranslatableText text={item.text} language={language} />
                 </span>
 
@@ -262,90 +262,185 @@ const LeftSidebar = () => {
         ></div>
       )}
       {isSearchClicked && (
-        <div className="absolute top-16 left-24 md:left-52 lg:left-96 bg-white w-[60dvw] h-[85dvh] z-40 rounded-md p-7">
-          <h2 className="pb-5 text-xl font-semibold">
-            <TranslatableText text={"Search for a user"} language={language} />
-          </h2>
-
-          <form
-            className="flex items-center w-full gap-4"
-            onSubmit={handleSubmit}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="absolute top-16 left-24 md:left-52 lg:left-96 bg-white w-[60dvw] h-[85dvh] z-40 rounded-xl shadow-xl p-7 border border-gray-100"
+        >
+          <motion.h2
+            className="pb-5 text-2xl font-bold text-gray-800"
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
           >
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={searchText}
-              className="px-3 py-2 text-[15px] font-light border border-gray-200 rounded-lg outline-none bg-gray-50 w-[70%]"
-            />
+            <TranslatableText text={"Search for a user"} language={language} />
+          </motion.h2>
 
-            {isLoading ? (
-              <Button>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Please wait
-              </Button>
-            ) : (
-              <Button type="submit">
-                <TranslatableText text={"Search"} language={language} />
-              </Button>
-            )}
-          </form>
-          <hr className="w-full my-4 border border-gray-100" />
-
-          {isLoading ? (
-            <div className="flex items-center justify-center w-full h-96">
-              <p className="">
-                {" "}
-                <Loader2 className="mr-2 h-14 w-14 animate-spin" />
-              </p>
-            </div>
-          ) : searchResult && searchResult.length > 0 ? (
-            <div className="flex flex-col w-full gap-1 p-4 overflow-scroll h-fit search-container">
-              {searchResult.map((user, userIndex) => {
-                return (
-                  <Link
-                    to={`/profile/${user?._id}`}
-                    key={userIndex}
-                    onClick={() => {
-                      setSearchClicked(false)
-                    }}
-                    className="flex items-center justify-between px-2 py-3 my-2 rounded-lg w-96 hover:bg-gray-100"
+          <motion.form
+            className="flex items-center w-full gap-4 mb-6"
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <motion.div
+              className="relative w-full"
+              whileHover={{ scale: 1.01 }}
+            >
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={searchText}
+                className="w-full px-4 py-3 text-[15px] font-light border border-gray-200 rounded-xl outline-none bg-gray-50 focus:ring-2 focus:ring-blue-500/80 focus:border-transparent transition-all"
+              />
+              <motion.div className="absolute -translate-y-1/2 right-2 top-1/2">
+                {isLoading ? (
+                  <Button className="px-6 py-2 bg-blue-600 hover:bg-blue-700">
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <TranslatableText text={"Searching"} language={language} />
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    className="px-6 py-2 text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
                   >
-                    <div className="flex items-center gap-2">
-                      <Link to={`/profile/${user?._id}`}>
-                        <Avatar>
-                          <AvatarImage
-                            src={user?.profilePicture}
-                            alt="post_image"
-                          />
-                          <AvatarFallback>
-                            <img src={person} alt="default_image" />
-                          </AvatarFallback>
-                        </Avatar>
-                      </Link>
-                      <div>
-                        <h1 className="text-sm font-semibold text-gray-800 capitalize">
-                          <Link to={`/profile/${user?._id}`}>
+                    <TranslatableText text={"Search"} language={language} />
+                  </Button>
+                )}
+              </motion.div>
+            </motion.div>
+          </motion.form>
+
+          <motion.hr
+            className="w-full my-4 border border-gray-100"
+            initial={{ width: 0 }}
+            animate={{ width: "100%" }}
+            transition={{ delay: 0.3 }}
+          />
+
+          <AnimatePresence>
+            {isLoading ? (
+              <motion.div
+                className="flex items-center justify-center w-full h-96"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  animate={{
+                    rotate: 360,
+                    transition: {
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    },
+                  }}
+                >
+                  <Loader2 className="w-16 h-16 text-blue-500" />
+                </motion.div>
+              </motion.div>
+            ) : searchResult && searchResult.length > 0 ? (
+              <motion.div
+                className="flex flex-col w-full gap-2 p-4 overflow-y-auto max-h-[65vh] custom-scrollbar"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                {searchResult.map((user, userIndex) => (
+                  <motion.div
+                    key={userIndex}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: userIndex * 0.05 }}
+                    whileHover={{ scale: 1.01 }}
+                  >
+                    <Link
+                      to={`/profile/${user?._id}`}
+                      onClick={() => setSearchClicked(false)}
+                      className="flex items-center justify-between px-4 py-3 transition-colors rounded-xl hover:bg-gray-50"
+                    >
+                      <div className="flex items-center gap-3">
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage
+                              src={user?.profilePicture}
+                              alt="profile"
+                            />
+                            <AvatarFallback>
+                              <img
+                                src={person}
+                                alt="default"
+                                className="w-full h-full"
+                              />
+                            </AvatarFallback>
+                          </Avatar>
+                        </motion.div>
+                        <div>
+                          <motion.h1
+                            className="text-sm font-semibold text-gray-800 capitalize transition-colors hover:text-blue-600"
+                            whileHover={{ x: 2 }}
+                          >
                             <TranslatableText
                               text={user?.username}
                               language={language}
                             />
-                          </Link>
-                        </h1>
-                        <span className="text-[13px] text-gray-600">
-                          <TranslatableText
-                            text="Suggested for you"
-                            language={language}
-                          />
-                        </span>
+                          </motion.h1>
+                          <span className="text-xs text-gray-500">
+                            <TranslatableText
+                              text="Suggested for you"
+                              language={language}
+                            />
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-          ) : null}
-        </div>
+                      <motion.div
+                        className="text-xs text-gray-400"
+                        whileHover={{ scale: 1.1 }}
+                      >
+                        →
+                      </motion.div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                className="flex flex-col items-center justify-center h-64 text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                <motion.div
+                  className="p-4 mb-4 text-blue-500 rounded-full bg-blue-50"
+                  animate={{
+                    rotate: [0, 10, -10, 0],
+                    transition: { duration: 1, repeat: Infinity },
+                  }}
+                >
+                  <Search className="w-8 h-8" />
+                </motion.div>
+                <h3 className="text-lg font-medium text-gray-700">
+                  <TranslatableText
+                    text="No results found"
+                    language={language}
+                  />
+                </h3>
+                <p className="max-w-md text-gray-500">
+                  <TranslatableText
+                    text="Try searching with different keywords"
+                    language={language}
+                  />
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       )}
     </div>
   )

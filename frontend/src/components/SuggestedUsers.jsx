@@ -4,6 +4,7 @@ import { useSelector } from "react-redux"
 import Suggested from "./Suggested"
 import { useLanguage } from "@/context/LanaguageContext"
 import { TranslatableText } from "@/utils/TranslatableText"
+import Empty from "./Empty"
 
 const SuggestedUsers = () => {
   const { suggestedUsers } = useSelector((store) => store.auth)
@@ -25,9 +26,13 @@ const SuggestedUsers = () => {
           <TranslatableText text={"See all"} language={language} />
         </span>
       </div>
-      {suggestedUsers.slice(0, 6).map((user, userId) => (
-        <Suggested user={user} key={userId} />
-      ))}
+      {suggestedUsers.length > 0 && suggestedUsers ? (
+        suggestedUsers
+          .slice(0, 6)
+          .map((user, userId) => <Suggested user={user} key={userId} />)
+      ) : (
+        <Empty type="default" />
+      )}
     </div>
   )
 }

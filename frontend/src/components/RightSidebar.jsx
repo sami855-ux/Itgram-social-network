@@ -10,7 +10,7 @@ import LanguageSelector from "./LanguageSelector"
 import { useLanguage } from "@/context/LanaguageContext"
 
 const sliceText = (string) => {
-  const sliceString = string.slice(0, 20)
+  const sliceString = string?.slice(0, 20)
 
   return sliceString + "..."
 }

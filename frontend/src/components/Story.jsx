@@ -1,19 +1,18 @@
 import { useDispatch, useSelector } from "react-redux"
 import { useEffect, useRef, useState } from "react"
 import { Link } from "react-router-dom"
-import { Loader2 } from "lucide-react"
-import { Plus } from "lucide-react"
+import { Loader2, Plus } from "lucide-react"
 import { toast } from "sonner"
 import axios from "axios"
 
 import { Dialog, DialogContent, DialogHeader } from "./ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { TranslatableText } from "@/utils/TranslatableText"
+import { useLanguage } from "@/context/LanaguageContext"
 import { readFileAsDataURL } from "@/lib/utils"
 import { setStory } from "@/redux/storySlice"
 import { Textarea } from "./ui/textarea"
 import { Button } from "./ui/button"
-import { useLanguage } from "@/context/LanaguageContext"
-import { TranslatableText } from "@/utils/TranslatableText"
 
 export default function Story() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -41,10 +40,11 @@ export default function Story() {
     }
   }
 
-  const createStoryHandler = async (e) => {
+  const createStoryHandler = async () => {
     const formData = new FormData()
     formData.append("caption", caption)
     if (imagePreview) formData.append("image", file)
+
     try {
       setLoading(true)
       const res = await axios.post(
@@ -58,12 +58,12 @@ export default function Story() {
         }
       )
       if (res.data.success) {
-        dispatch(setStory([res.data.story, ...stories])) // [1] -> [1,2] -> total element = 2
+        dispatch(setStory([res.data.story, ...stories]))
         toast.success(res.data.message)
         setIsModalOpen(false)
       }
     } catch (error) {
-      toast.error(error.response.data.message)
+      toast.error(error.response?.data?.message || "Something went wrong")
     } finally {
       setLoading(false)
       setCaption("")
@@ -77,7 +77,6 @@ export default function Story() {
         `${import.meta.env.VITE_BASE_URL}/api/v1/story/all`
       )
       if (response.data.success) {
-        console.log("Fetched stories:", response.data.stories)
         return response.data.stories
       }
     } catch (error) {
@@ -99,12 +98,12 @@ export default function Story() {
 
   return (
     <>
-      <div className="REEL max-w-full h-28 pl-[28%] flex items-center gap-3 overflow-x-scroll scrollbar-thin scrollbar-thumb-gray-400">
+      <div className="max-w-full h-28 pl-[28%] flex items-center gap-4 overflow-x-auto scrollbar-hide">
         <section
-          className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full cursor-pointer"
+          className="flex items-center justify-center w-16 h-16 transition bg-gray-200 rounded-full shadow cursor-pointer hover:bg-gray-300"
           onClick={handleModal}
         >
-          <Plus />
+          <Plus className="text-gray-700" />
         </section>
 
         {allStories.slice(0, 7).map((story) => (
@@ -113,84 +112,81 @@ export default function Story() {
       </div>
 
       {isModalOpen && (
-        <>
-          {/* //overlay */}
-          <Dialog open={isModalOpen}>
-            <DialogContent onInteractOutside={() => setIsModalOpen(false)}>
-              <DialogHeader className="font-semibold text-center">
-                <TranslatableText
-                  text={"Create New Story"}
-                  language={language}
-                />
-              </DialogHeader>
-              <div className="flex items-center gap-3">
-                <Avatar>
-                  <AvatarImage src={user?.profilePicture} alt="img" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h1 className="text-xs font-semibold">
-                    <TranslatableText
-                      text={user?.username}
-                      language={language}
-                    />
-                  </h1>
-                  <span className="text-xs text-gray-600">
-                    <TranslatableText text="Bio here..." language={language} />
-                  </span>
-                </div>
+        <Dialog open={isModalOpen}>
+          <DialogContent
+            onInteractOutside={() => setIsModalOpen(false)}
+            className="p-6 space-y-4 bg-white shadow-xl sm:max-w-md rounded-xl"
+          >
+            <DialogHeader className="text-lg font-semibold text-center">
+              <TranslatableText text="Create New Story" language={language} />
+            </DialogHeader>
+
+            <div className="flex items-center gap-3">
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={user?.profilePicture} alt="img" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="text-sm font-medium">
+                  <TranslatableText text={user?.username} language={language} />
+                </h1>
+                <span className="text-xs text-gray-500">
+                  <TranslatableText text="Bio here..." language={language} />
+                </span>
               </div>
-              <Textarea
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                className="border-none focus-visible:ring-transparent"
-                placeholder="Write a caption..."
-              />
-              {imagePreview && (
-                <div className="flex items-center justify-center w-full h-64">
-                  <img
-                    src={imagePreview}
-                    alt="preview_img"
-                    className="object-cover w-full h-full rounded-md"
-                  />
-                </div>
-              )}
-              <input
-                ref={imageRef}
-                type="file"
-                className="hidden"
-                onChange={fileChangeHandler}
-              />
-              <Button
-                onClick={() => imageRef.current.click()}
-                className="w-fit mx-auto bg-[#0095F6] hover:bg-[#258bcf] "
-              >
-                <TranslatableText
-                  text={" Select from computer"}
-                  language={language}
+            </div>
+
+            <Textarea
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              className="border border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-transparent"
+              placeholder="Write a caption..."
+            />
+
+            {imagePreview && (
+              <div className="w-full overflow-hidden border border-gray-300 rounded-md h-60">
+                <img
+                  src={imagePreview}
+                  alt="preview_img"
+                  className="object-cover w-full h-full"
                 />
-              </Button>
-              {imagePreview &&
-                (loading ? (
-                  <Button>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    <TranslatableText
-                      text={" Please wait"}
-                      language={language}
-                    />
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={createStoryHandler}
-                    type="submit"
-                    className="w-full"
-                  >
-                    <TranslatableText text={"Post"} language={language} />
-                  </Button>
-                ))}
-            </DialogContent>
-          </Dialog>
-        </>
+              </div>
+            )}
+
+            <input
+              ref={imageRef}
+              type="file"
+              className="hidden"
+              onChange={fileChangeHandler}
+            />
+
+            <Button
+              onClick={() => imageRef.current.click()}
+              className="w-full text-white bg-blue-600 hover:bg-blue-700"
+            >
+              <TranslatableText
+                text="Select from computer"
+                language={language}
+              />
+            </Button>
+
+            {imagePreview &&
+              (loading ? (
+                <Button className="w-full" disabled>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <TranslatableText text="Please wait" language={language} />
+                </Button>
+              ) : (
+                <Button
+                  onClick={createStoryHandler}
+                  type="submit"
+                  className="w-full text-white bg-green-600 hover:bg-green-700"
+                >
+                  <TranslatableText text="Post" language={language} />
+                </Button>
+              ))}
+          </DialogContent>
+        </Dialog>
       )}
     </>
   )
@@ -199,7 +195,7 @@ export default function Story() {
 const ReelSingle = ({ story }) => {
   return (
     <Link to={`/story/${story?._id}`}>
-      <section className="w-[77px] h-[77px] p-[2px] bg-gradient-to-tr from-[#5bfec0] to-[#ca37f2] rounded-full cursor-pointer">
+      <section className="w-[77px] h-[77px] p-[2px] bg-gradient-to-tr from-[#5bfec0] to-[#ca37f2] rounded-full cursor-pointer hover:scale-105 transition-transform duration-200 shadow-md">
         <div className="flex items-center justify-center w-full h-full bg-white rounded-full dark:bg-black">
           <img
             src={story?.media}

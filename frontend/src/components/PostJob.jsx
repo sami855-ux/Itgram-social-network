@@ -1,4 +1,4 @@
-import { CalendarCheck, Clock, Plus } from "lucide-react"
+import { Badge, CalendarCheck, Clock, Plus, X } from "lucide-react"
 import { useState } from "react"
 import axios from "axios"
 
@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader } from "./ui/dialog"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { toast } from "sonner"
+import { AnimatePresence, motion } from "framer-motion"
 
 export default function PostJob() {
   const [jobInput, setJobInput] = useState({
@@ -149,142 +150,156 @@ export default function PostJob() {
   }
 
   return (
-    <div className="w-full min-h-screen pl-[18%] py-10 pr-7">
-      <form onSubmit={handelCreateJob}>
-        <h2 className="py-4 text-xl font-semibold text-gray-800">Post a Job</h2>
-        <div className="flex w-full gap-2 h-fit">
-          <div className="border border-gray-200 rounded-lg w-full lg:w-[60%] min-h-[550px] p-4">
-            <section className="">
-              <h2 className="text-lg font-semibold">Basic Information</h2>
-            </section>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="w-full min-h-screen pl-[18%] py-10 pr-7"
+    >
+      <motion.form
+        onSubmit={handelCreateJob}
+        initial={{ y: 20 }}
+        animate={{ y: 0 }}
+      >
+        <motion.h2
+          className="py-4 text-2xl font-bold text-gray-800"
+          whileHover={{ x: 2 }}
+        >
+          Post a Job
+        </motion.h2>
 
-            <div className="w-full py-4 h-fit">
-              <div className="w-[90%] flex flex-col gpa-1 my-2">
+        <div className="flex flex-col w-full gap-6 lg:flex-row h-fit">
+          {/* Main Form */}
+          <motion.div
+            className="border border-gray-200 rounded-xl w-full lg:w-[70%] p-6 bg-white shadow-sm"
+            whileHover={{ y: -2 }}
+          >
+            <motion.section
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
+              <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                Basic Information
+              </h2>
+            </motion.section>
+
+            <div className="w-full py-4 space-y-6">
+              <InputOne
+                label="job title"
+                value={jobInput.jobTitle}
+                onHandleChange={handleChange}
+              />
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <InputOne
-                  label="job title"
-                  value={jobInput.jobTitle}
+                  label="role"
+                  value={jobInput.role}
+                  onHandleChange={handleChange}
+                />
+                <InputOne
+                  label="category"
+                  value={jobInput.category}
                   onHandleChange={handleChange}
                 />
               </div>
-              <div className="w-[90%] flex gap-2 my-2">
-                <section className="flex flex-col w-1/2 gap-1">
-                  <InputOne
-                    label="role"
-                    value={jobInput.role}
-                    onHandleChange={handleChange}
-                  />
-                </section>
-                <section className="flex flex-col w-1/2 gap-1">
-                  <InputOne
-                    label="category"
-                    value={jobInput.category}
-                    onHandleChange={handleChange}
-                  />
-                </section>
-              </div>
-              <div className="w-[90%] flex flex-col gpa-1 my-2">
-                <InputOne
-                  label="job description"
-                  value={jobInput.jobDescription}
-                  onHandleChange={handleChange}
-                />
-              </div>
+
+              <InputOne
+                label="job description"
+                value={jobInput.jobDescription}
+                onHandleChange={handleChange}
+                textarea
+              />
             </div>
 
             {/* Additional Information */}
-            <section className="">
-              <h2 className="text-lg font-semibold">Additional Information</h2>
-            </section>
+            <motion.section
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                Additional Information
+              </h2>
+            </motion.section>
 
-            <div className="w-full py-4 h-fit">
-              <section className="flex flex-col">
-                <label className="text-[14px] text-gray-800 mb-1">
+            <div className="w-full py-4 space-y-6">
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Employment type
                 </label>
-                <div className="flex h-12 gap-2">
-                  <section
-                    className={`${
-                      jobInput.employmentType === "fulltime"
-                        ? "border-blue-600 bg-blue-300"
-                        : null
-                    } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                    onClick={() => {
-                      handleEmployment("fulltime")
-                    }}
-                  >
-                    <CalendarCheck size={19} />
-                    <span className="text-[14px]">Fulltime</span>
-                  </section>
-                  <section
-                    className={`${
-                      jobInput.employmentType === "freelance"
-                        ? "border-blue-600 bg-blue-300"
-                        : null
-                    } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                    onClick={() => {
-                      handleEmployment("freelance")
-                    }}
-                  >
-                    <Clock size={19} />
-                    <span className="text-[14px]">Freelance</span>
-                  </section>
-                  <section
-                    className={`${
-                      jobInput.employmentType === "contract"
-                        ? "border-blue-600 bg-blue-300"
-                        : null
-                    } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                    onClick={() => {
-                      handleEmployment("contract")
-                    }}
-                  >
-                    <Clock size={19} />
-                    <span className="text-[14px]">Contract</span>
-                  </section>
-                  <section
-                    className={`${
-                      jobInput.employmentType === "internship"
-                        ? "border-blue-600 bg-blue-300"
-                        : null
-                    } flex items-center justify-center h-10 gap-2 transition-all duration-100 ease-out border-2 border-gray-300 rounded-md cursor-pointer w-28 `}
-                    onClick={() => {
-                      handleEmployment("internship")
-                    }}
-                  >
-                    <Clock size={19} />
-                    <span className="text-[14px]">Internship</span>
-                  </section>
+                <div className="flex flex-wrap gap-3">
+                  {[
+                    {
+                      type: "fulltime",
+                      icon: <CalendarCheck size={18} />,
+                      label: "Fulltime",
+                    },
+                    {
+                      type: "freelance",
+                      icon: <Clock size={18} />,
+                      label: "Freelance",
+                    },
+                    {
+                      type: "contract",
+                      icon: <Clock size={18} />,
+                      label: "Contract",
+                    },
+                    {
+                      type: "internship",
+                      icon: <Clock size={18} />,
+                      label: "Internship",
+                    },
+                  ].map((item) => (
+                    <motion.div
+                      key={item.type}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      <button
+                        type="button"
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all ${
+                          jobInput.employmentType === item.type
+                            ? "border-blue-600 bg-blue-100 text-blue-700"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                        onClick={() => handleEmployment(item.type)}
+                      >
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </button>
+                    </motion.div>
+                  ))}
                 </div>
-              </section>
+              </div>
 
-              {/* Job placement */}
-              <div className="w-[90%] flex gap-2 my-2">
-                <section className="flex flex-col w-1/2 gap-1">
-                  <span className="text-[14px] text-gray-800 mb-1">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
                     Job placement
-                  </span>
+                  </label>
                   <select
                     name="Job placement"
                     value={jobInput.jobPlacement}
                     onChange={handleChange}
-                    className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">Select option</option>
                     <option value="onsite">Onsite</option>
                     <option value="remote">Remote</option>
                     <option value="hybrid">Hybrid</option>
                   </select>
-                </section>
+                </div>
 
-                <section className="flex flex-col w-1/2 gap-1">
-                  <span className="text-[14px] text-gray-800 mb-1">
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
                     Job experience
-                  </span>
+                  </label>
                   <select
                     name="Job experience"
                     value={jobInput.jobExperience}
                     onChange={handleChange}
-                    className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">Select option</option>
                     <option value="no">No experience</option>
@@ -293,193 +308,332 @@ export default function PostJob() {
                     <option value="4-8">4-8 years</option>
                     <option value=">8">more than 8 years</option>
                   </select>
-                </section>
-              </div>
-
-              {/* Company Information */}
-              <h2 className="pt-5 text-lg font-semibold">
-                Company Information
-              </h2>
-
-              <div className="w-full py-4 h-fit">
-                <div className="w-[90%] flex flex-col gpa-1 my-2">
-                  <InputOne
-                    label="company name"
-                    value={jobInput.companyName}
-                    onHandleChange={handleChange}
-                  />
                 </div>
-                <h2 className="font-semibold text-[16px] py-2 text-gray-900">
-                  Location
-                </h2>
-
-                <div className="w-[90%] flex gap-2 my-2">
-                  <section className="flex flex-col w-1/2 gap-1">
-                    <span className="text-[14px] text-gray-800 mb-1">City</span>
-                    <select
-                      name="city"
-                      value={jobInput.city}
-                      onChange={handleChange}
-                      className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
-                    >
-                      <option value="">Select option</option>
-                      <option value="addis abeba">Addis abeba</option>
-                      <option value="bhair dar">Bhair dar</option>
-                      <option value="debre brihan">Debre brihan</option>
-                    </select>
-                  </section>
-
-                  <section className="flex flex-col w-1/2 gap-1">
-                    <span className="text-[14px] text-gray-800 mb-1">
-                      Country
-                    </span>
-                    <select
-                      name="country"
-                      value={jobInput.country}
-                      onChange={handleChange}
-                      className="py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px]"
-                    >
-                      <option value="">Select option</option>
-                      <option value="ethiopia">Ethiopia</option>
-                      <option value="kenya">Kenya</option>
-                      <option value="sudan">Sudan</option>
-                      <option value="egypt">Egypt</option>
-                      <option value="other">other</option>
-                    </select>
-                  </section>
-                </div>
-                <h2 className="font-semibold text-[16px] pt-5 pb-2 text-gray-900">
-                  About job
-                </h2>
-                <section className="flex flex-col w-full gap-1 pt-3">
-                  <span className="text-[14px] text-gray-800">
-                    Skill required
-                  </span>
-                  <div className="flex flex-wrap items-center w-full gap-2 min-h-14">
-                    <section
-                      className="w-7 h-7 bg-[#618bd3] flex items-center justify-center rounded-full capitalize cursor-pointer"
-                      onClick={() => setIsModalOpen(true)}
-                    >
-                      <Plus size={15} />
-                    </section>
-                    {jobInput.skills && jobInput.skills.length > 0
-                      ? jobInput.skills.map((skill, skillIndex) => (
-                          <Skills skill={skill} key={skillIndex} />
-                        ))
-                      : null}
-                  </div>
-                </section>
-                <section className="flex flex-col w-full gap-1 pt-3">
-                  <span className="text-[14px] text-gray-800 font-semibold">
-                    Salary range
-                  </span>
-                  <section className="flex items-center w-full gap-3 h-fit">
-                    <span className="font-medium text-[14px] text-gray-800 capitalize">
-                      Max salary
-                    </span>
-                    <input
-                      type="number"
-                      name={"max salary"}
-                      value={jobInput.salary.max}
-                      onChange={handleChange}
-                      className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
-                    />
-                    <span className="font-medium text-[14px] text-gray-800 capitalize">
-                      Min salary
-                    </span>
-                    <input
-                      type="number"
-                      name={"min salary"}
-                      value={jobInput.salary.min}
-                      onChange={handleChange}
-                      className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
-                    />
-                  </section>
-                </section>
-                <span className="font-medium text-[14px] text-gray-800 capitalize block pt-4">
-                  Deadline date
-                </span>
-                <input
-                  type="date"
-                  name={"deadline"}
-                  value={jobInput.deadline}
-                  onChange={handleChange}
-                  className="w-44 text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
-                />
               </div>
             </div>
-          </div>
-          <section className="hidden lg:flex flex-col p-3 py-5 bg-[#d3dae3] rounded-lg h-44 w-80 ml-4">
-            <h2 className="font-semibold text-[15px] text-gray-900">
+
+            {/* Company Information */}
+            <motion.section
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                Company Information
+              </h2>
+            </motion.section>
+
+            <div className="w-full py-4 space-y-6">
+              <InputOne
+                label="company name"
+                value={jobInput.companyName}
+                onHandleChange={handleChange}
+              />
+
+              <h3 className="text-lg font-semibold text-gray-800">Location</h3>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    City
+                  </label>
+                  <select
+                    name="city"
+                    value={jobInput.city}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select option</option>
+                    <option value="addis abeba">Addis abeba</option>
+                    <option value="bhair dar">Bhair dar</option>
+                    <option value="debre brihan">Debre brihan</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Country
+                  </label>
+                  <select
+                    name="country"
+                    value={jobInput.country}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select option</option>
+                    <option value="ethiopia">Ethiopia</option>
+                    <option value="kenya">Kenya</option>
+                    <option value="sudan">Sudan</option>
+                    <option value="egypt">Egypt</option>
+                    <option value="other">other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-4 text-lg font-semibold text-gray-800">
+                  About job
+                </h3>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      Skills required
+                    </label>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <motion.button
+                        type="button"
+                        className="flex items-center justify-center w-8 h-8 text-white transition-colors bg-blue-600 rounded-full hover:bg-blue-700"
+                        onClick={() => setIsModalOpen(true)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <Plus size={18} />
+                      </motion.button>
+
+                      <AnimatePresence>
+                        {jobInput.skills.map((skill, skillIndex) => (
+                          <motion.div
+                            key={skillIndex}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            layout
+                          >
+                            <Badge className="flex items-center gap-2 px-3 py-1 text-blue-700 bg-blue-100 hover:bg-blue-200">
+                              {skill}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setJobInput({
+                                    ...jobInput,
+                                    skills: jobInput.skills.filter(
+                                      (_, i) => i !== skillIndex
+                                    ),
+                                  })
+                                }}
+                                className="text-blue-700 hover:text-blue-900"
+                              >
+                                <X size={14} />
+                              </button>
+                            </Badge>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      Salary range
+                    </label>
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <div>
+                        <label className="block mb-1 text-xs text-gray-500">
+                          Minimum salary
+                        </label>
+                        <div className="relative">
+                          <span className="absolute text-gray-500 transform -translate-y-1/2 left-3 top-1/2">
+                            $
+                          </span>
+                          <input
+                            type="number"
+                            name="min salary"
+                            value={jobInput.salary.min}
+                            onChange={handleChange}
+                            className="w-full py-2 pl-8 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block mb-1 text-xs text-gray-500">
+                          Maximum salary
+                        </label>
+                        <div className="relative">
+                          <span className="absolute text-gray-500 transform -translate-y-1/2 left-3 top-1/2">
+                            $
+                          </span>
+                          <input
+                            type="number"
+                            name="max salary"
+                            value={jobInput.salary.max}
+                            onChange={handleChange}
+                            className="w-full py-2 pl-8 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      Deadline date
+                    </label>
+                    <input
+                      type="date"
+                      name="deadline"
+                      value={jobInput.deadline}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Side Panel */}
+          <motion.div
+            className="sticky flex-col hidden p-6 lg:flex bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl h-fit top-6"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <h2 className="mb-3 font-semibold text-gray-800">
               Place of work if accepted into this job vacancy
             </h2>
-            <p className="text-[14px] text-gray-800 pt-4">
+            <p className="text-sm text-gray-600">
               You can fill manually, if your work address is different from the
               head office address
             </p>
-          </section>
+          </motion.div>
         </div>
 
-        <div className="flex items-center justify-between w-[70%] h-16 py-4">
-          <Button className="px-10 text-gray-900 bg-gray-400 hover:bg-gray-300">
-            Cancel
+        <motion.div
+          className="flex items-center justify-end gap-4 mt-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Button
+            type="button"
+            variant="outline"
+            className="px-8 py-3 text-gray-700 hover:bg-gray-100"
+            onClick={() => {
+              setJobInput({
+                jobTitle: "",
+                role: "",
+                category: "",
+                jobDescription: "",
+                employmentType: "",
+                jobPlacement: "",
+                jobExperience: "",
+                companyName: "",
+                city: "",
+                country: "",
+                skills: [],
+                salary: {
+                  max: 0,
+                  min: 0,
+                },
+                deadline: "",
+              })
+            }}
+          >
+            Reset
           </Button>
-          <Button type="submit" className="px-10 bg-blue-600 hover:bg-blue-500">
-            Post a job
+          <Button
+            type="submit"
+            className="px-8 py-3 text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <motion.span
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 2V6M12 18V22M6 12H2M22 12H18M19.0784 19.0784L16.25 16.25M19.0784 4.99994L16.25 7.82837M4.92157 19.0784L7.75 16.25M4.92157 4.99994L7.75 7.82837"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </motion.span>
+                Posting...
+              </span>
+            ) : (
+              "Post Job"
+            )}
           </Button>
-        </div>
-      </form>
-      {isModalOpen && (
-        <>
-          {/* //overlay */}
-          <Dialog open={isModalOpen}>
-            <DialogContent onInteractOutside={() => setIsModalOpen(false)}>
-              <DialogHeader className="font-semibold text-center">
-                Add the skill you want
+        </motion.div>
+      </motion.form>
+
+      {/* Add Skill Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <DialogContent>
+              <DialogHeader className="text-lg font-semibold">
+                Add Required Skill
               </DialogHeader>
-              <div className="flex items-center gap-3"></div>
-              <Input
-                value={enterdSkill}
-                onChange={(e) => setEnterdSkill(e.target.value)}
-                className="border-none focus-visible:ring-transparent"
-                placeholder="Enter the skill..."
-              />
-
-              <Button
-                className="w-fit mx-auto bg-[#0095F6] hover:bg-[#258bcf] px-7"
-                onClick={handleAddSkill}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
               >
-                Add
-              </Button>
+                <Input
+                  value={enterdSkill}
+                  onChange={(e) => setEnterdSkill(e.target.value)}
+                  placeholder="Enter skill name..."
+                  className="focus:ring-2 focus:ring-blue-500"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleAddSkill()
+                    }
+                  }}
+                />
+                <div className="flex justify-end gap-3 mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleAddSkill}>Add Skill</Button>
+                </div>
+              </motion.div>
             </DialogContent>
           </Dialog>
-        </>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+const InputOne = ({ label, value, onHandleChange, textarea = false }) => {
+  return (
+    <div className="space-y-1">
+      <label className="block text-sm font-medium text-gray-700 capitalize">
+        {label}
+      </label>
+      {textarea ? (
+        <textarea
+          name={label}
+          value={value}
+          onChange={onHandleChange}
+          className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px]"
+          rows={4}
+        />
+      ) : (
+        <input
+          type="text"
+          name={label}
+          value={value}
+          onChange={onHandleChange}
+          className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
       )}
     </div>
-  )
-}
-
-const Skills = ({ skill }) => {
-  return (
-    <section className="w-fit px-4 py-2 bg-[#a8c4f6] flex items-center justify-center text-[14px] rounded-2xl capitalize">
-      {skill}
-    </section>
-  )
-}
-
-const InputOne = ({ label, value, onHandleChange }) => {
-  return (
-    <>
-      <span className="font-medium text-[14px] text-gray-800 capitalize">
-        {label}
-      </span>
-      <input
-        type="text"
-        name={label}
-        value={value}
-        onChange={onHandleChange}
-        className="w-full text-[14px] px-3 py-1 my-2 border border-gray-300 rounded-md outline-none focus-visible:ring-transparent"
-      />
-    </>
   )
 }

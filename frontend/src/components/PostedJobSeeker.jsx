@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion"
 import { BadgeDollarSign, Loader2, MapPin, Search } from "lucide-react"
 import { useEffect, useRef, useState, useMemo } from "react"
 import { toast } from "sonner"
@@ -5,13 +6,13 @@ import axios from "axios"
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Dialog, DialogContent, DialogHeader } from "./ui/dialog"
-import styles from "./PostedJobSeeker.module.css"
-import { readFileAsDataURL } from "@/lib/utils"
-import person from "../assets/person.png"
 import { Textarea } from "./ui/textarea"
 import { Button } from "./ui/button"
 import { useLanguage } from "@/context/LanaguageContext"
 import { TranslatableText } from "@/utils/TranslatableText"
+import Empty from "./Empty"
+import { readFileAsDataURL } from "@/lib/utils"
+import person from "../assets/person.png"
 
 export default function PostedJobSeeker() {
   const imageRef = useRef()
@@ -40,11 +41,9 @@ export default function PostedJobSeeker() {
 
   const filteredJobsArr = useMemo(() => {
     let filtered = allJobs.filter((job) => {
-      // Job Type Filtering
       if (filters.jobType && job.employmentType !== filters.jobType) {
         return false
       }
-      // Salary Range Filtering
       if (filters.salary && filters.salary.min && filters.salary.max) {
         const { min, max } = filters.salary
         if (job.salary) {
@@ -55,33 +54,27 @@ export default function PostedJobSeeker() {
           }
         }
       }
-
       return true
     })
 
-    //Sorting
     if (filters.sortOption) {
       switch (filters.sortOption) {
         case "newest":
-          // Sort by the newest created date (most recent first)
           filtered = filtered.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           )
           break
         case "oldest":
-          // Sort by the oldest created date (least recent first)
           filtered = filtered.sort(
             (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
           )
           break
         case "a-z":
-          // Sort by title alphabetically (A to Z)
           filtered = filtered.sort((a, b) =>
             a.jobTitle.localeCompare(b.jobTitle)
           )
           break
         case "z-a":
-          // Sort by jobTitle alphabetically (Z to A)
           filtered = filtered.sort((a, b) =>
             b.jobTitle.localeCompare(a.jobTitle)
           )
@@ -95,7 +88,6 @@ export default function PostedJobSeeker() {
   }, [filters, allJobs])
 
   const displayData = query ? filteredJobs : filteredJobsArr
-
   const paginatedJobs = useMemo(() => {
     const start = (currentPage - 1) * jobsPerPage
     const end = start + jobsPerPage
@@ -114,6 +106,7 @@ export default function PostedJobSeeker() {
   const handleSort = (e) => {
     setFilters({ ...filters, sortOption: e.target.value })
   }
+
   const fileChangeHandler = async (e) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -122,6 +115,7 @@ export default function PostedJobSeeker() {
       setImagePreview(dataUrl)
     }
   }
+
   const handleApplyToJob = async () => {
     const formData = new FormData()
     formData.append("message", message)
@@ -162,9 +156,7 @@ export default function PostedJobSeeker() {
           withCredentials: true,
         }
       )
-
       if (res.data.success) {
-        console.log(res.data)
         return res.data.jobs
       }
     } catch (error) {
@@ -177,14 +169,11 @@ export default function PostedJobSeeker() {
 
   const handleSearch = (e) => {
     setQuery(e.target.value)
-
     e.preventDefault()
-
     if (!query) {
       setFilteredJobs(allJobs)
       return
     }
-
     const data = allJobs.filter((job) => {
       const searchContent = `${job.jobTitle} ${job.companyName}`.toLowerCase()
       return query
@@ -192,9 +181,6 @@ export default function PostedJobSeeker() {
         .split(" ")
         .every((word) => searchContent.includes(word))
     })
-
-    console.log(query, data)
-
     setFilteredJobs(data)
   }
 
@@ -204,7 +190,6 @@ export default function PostedJobSeeker() {
       setAllJobs(data)
       setFilteredJobs(data)
     }
-
     getJobs()
   }, [])
 
@@ -213,137 +198,182 @@ export default function PostedJobSeeker() {
   }, [filters])
 
   return (
-    <div className="w-full min-h-screen pl-[18%] py-10 pr-7">
-      <h2 className="text-xl font-semibold text-gray-900 capitalize">
-        <TranslatableText text="Find you dream job" language={language} />
-      </h2>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="w-full min-h-screen pl-[18%] py-10 pr-7"
+    >
+      <motion.h2
+        className="text-2xl font-bold text-gray-900 capitalize"
+        initial={{ y: -20 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <TranslatableText text="Find your dream job" language={language} />
+      </motion.h2>
+
       {/* Search Bar */}
-      <form className="w-[80%] h-14 flex gap-2 items-center bg-slate-100 px-4 rounded-[34px] my-5">
-        <Search size={20} />
+      <motion.form
+        className="w-[80%] h-14 flex gap-2 items-center bg-white px-6 rounded-full my-5 shadow-md border border-gray-200"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <Search size={20} className="text-gray-500" />
         <input
           type="text"
           value={query}
           onChange={handleSearch}
           placeholder="Job title or keywords..."
-          className="bg-transparent h-full w-[80%] px-4 text-[15px] outline-none"
+          className="bg-transparent h-full w-full px-4 text-[15px] outline-none"
         />
-        <p
-          className="px-2 mx-2 text-gray-700 cursor-pointer text-[15px]"
-          onClick={() => {
-            setQuery("")
-            setFilteredJobs(allJobs)
-          }}
-        >
-          <TranslatableText text="Clear" language={language} />
-        </p>
-        <button
+        {query && (
+          <motion.p
+            className="px-4 py-1 text-gray-700 cursor-pointer text-[15px] rounded-full hover:bg-gray-100"
+            onClick={() => {
+              setQuery("")
+              setFilteredJobs(allJobs)
+            }}
+            whileHover={{ scale: 1.05 }}
+          >
+            <TranslatableText text="Clear" language={language} />
+          </motion.p>
+        )}
+        <motion.button
           type="submit"
-          className="h-10 px-6 bg-blue-700 text-white rounded-3xl cursor-pointer text-[15px]"
+          className="h-10 px-6 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-full cursor-pointer text-[15px]"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
         >
           <TranslatableText text="Search" language={language} />
-        </button>
-      </form>
+        </motion.button>
+      </motion.form>
 
       {/* Main content */}
-      <div className="flex w-full gap-4 h-fit">
+      <div className="flex w-full gap-6 h-fit">
         {/* Filter div */}
-        <div className=" w-80 min-h-96 p-7">
-          <p className="py-4 text-gray-800">
-            {" "}
-            <TranslatableText text={"Filter"} language={language} />
-          </p>
+        {allJobs && allJobs.length > 0 ? (
+          <motion.div
+            className="p-6 bg-white border border-gray-100 shadow-sm w-80 min-h-96 rounded-xl"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <p className="py-4 text-lg font-medium text-gray-800">
+              <TranslatableText text={"Filter"} language={language} />
+            </p>
 
-          <section className="w-full">
-            <p
-              className="uppercase text-gray-800 text-[14px] font-semibold py-4"
-              onClick={() => {
-                setFilters({ ...filters, jobType: "" })
-              }}
-            >
-              <TranslatableText text="job type" language={language} />
-            </p>
-            <div className="flex flex-col gap-2">
-              {[
-                "fulltime",
-                "parttime",
-                "internship",
-                "contract",
-                "freelance",
-              ].map((type) => (
-                <label key={type} className={`${styles["custom-checkbox"]}`}>
-                  <input
-                    type="checkbox"
-                    checked={filters.jobType.includes(type)}
-                    onChange={() => handleChange(type)}
-                  />
-                  <span className={`${styles.checkmark}`}></span>
-                  <span className="capitalize">
-                    {" "}
-                    <TranslatableText text={type} language={language} />
-                  </span>
-                </label>
-              ))}
-            </div>
-            <p className="uppercase text-gray-800 text-[14px] font-semibold pb-5 pt-7">
-              <TranslatableText text={"salary"} language={language} />
-            </p>
-            <div className="flex items-center gap-3">
-              <select
-                name="max"
-                value={filters.salary.max}
-                onChange={(e) => {
-                  setFilters({
-                    ...filters,
-                    salary: {
-                      ...filters.salary,
-                      max: parseInt(e.target.value),
-                    },
-                  })
-                }}
-                className="w-24 py-2 border rounded-md border-gray-300 px-1 outline-none text-[14px]"
-              >
-                <option value="">
-                  <TranslatableText text={"Max"} language={language} />{" "}
-                </option>
-                <option value="500">500</option>
-                <option value="1000">1000</option>
-                <option value="1500">15000</option>
-                <option value="2500"> more than 25000 </option>
-              </select>
-              <select
-                name="min"
-                value={filters.salary.min}
-                onChange={(e) => {
-                  setFilters({
-                    ...filters,
-                    salary: {
-                      ...filters.salary,
-                      min: parseInt(e.target.value),
-                    },
-                  })
-                }}
-                className="w-24 py-2 border rounded-md border-gray-300 px-1 outline-none text-[14px]"
-              >
-                <option value="">
-                  {" "}
-                  <TranslatableText text={"Mai"} language={language} />
-                </option>
-                <option value="100">100</option>
-                <option value="500">500</option>
-                <option value="1600">1600</option>
-                <option value="2000">2000</option>
-              </select>
-            </div>
-          </section>
-        </div>
-        {/* Job list div */}{" "}
+            <section className="w-full">
+              <p className="uppercase text-gray-800 text-[14px] font-semibold py-4">
+                <TranslatableText text="job type" language={language} />
+              </p>
+              <div className="flex flex-col gap-3">
+                {[
+                  "fulltime",
+                  "parttime",
+                  "internship",
+                  "contract",
+                  "freelance",
+                ].map((type) => (
+                  <motion.label
+                    key={type}
+                    className="flex items-center gap-3 cursor-pointer"
+                    whileHover={{ x: 3 }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={filters.jobType.includes(type)}
+                      onChange={() => handleChange(type)}
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <span className="capitalize">
+                      <TranslatableText text={type} language={language} />
+                    </span>
+                  </motion.label>
+                ))}
+              </div>
+              <p className="uppercase text-gray-800 text-[14px] font-semibold pb-5 pt-7">
+                <TranslatableText text={"salary"} language={language} />
+              </p>
+              <div className="flex items-center gap-3">
+                <motion.select
+                  name="max"
+                  value={filters.salary.max}
+                  onChange={(e) => {
+                    setFilters({
+                      ...filters,
+                      salary: {
+                        ...filters.salary,
+                        max: parseInt(e.target.value),
+                      },
+                    })
+                  }}
+                  className="w-24 py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px] focus:ring-2 focus:ring-blue-500/50"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <option value="">
+                    <TranslatableText text={"Max"} language={language} />
+                  </option>
+                  <option value="500">500</option>
+                  <option value="1000">1000</option>
+                  <option value="1500">15000</option>
+                  <option value="2500">more than 25000</option>
+                </motion.select>
+                <motion.select
+                  name="min"
+                  value={filters.salary.min}
+                  onChange={(e) => {
+                    setFilters({
+                      ...filters,
+                      salary: {
+                        ...filters.salary,
+                        min: parseInt(e.target.value),
+                      },
+                    })
+                  }}
+                  className="w-24 py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px] focus:ring-2 focus:ring-blue-500/50"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <option value="">
+                    <TranslatableText text={"Min"} language={language} />
+                  </option>
+                  <option value="100">100</option>
+                  <option value="500">500</option>
+                  <option value="1600">1600</option>
+                  <option value="2000">2000</option>
+                </motion.select>
+              </div>
+            </section>
+          </motion.div>
+        ) : null}
+
+        {/* Job list div */}
         {isLoading ? (
-          <div className="flex items-center justify-center w-full h-96">
-            <Loader2 className="w-16 h-16 animated-spin" />
-          </div>
-        ) : (
-          <div className="flex flex-col w-full gap-2 pt-9 h-fit">
-            <section className="flex items-center justify-between w-[85%] h-10 px-2">
+          <motion.div
+            className="flex items-center justify-center w-full h-96"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            >
+              <Loader2 className="w-16 h-16 text-blue-500" />
+            </motion.div>
+          </motion.div>
+        ) : allJobs && allJobs.length > 0 ? (
+          <motion.div
+            className="flex flex-col w-full gap-4 pt-6 h-fit"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <motion.section
+              className="flex items-center justify-between w-[85%] h-10 px-2"
+              initial={{ y: -10 }}
+              animate={{ y: 0 }}
+            >
               {allJobs.length > 0 && (
                 <p className="font-semibold text-[15px]">
                   {allJobs.length}{" "}
@@ -358,14 +388,15 @@ export default function PostedJobSeeker() {
                   >
                     <TranslatableText text={"Sort by"} language={language} />
                   </label>
-                  <select
+                  <motion.select
                     id="sort"
                     value={filters.sortOption}
                     onChange={handleSort}
-                    className="text-[15px] py-1 border border-gray-200 rounded-md px-4 outline-none"
+                    className="text-[15px] py-1 border border-gray-200 rounded-md px-4 outline-none focus:ring-2 focus:ring-blue-500/50"
+                    whileHover={{ scale: 1.02 }}
                   >
                     <option value="newest">
-                      <TranslatableText text={"Newest"} language={language} />{" "}
+                      <TranslatableText text={"Newest"} language={language} />
                     </option>
                     <option value="oldest">
                       <TranslatableText text={"Oldest"} language={language} />
@@ -374,63 +405,88 @@ export default function PostedJobSeeker() {
                       {language == "am" ? "ሀ ->ፐ" : "A → Z"}
                     </option>
                     <option value="z-a">
-                      {" "}
                       {language == "am" ? "ፐ -> ሀ" : "Z → A"}
                     </option>
-                  </select>
+                  </motion.select>
                 </div>
               )}
-            </section>
-            {/* Job lister container */}
-            <div className="flex flex-col w-[85%] gap-2 h-fit">
-              {paginatedJobs && paginatedJobs.length > 0 ? (
-                paginatedJobs.map((job, jobIndex) => (
-                  <Job
-                    onOpen={setOpen}
-                    job={job}
-                    key={jobIndex}
-                    setJobId={setJobId}
-                  />
-                ))
-              ) : (
-                <p className="py-4 text-gray-800">
-                  <TranslatableText
-                    text={"There is no jobs now"}
-                    language={language}
-                  />
-                </p>
-              )}
+            </motion.section>
 
-              <div className="flex items-center w-full h-16 gap-4">
-                <button
-                  className="py-1 bg-blue-600 border border-blue-300 rounded-lg cursor-pointer disabled:text-slate-400 disabled:cursor-not-allowed px-7 disabled:bg-blue-200"
+            {/* Job lister container */}
+            <div className="flex flex-col w-[85%] gap-4 h-fit">
+              <AnimatePresence>
+                {paginatedJobs && paginatedJobs.length > 0 ? (
+                  paginatedJobs.map((job, jobIndex) => (
+                    <Job
+                      onOpen={setOpen}
+                      job={job}
+                      key={jobIndex}
+                      setJobId={setJobId}
+                    />
+                  ))
+                ) : (
+                  <motion.p
+                    className="py-4 text-gray-800"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <TranslatableText
+                      text={"There is no jobs now"}
+                      language={language}
+                    />
+                  </motion.p>
+                )}
+              </AnimatePresence>
+
+              <motion.div
+                className="flex items-center w-full h-16 gap-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                <motion.button
+                  className="py-2 text-white bg-blue-600 border border-blue-300 rounded-lg cursor-pointer disabled:text-slate-400 disabled:cursor-not-allowed px-7 disabled:bg-blue-200"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((prev) => prev - 1)}
+                  whileHover={{ scale: currentPage === 1 ? 1 : 1.03 }}
+                  whileTap={{ scale: currentPage === 1 ? 1 : 0.97 }}
                 >
                   <TranslatableText text={"Previous"} language={language} />
-                </button>
+                </motion.button>
 
-                <span>
+                <span className="text-gray-700">
                   <TranslatableText text="Page" language={language} />{" "}
                   {currentPage}{" "}
                   <TranslatableText text="of" language={language} />{" "}
                   {totalPages}
                 </span>
 
-                <button
-                  className="py-1 bg-blue-600 border border-blue-300 rounded-lg cursor-pointer px-7 disabled:text-slate-400 disabled:cursor-not-allowed disabled:bg-blue-200"
+                <motion.button
+                  className="py-2 text-white bg-blue-600 border border-blue-300 rounded-lg cursor-pointer px-7 disabled:text-slate-400 disabled:cursor-not-allowed disabled:bg-blue-200"
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((prev) => prev + 1)}
+                  whileHover={{ scale: currentPage === totalPages ? 1 : 1.03 }}
+                  whileTap={{ scale: currentPage === totalPages ? 1 : 0.97 }}
                 >
                   <TranslatableText text="Next" language={language} />
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            className="flex items-center justify-center w-full h-fit"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Empty type="job" />
+          </motion.div>
         )}
       </div>
 
-      <Dialog open={open} className="w-[500px]">
+      {/* Application Dialog */}
+      <Dialog open={open}>
         <DialogContent
           onInteractOutside={() => {
             setOpen(false)
@@ -438,109 +494,124 @@ export default function PostedJobSeeker() {
             setMessage("")
             setImagePreview("")
           }}
+          className="max-w-md"
         >
           <DialogHeader className="py-4 text-xl font-semibold text-center">
             <TranslatableText text={"Apply to the job"} language={language} />
           </DialogHeader>
-          <label htmlFor="" className="text-[14px] block">
-            <TranslatableText text={"Write Your message"} language={language} />
-          </label>
-          <Textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="border border-gray-200 focus-visible:ring-transparent"
-            placeholder="message..."
-          />
-          {imagePreview && (
-            <div className="flex items-center justify-center w-full h-64">
-              <img
-                src={imagePreview}
-                alt="preview_img"
-                className="object-cover w-full h-full rounded-md"
-              />
-            </div>
-          )}
-          <input
-            ref={imageRef}
-            type="file"
-            className="hidden"
-            onChange={fileChangeHandler}
-          />
-          <Button
-            onClick={() => imageRef.current.click()}
-            className="w-fit mx-auto bg-[#0095F6] hover:bg-[#258bcf] "
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
           >
-            <TranslatableText text={"Attach your resume"} language={language} />
-          </Button>
-          {imagePreview &&
-            (loadingApply ? (
-              <Button>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                <TranslatableText text={"Please wait..."} language={language} />
-              </Button>
-            ) : (
-              <Button
-                onClick={handleApplyToJob}
-                type="submit"
-                className="w-full"
+            <label className="text-[14px] block font-medium">
+              <TranslatableText
+                text={"Write Your message"}
+                language={language}
+              />
+            </label>
+            <Textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="border border-gray-200 focus:ring-2 focus:ring-blue-500/50"
+              placeholder="message..."
+            />
+            {imagePreview && (
+              <motion.div
+                className="flex items-center justify-center w-full h-64 overflow-hidden rounded-md"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
               >
-                <TranslatableText text={"Apply Now"} language={language} />
+                <img
+                  src={imagePreview}
+                  alt="preview_img"
+                  className="object-contain w-full h-full"
+                />
+              </motion.div>
+            )}
+            <input
+              ref={imageRef}
+              type="file"
+              className="hidden"
+              onChange={fileChangeHandler}
+            />
+            <motion.div className="flex flex-col gap-3">
+              <Button
+                onClick={() => imageRef.current.click()}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <TranslatableText
+                  text={"Attach your resume"}
+                  language={language}
+                />
               </Button>
-            ))}
+              {imagePreview &&
+                (loadingApply ? (
+                  <Button disabled>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <TranslatableText
+                      text={"Please wait..."}
+                      language={language}
+                    />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleApplyToJob}
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <TranslatableText text={"Apply Now"} language={language} />
+                  </Button>
+                ))}
+            </motion.div>
+          </motion.div>
         </DialogContent>
       </Dialog>
-    </div>
-  )
-}
-/* eslint-disable-next-line */
-const PageNumber = ({ number }) => {
-  const isActive = false
-  return (
-    <span
-      className={`${
-        isActive
-          ? "border-blue-600 bg-blue-600 text-white"
-          : "text-gray-800 border-gray-200"
-      } flex items-center justify-center w-8 h-8   border  rounded-full text-[14px] cursor-pointer`}
-    >
-      {number}
-    </span>
+    </motion.div>
   )
 }
 
-//eslint-disable-next-line
 const Job = ({ onOpen, job, setJobId }) => {
   const { language } = useLanguage()
   return (
-    <section
-      className="flex flex-col w-full p-5 border border-blue-100 cursor-pointer h-fit rounded-xl hover:bg-gray-100"
+    <motion.section
+      className="w-full p-6 transition-all bg-white border border-gray-200 cursor-pointer rounded-xl hover:shadow-md"
       onClick={() => {
         onOpen(true)
-        //eslint-disable-next-line
         setJobId(`${job?._id}`)
       }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.3 }}
     >
-      <div className="flex w-full gap-2 h-fit">
-        <Avatar className="w-16 h-16 border border-gray-400">
-          {/* eslint-disable-next-line */}
-          <AvatarImage src={job.author?.profilePicture} alt="@shadcn" />
-          <AvatarFallback>
-            <img src={person} alt="default image" />
-          </AvatarFallback>
-        </Avatar>
+      <div className="flex w-full gap-4">
+        <motion.div whileHover={{ scale: 1.05 }}>
+          <Avatar className="w-16 h-16 border-2 border-blue-100">
+            <AvatarImage src={job.author?.profilePicture} alt="@shadcn" />
+            <AvatarFallback>
+              <img src={person} alt="default image" />
+            </AvatarFallback>
+          </Avatar>
+        </motion.div>
 
-        <article className="w-[420px]">
-          <h2 className="py-1 text-lg font-semibold text-gray-800">
-            {/* eslint-disable-next-line */}
+        <article className="flex-1">
+          <motion.h2
+            className="py-1 text-lg font-bold text-gray-800 transition-colors hover:text-blue-600"
+            whileHover={{ x: 2 }}
+          >
             <TranslatableText text={job.jobTitle} language={language} />
-          </h2>
-          {/* eslint-disable-next-line */}
-          <p className="text-[14px] pr-4">
+          </motion.h2>
+          <p className="text-[14px] pr-4 text-gray-600 line-clamp-2">
             <TranslatableText text={job.jobDescription} language={language} />
           </p>
-          <p className="text-[15px]">
+          <p className="text-[15px] mt-1">
             <TranslatableText text="by" language={language} />{" "}
-            <span className="text-blue-600">
+            <span className="font-medium text-blue-600">
               <TranslatableText
                 text={job.author.username}
                 language={language}
@@ -548,87 +619,96 @@ const Job = ({ onOpen, job, setJobId }) => {
             </span>
           </p>
         </article>
-        <article className="py-9 pl-7">
+        <article className="py-2 pl-4">
           <p className="text-[14px] text-gray-700">
-            <TranslatableText text="Company name:" language={language} />{" "}
-            <span className="text-blue-600 capitalize">
+            <TranslatableText text="Company:" language={language} />{" "}
+            <span className="font-medium text-blue-600 capitalize">
               <TranslatableText text={job.companyName} language={language} />{" "}
             </span>
           </p>
         </article>
       </div>
-      <div className="flex items-center w-full gap-2 pt-5 h-fit">
-        <p className="text-[14px] text-gray-700">
+      <div className="flex flex-wrap items-center w-full gap-2 pt-4">
+        <p className="text-[14px] text-gray-700 font-medium">
           <TranslatableText text="Skills required" language={language} />
         </p>
         {job.skillsRequired.map((skill, skillIndex) => (
           <Skills skill={skill} key={skillIndex} />
         ))}
       </div>
-      <div className="flex w-full gap-1 pt-4 h-fit">
-        <span className="text-[14px] px-3 py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold capitalize">
+      <div className="flex flex-wrap w-full gap-2 pt-4">
+        <motion.span
+          className="text-[14px] px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-medium capitalize"
+          whileHover={{ scale: 1.05 }}
+        >
           <TranslatableText text={job.employmentType} language={language} />
-        </span>
-        <span className="text-[14px] px-3 py-1 rounded-3xl bg-blue-100 text-[#4b75df] font-semibold">
+        </motion.span>
+        <motion.span
+          className="text-[14px] px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-medium"
+          whileHover={{ scale: 1.05 }}
+        >
           <TranslatableText text="Onsite" language={language} />
-        </span>
-        <span className="text-[14px] capitalize flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#173e8a] font-semibold">
-          <MapPin color="#4b75df" size={18} />
+        </motion.span>
+        <motion.span
+          className="text-[14px] flex gap-1 rounded-full bg-blue-100 items-center px-4 py-1 text-blue-700 font-medium"
+          whileHover={{ scale: 1.05 }}
+        >
+          <MapPin color="#3b82f6" size={16} />
           <TranslatableText text={job.city} language={language} />,{" "}
           <TranslatableText text={job.country} language={language} />
-        </span>
-        <span className="text-[14px] flex gap-1 rounded-3xl bg-blue-100 items-center px-4 py-1  text-[#14377d] font-semibold">
-          {/* eslint-disable-next-line */}
-          <BadgeDollarSign color="#4b75df" size={18} />${job.salaryRange.max}{" "}
-          birr - {/* eslint-disable-next-line */}
+        </motion.span>
+        <motion.span
+          className="text-[14px] flex gap-1 rounded-full bg-blue-100 items-center px-4 py-1 text-blue-700 font-medium"
+          whileHover={{ scale: 1.05 }}
+        >
+          <BadgeDollarSign color="#3b82f6" size={16} />${job.salaryRange.max} -{" "}
           {job.salaryRange.min} birr/month
-        </span>
+        </motion.span>
       </div>
-      <span className="text-[14px] flex gap-1 items-center  pt-4  text-[#14377d] font-semibold">
-        {/* eslint-disable-next-line */}
-        <TranslatableText
-          text={getTimeLeftUntil(job.deadline)}
-          language={language}
-        />
-      </span>
-      <p className="pt-3  text-[14px] text-gray-700">
-        {/* eslint-disable-next-line */}
-        {job.applicants.length === 0 ? (
-          <span className="text-red-500">
-            <TranslatableText
-              text="No user applied to this job yet"
-              language={language}
-            />
-          </span>
-        ) : (
-          <span className="text-green-600">
-            {" "}
-            {/* eslint-disable-next-line */}
-            {job.applicants.length}{" "}
-            <TranslatableText
-              text="applicants applied to this job until now"
-              language={language}
-            />
-          </span>
-        )}
-      </p>
-    </section>
+      <motion.div
+        className="pt-4 text-[14px]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <span className="font-medium">
+          <TranslatableText
+            text={getTimeLeftUntil(job.deadline)}
+            language={language}
+          />
+        </span>
+        <p className="pt-2 text-[14px]">
+          {job.applicants.length === 0 ? (
+            <span className="text-red-500">
+              <TranslatableText text="No applicants yet" language={language} />
+            </span>
+          ) : (
+            <span className="text-green-600">
+              {job.applicants.length}{" "}
+              <TranslatableText text="applicants" language={language} />
+            </span>
+          )}
+        </p>
+      </motion.div>
+    </motion.section>
   )
 }
-/* eslint-disable-next-line */
+
 const Skills = ({ skill }) => {
   const { language } = useLanguage()
   return (
-    <section className="w-fit capitalize px-2 text-[#4c1ac8] font-medium flex items-center justify-center text-[14px] rounded-2xl capitalize">
+    <motion.span
+      className="text-[14px] px-3 py-1 text-blue-700 font-medium rounded-full bg-blue-50"
+      whileHover={{ scale: 1.05 }}
+    >
       <TranslatableText text={skill} language={language} />
-    </section>
+    </motion.span>
   )
 }
 
 export const getTimeLeftUntil = (futureDate) => {
   const now = new Date()
   const deadline = new Date(futureDate)
-  const diff = deadline - now // difference in milliseconds
+  const diff = deadline - now
 
   if (diff <= 0) return "Deadline passed"
 
@@ -637,10 +717,9 @@ export const getTimeLeftUntil = (futureDate) => {
   const hours = Math.floor(minutes / 60)
   const days = Math.floor(hours / 24)
 
-  if (days > 0) return `${days} day${days > 1 ? "s" : ""} left to apply`
-  if (hours > 0)
-    return `${hours % 24} hour${hours % 24 > 1 ? "s" : ""} left to apply`
+  if (days > 0) return `${days} day${days > 1 ? "s" : ""} left`
+  if (hours > 0) return `${hours % 24} hour${hours % 24 > 1 ? "s" : ""} left`
   if (minutes > 0)
-    return `${minutes % 60} minute${minutes % 60 > 1 ? "s" : ""} left to apply`
-  return `${seconds % 60} second${seconds % 60 > 1 ? "s" : ""} left to apply`
+    return `${minutes % 60} minute${minutes % 60 > 1 ? "s" : ""} left`
+  return `${seconds % 60} second${seconds % 60 > 1 ? "s" : ""} left`
 }

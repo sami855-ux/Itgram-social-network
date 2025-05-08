@@ -13,7 +13,7 @@ import jobRoutes from "./routes/job.route.js"
 import { app, server } from "./socket/socket.js"
 
 dotenv.config()
-
+//mongodb://localhost:27017/itgram
 // CONFIGURATION
 app.use(express.json())
 app.use(cookieParser())

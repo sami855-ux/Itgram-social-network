@@ -4,6 +4,7 @@ import axios from "axios"
 import Suggested from "./Suggested"
 import { TranslatableText } from "@/utils/TranslatableText"
 import { useLanguage } from "@/context/LanaguageContext"
+import Empty from "./Empty"
 
 const SuggestedUsers = () => {
   const [suggestedUsers, setSuggestedUsers] = useState([])
@@ -32,12 +33,16 @@ const SuggestedUsers = () => {
     <div className="mt-24 mb-10">
       <div className="flex items-center justify-between text-sm">
         <h1 className="font-semibold text-[15px] text-gray-800">
-          <TranslatableText text={"Suggested for you"} language={language} />
+          <TranslatableText text={"Suggested for Work"} language={language} />
         </h1>
       </div>
-      {suggestedUsers.slice(0, 5).map((user, userId) => (
-        <Suggested user={user} key={userId} />
-      ))}
+      {suggestedUsers && suggestedUsers.length > 0 ? (
+        suggestedUsers
+          .slice(0, 5)
+          .map((user, userId) => <Suggested user={user} key={userId} />)
+      ) : (
+        <Empty type="default" />
+      )}
     </div>
   )
 }
