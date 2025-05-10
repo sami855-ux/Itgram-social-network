@@ -1,7 +1,10 @@
+import { useLanguage } from "@/context/LanaguageContext"
+import { TranslatableText } from "@/utils/TranslatableText"
 import { motion } from "framer-motion"
 import { PlusCircle, FileText, Image, Users, MessageSquare } from "lucide-react"
 
 const Empty = ({ type = "post", title, description, actionText, onAction }) => {
+  const { language } = useLanguage()
   // Icon mapping based on type
   const iconMap = {
     post: <FileText className="w-10 h-10" />,
@@ -67,7 +70,7 @@ const Empty = ({ type = "post", title, description, actionText, onAction }) => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        {content.title}
+        <TranslatableText text={content.title} language={language} />
       </motion.h3>
 
       <motion.p
@@ -76,7 +79,7 @@ const Empty = ({ type = "post", title, description, actionText, onAction }) => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        {content.description}
+        <TranslatableText text={content.description} language={language} />
       </motion.p>
 
       {actionText && (

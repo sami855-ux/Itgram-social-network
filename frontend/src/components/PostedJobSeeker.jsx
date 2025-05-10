@@ -202,7 +202,7 @@ export default function PostedJobSeeker() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="w-full min-h-screen pl-[18%] py-10 pr-7"
+      className="w-full min-h-screen px-4 py-10 sm:px-6 md:pl-[18%] md:pr-7"
     >
       <motion.h2
         className="text-2xl font-bold text-gray-900 capitalize"
@@ -215,7 +215,7 @@ export default function PostedJobSeeker() {
 
       {/* Search Bar */}
       <motion.form
-        className="w-[80%] h-14 flex gap-2 items-center bg-white px-6 rounded-full my-5 shadow-md border border-gray-200"
+        className="w-full md:w-[80%] h-14 flex gap-2 items-center bg-white px-4 md:px-6 rounded-full my-5 shadow-md border border-gray-200"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
@@ -226,11 +226,11 @@ export default function PostedJobSeeker() {
           value={query}
           onChange={handleSearch}
           placeholder="Job title or keywords..."
-          className="bg-transparent h-full w-full px-4 text-[15px] outline-none"
+          className="bg-transparent h-full w-full px-2 md:px-4 text-[15px] outline-none"
         />
         {query && (
           <motion.p
-            className="px-4 py-1 text-gray-700 cursor-pointer text-[15px] rounded-full hover:bg-gray-100"
+            className="px-2 md:px-4 py-1 text-gray-700 cursor-pointer text-[15px] rounded-full hover:bg-gray-100"
             onClick={() => {
               setQuery("")
               setFilteredJobs(allJobs)
@@ -242,7 +242,7 @@ export default function PostedJobSeeker() {
         )}
         <motion.button
           type="submit"
-          className="h-10 px-6 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-full cursor-pointer text-[15px]"
+          className="h-10 px-4 md:px-6 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-full cursor-pointer text-[15px]"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
         >
@@ -251,11 +251,11 @@ export default function PostedJobSeeker() {
       </motion.form>
 
       {/* Main content */}
-      <div className="flex w-full gap-6 h-fit">
+      <div className="flex flex-col w-full gap-6 lg:flex-row h-fit">
         {/* Filter div */}
         {allJobs && allJobs.length > 0 ? (
           <motion.div
-            className="p-6 bg-white border border-gray-100 shadow-sm w-80 min-h-96 rounded-xl"
+            className="w-full p-4 bg-white border border-gray-100 shadow-sm md:p-6 lg:w-80 min-h-96 rounded-xl"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -268,7 +268,7 @@ export default function PostedJobSeeker() {
               <p className="uppercase text-gray-800 text-[14px] font-semibold py-4">
                 <TranslatableText text="job type" language={language} />
               </p>
-              <div className="flex flex-col gap-3">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-1">
                 {[
                   "fulltime",
                   "parttime",
@@ -296,7 +296,7 @@ export default function PostedJobSeeker() {
               <p className="uppercase text-gray-800 text-[14px] font-semibold pb-5 pt-7">
                 <TranslatableText text={"salary"} language={language} />
               </p>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col items-center gap-3 sm:flex-row">
                 <motion.select
                   name="max"
                   value={filters.salary.max}
@@ -309,7 +309,7 @@ export default function PostedJobSeeker() {
                       },
                     })
                   }}
-                  className="w-24 py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px] focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full sm:w-24 py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px] focus:ring-2 focus:ring-blue-500/50"
                   whileHover={{ scale: 1.02 }}
                 >
                   <option value="">
@@ -332,7 +332,7 @@ export default function PostedJobSeeker() {
                       },
                     })
                   }}
-                  className="w-24 py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px] focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full sm:w-24 py-2 border rounded-md border-gray-300 px-2 outline-none text-[14px] focus:ring-2 focus:ring-blue-500/50"
                   whileHover={{ scale: 1.02 }}
                 >
                   <option value="">
@@ -370,7 +370,7 @@ export default function PostedJobSeeker() {
             transition={{ delay: 0.3 }}
           >
             <motion.section
-              className="flex items-center justify-between w-[85%] h-10 px-2"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full lg:w-[85%] h-10 px-2"
               initial={{ y: -10 }}
               animate={{ y: 0 }}
             >
@@ -381,7 +381,7 @@ export default function PostedJobSeeker() {
                 </p>
               )}
               {allJobs.length > 0 && (
-                <div className="">
+                <div className="mt-2 sm:mt-0">
                   <label
                     htmlFor="sort"
                     className="text-[15px] mr-3 text-gray-700"
@@ -413,7 +413,7 @@ export default function PostedJobSeeker() {
             </motion.section>
 
             {/* Job lister container */}
-            <div className="flex flex-col w-[85%] gap-4 h-fit">
+            <div className="flex flex-col w-full lg:w-[85%] gap-4 h-fit">
               <AnimatePresence>
                 {paginatedJobs && paginatedJobs.length > 0 ? (
                   paginatedJobs.map((job, jobIndex) => (
@@ -439,7 +439,7 @@ export default function PostedJobSeeker() {
               </AnimatePresence>
 
               <motion.div
-                className="flex items-center w-full h-16 gap-4"
+                className="flex flex-col items-center w-full h-16 gap-4 sm:flex-row"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
@@ -494,7 +494,7 @@ export default function PostedJobSeeker() {
             setMessage("")
             setImagePreview("")
           }}
-          className="max-w-md"
+          className="max-w-md w-[90vw] sm:w-full"
         >
           <DialogHeader className="py-4 text-xl font-semibold text-center">
             <TranslatableText text={"Apply to the job"} language={language} />
@@ -579,7 +579,7 @@ const Job = ({ onOpen, job, setJobId }) => {
   const { language } = useLanguage()
   return (
     <motion.section
-      className="w-full p-6 transition-all bg-white border border-gray-200 cursor-pointer rounded-xl hover:shadow-md"
+      className="w-full p-4 transition-all bg-white border border-gray-200 cursor-pointer sm:p-6 rounded-xl hover:shadow-md"
       onClick={() => {
         onOpen(true)
         setJobId(`${job?._id}`)
@@ -589,8 +589,8 @@ const Job = ({ onOpen, job, setJobId }) => {
       whileHover={{ y: -3 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="flex w-full gap-4">
-        <motion.div whileHover={{ scale: 1.05 }}>
+      <div className="flex flex-col w-full gap-4 sm:flex-row">
+        <motion.div whileHover={{ scale: 1.05 }} className="flex-shrink-0">
           <Avatar className="w-16 h-16 border-2 border-blue-100">
             <AvatarImage src={job.author?.profilePicture} alt="@shadcn" />
             <AvatarFallback>
@@ -619,7 +619,7 @@ const Job = ({ onOpen, job, setJobId }) => {
             </span>
           </p>
         </article>
-        <article className="py-2 pl-4">
+        <article className="py-2 pl-0 sm:pl-4">
           <p className="text-[14px] text-gray-700">
             <TranslatableText text="Company:" language={language} />{" "}
             <span className="font-medium text-blue-600 capitalize">

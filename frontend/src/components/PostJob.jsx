@@ -7,8 +7,11 @@ import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { toast } from "sonner"
 import { AnimatePresence, motion } from "framer-motion"
+import { TranslatableText } from "@/utils/TranslatableText"
+import { useLanguage } from "@/context/LanaguageContext"
 
 export default function PostJob() {
+  const { language } = useLanguage()
   const [jobInput, setJobInput] = useState({
     jobTitle: "",
     role: "",
@@ -165,7 +168,7 @@ export default function PostJob() {
           className="py-4 text-2xl font-bold text-gray-800"
           whileHover={{ x: 2 }}
         >
-          Post a Job
+          <TranslatableText text={"Post a Job"} language={language} />
         </motion.h2>
 
         <div className="flex flex-col w-full gap-6 lg:flex-row h-fit">
@@ -180,7 +183,10 @@ export default function PostJob() {
               transition={{ delay: 0.1 }}
             >
               <h2 className="mb-4 text-xl font-semibold text-gray-800">
-                Basic Information
+                <TranslatableText
+                  text={" Basic Information"}
+                  language={language}
+                />
               </h2>
             </motion.section>
 
@@ -219,14 +225,20 @@ export default function PostJob() {
               transition={{ delay: 0.2 }}
             >
               <h2 className="mb-4 text-xl font-semibold text-gray-800">
-                Additional Information
+                <TranslatableText
+                  text="Additional Information"
+                  language={language}
+                />
               </h2>
             </motion.section>
 
             <div className="w-full py-4 space-y-6">
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Employment type
+                  <TranslatableText
+                    text="Employment type"
+                    language={language}
+                  />
                 </label>
                 <div className="flex flex-wrap gap-3">
                   {[
@@ -266,7 +278,12 @@ export default function PostJob() {
                         onClick={() => handleEmployment(item.type)}
                       >
                         {item.icon}
-                        <span>{item.label}</span>
+                        <span>
+                          <TranslatableText
+                            text={item.label}
+                            language={language}
+                          />
+                        </span>
                       </button>
                     </motion.div>
                   ))}
@@ -276,7 +293,10 @@ export default function PostJob() {
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Job placement
+                    <TranslatableText
+                      text={"Job placement"}
+                      language={language}
+                    />
                   </label>
                   <select
                     name="Job placement"
@@ -284,16 +304,30 @@ export default function PostJob() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">Select option</option>
-                    <option value="onsite">Onsite</option>
-                    <option value="remote">Remote</option>
-                    <option value="hybrid">Hybrid</option>
+                    <option value="">
+                      <TranslatableText
+                        text="Select option"
+                        language={language}
+                      />
+                    </option>
+                    <option value="onsite">
+                      <TranslatableText text="Onsite" language={language} />
+                    </option>
+                    <option value="remote">
+                      <TranslatableText text="Remote" language={language} />
+                    </option>
+                    <option value="hybrid">
+                      <TranslatableText text="Hybrid" language={language} />
+                    </option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Job experience
+                    <TranslatableText
+                      text={"Job experience"}
+                      language={language}
+                    />
                   </label>
                   <select
                     name="Job experience"
@@ -301,12 +335,33 @@ export default function PostJob() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">Select option</option>
-                    <option value="no">No experience</option>
-                    <option value="1-2">1-2 years</option>
-                    <option value="2-4">2-4 years</option>
-                    <option value="4-8">4-8 years</option>
-                    <option value=">8">more than 8 years</option>
+                    <option value="">
+                      <TranslatableText
+                        text="Select option"
+                        language={language}
+                      />
+                    </option>
+                    <option value="no">
+                      <TranslatableText
+                        text="No experience"
+                        language={language}
+                      />
+                    </option>
+                    <option value="1-2">
+                      <TranslatableText text="1-2 years" language={language} />
+                    </option>
+                    <option value="2-4">
+                      <TranslatableText text="2-4 years" language={language} />
+                    </option>
+                    <option value="4-8">
+                      <TranslatableText text="4-8 years" language={language} />
+                    </option>
+                    <option value=">8">
+                      <TranslatableText
+                        text="more than 8 years"
+                        language={language}
+                      />
+                    </option>
                   </select>
                 </div>
               </div>
@@ -319,7 +374,10 @@ export default function PostJob() {
               transition={{ delay: 0.3 }}
             >
               <h2 className="mb-4 text-xl font-semibold text-gray-800">
-                Company Information
+                <TranslatableText
+                  text={"Company Information"}
+                  language={language}
+                />
               </h2>
             </motion.section>
 
@@ -330,12 +388,14 @@ export default function PostJob() {
                 onHandleChange={handleChange}
               />
 
-              <h3 className="text-lg font-semibold text-gray-800">Location</h3>
+              <h3 className="text-lg font-semibold text-gray-800">
+                <TranslatableText text={"Location"} language={language} />
+              </h3>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-700">
-                    City
+                    <TranslatableText text={"City"} language={language} />
                   </label>
                   <select
                     name="city"
@@ -343,16 +403,33 @@ export default function PostJob() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">Select option</option>
-                    <option value="addis abeba">Addis abeba</option>
-                    <option value="bhair dar">Bhair dar</option>
-                    <option value="debre brihan">Debre brihan</option>
+                    <option value="">
+                      <TranslatableText
+                        text="Select option"
+                        language={language}
+                      />
+                    </option>
+                    <option value="addis abeba">
+                      <TranslatableText
+                        text="Addis abeba"
+                        language={language}
+                      />
+                    </option>
+                    <option value="bhair dar">
+                      <TranslatableText text="Bhair dar" language={language} />
+                    </option>
+                    <option value="debre brihan">
+                      <TranslatableText
+                        text="Debre brihan"
+                        language={language}
+                      />
+                    </option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Country
+                    <TranslatableText text={"Country"} language={language} />
                   </label>
                   <select
                     name="country"
@@ -360,25 +437,43 @@ export default function PostJob() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">Select option</option>
-                    <option value="ethiopia">Ethiopia</option>
-                    <option value="kenya">Kenya</option>
-                    <option value="sudan">Sudan</option>
-                    <option value="egypt">Egypt</option>
-                    <option value="other">other</option>
+                    <option value="">
+                      <TranslatableText
+                        text="Select option"
+                        language={language}
+                      />
+                    </option>
+                    <option value="ethiopia">
+                      <TranslatableText text="Ethiopia" language={language} />
+                    </option>
+                    <option value="kenya">
+                      <TranslatableText text="Kenya" language={language} />
+                    </option>
+                    <option value="sudan">
+                      <TranslatableText text="Sudan" language={language} />
+                    </option>
+                    <option value="egypt">
+                      <TranslatableText text="Egypt" language={language} />
+                    </option>
+                    <option value="other">
+                      <TranslatableText text="other" language={language} />
+                    </option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <h3 className="mb-4 text-lg font-semibold text-gray-800">
-                  About job
+                  <TranslatableText text={" About job"} language={language} />
                 </h3>
 
                 <div className="space-y-4">
                   <div>
                     <label className="block mb-2 text-sm font-medium text-gray-700">
-                      Skills required
+                      <TranslatableText
+                        text={" Skills required"}
+                        language={language}
+                      />{" "}
                     </label>
                     <div className="flex flex-wrap items-center gap-3">
                       <motion.button
@@ -400,23 +495,7 @@ export default function PostJob() {
                             exit={{ opacity: 0, scale: 0.8 }}
                             layout
                           >
-                            <Badge className="flex items-center gap-2 px-3 py-1 text-blue-700 bg-blue-100 hover:bg-blue-200">
-                              {skill}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setJobInput({
-                                    ...jobInput,
-                                    skills: jobInput.skills.filter(
-                                      (_, i) => i !== skillIndex
-                                    ),
-                                  })
-                                }}
-                                className="text-blue-700 hover:text-blue-900"
-                              >
-                                <X size={14} />
-                              </button>
-                            </Badge>
+                            <Skills skill={skill} />
                           </motion.div>
                         ))}
                       </AnimatePresence>
@@ -425,12 +504,18 @@ export default function PostJob() {
 
                   <div>
                     <label className="block mb-2 text-sm font-medium text-gray-700">
-                      Salary range
+                      <TranslatableText
+                        text="Salary range"
+                        language={language}
+                      />
                     </label>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div>
                         <label className="block mb-1 text-xs text-gray-500">
-                          Minimum salary
+                          <TranslatableText
+                            text="Minimum salary"
+                            language={language}
+                          />
                         </label>
                         <div className="relative">
                           <span className="absolute text-gray-500 transform -translate-y-1/2 left-3 top-1/2">
@@ -448,7 +533,10 @@ export default function PostJob() {
                       </div>
                       <div>
                         <label className="block mb-1 text-xs text-gray-500">
-                          Maximum salary
+                          <TranslatableText
+                            text="Maximum salary"
+                            language={language}
+                          />
                         </label>
                         <div className="relative">
                           <span className="absolute text-gray-500 transform -translate-y-1/2 left-3 top-1/2">
@@ -469,7 +557,10 @@ export default function PostJob() {
 
                   <div>
                     <label className="block mb-2 text-sm font-medium text-gray-700">
-                      Deadline date
+                      <TranslatableText
+                        text={" Deadline date"}
+                        language={language}
+                      />
                     </label>
                     <input
                       type="date"
@@ -492,11 +583,17 @@ export default function PostJob() {
             transition={{ delay: 0.4 }}
           >
             <h2 className="mb-3 font-semibold text-gray-800">
-              Place of work if accepted into this job vacancy
+              <TranslatableText
+                text="Place of work if accepted into this job vacancy"
+                language={language}
+              />
             </h2>
             <p className="text-sm text-gray-600">
-              You can fill manually, if your work address is different from the
-              head office address
+              <TranslatableText
+                text="You can fill manually, if your work address is different from the
+              head office address"
+                language={language}
+              />
             </p>
           </motion.div>
         </div>
@@ -532,7 +629,7 @@ export default function PostJob() {
               })
             }}
           >
-            Reset
+            <TranslatableText text={"Reset"} language={language} />
           </Button>
           <Button
             type="submit"
@@ -560,10 +657,10 @@ export default function PostJob() {
                     />
                   </svg>
                 </motion.span>
-                Posting...
+                <TranslatableText text={" Posting..."} language={language} />
               </span>
             ) : (
-              "Post Job"
+              <TranslatableText text={"Post Job"} language={language} />
             )}
           </Button>
         </motion.div>
@@ -575,7 +672,10 @@ export default function PostJob() {
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogContent>
               <DialogHeader className="text-lg font-semibold">
-                Add Required Skill
+                <TranslatableText
+                  text={"Add Required Skill"}
+                  language={language}
+                />
               </DialogHeader>
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -598,9 +698,11 @@ export default function PostJob() {
                     variant="outline"
                     onClick={() => setIsModalOpen(false)}
                   >
-                    Cancel
+                    <TranslatableText text={"Cancel"} language={language} />
                   </Button>
-                  <Button onClick={handleAddSkill}>Add Skill</Button>
+                  <Button onClick={handleAddSkill}>
+                    <TranslatableText text={"Add Skill"} language={language} />
+                  </Button>
                 </div>
               </motion.div>
             </DialogContent>
@@ -612,10 +714,11 @@ export default function PostJob() {
 }
 
 const InputOne = ({ label, value, onHandleChange, textarea = false }) => {
+  const { language } = useLanguage()
   return (
     <div className="space-y-1">
       <label className="block text-sm font-medium text-gray-700 capitalize">
-        {label}
+        <TranslatableText text={label} language={language} />
       </label>
       {textarea ? (
         <textarea
@@ -635,5 +738,17 @@ const InputOne = ({ label, value, onHandleChange, textarea = false }) => {
         />
       )}
     </div>
+  )
+}
+
+const Skills = ({ skill }) => {
+  const { language } = useLanguage()
+  return (
+    <motion.span
+      className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full w-fit"
+      whileHover={{ scale: 1.05 }}
+    >
+      <TranslatableText text={skill} language={language} />
+    </motion.span>
   )
 }

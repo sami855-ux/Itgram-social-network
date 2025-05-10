@@ -275,8 +275,10 @@ export const checkFollowing = async (req, res) => {
 }
 
 export const getUsersForMessaging = async (req, res) => {
+  console.log("hi")
   try {
     const userId = req.id
+    console.log(req.id)
 
     const currentUser = await User.findById(userId)
 

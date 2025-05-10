@@ -3,10 +3,12 @@ import { Heart, MessageCircle } from "lucide-react"
 import { useSelector } from "react-redux"
 import Empty from "./Empty"
 import { useState } from "react"
+import { useLanguage } from "@/context/LanaguageContext"
+import { TranslatableText } from "@/utils/TranslatableText"
 
 export default function Explore() {
   const { posts } = useSelector((store) => store.post)
-
+  const { language } = useLanguage()
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -20,7 +22,7 @@ export default function Explore() {
         animate={{ y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        Explore Posts
+        <TranslatableText text={"Explore Posts"} language={language} />
       </motion.h2>
 
       <AnimatePresence>

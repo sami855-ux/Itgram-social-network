@@ -45,6 +45,8 @@ const Profile = () => {
   const [appliedJobs, setAppliedJobs] = useState([])
   const [editOpen, setEditOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [enterdSkill, setEnterdSkill] = useState("")
   const [editedJob, setEditedJob] = useState([])
   const [editLoading, setEditLoading] = useState(false)
@@ -55,7 +57,6 @@ const Profile = () => {
   const { userProfile, user } = useSelector((store) => store.auth)
   const isLoggedInUserProfile = user?._id === userProfile?._id
   const { language } = useLanguage()
-  const isFollowing = false
 
   const [jobInput, setJobInput] = useState({
     jobTitle: "",
@@ -157,6 +158,8 @@ const Profile = () => {
 
   const followOrUnfollowUser = async (targetUserId) => {
     try {
+      setIsLoading(true)
+
       // Send the follow/unfollow request to the backend
       const response = await axios.post(
         `${
@@ -165,16 +168,19 @@ const Profile = () => {
         {},
         { withCredentials: true }
       )
+      const isFollowed = await checkIfFollowed(targetUserId)
+      setIsFollowing(isFollowed)
 
       // Handle the response
       if (response.data.success) {
-        console.log(response.data.message) // "Followed successfully" or "Unfollowed successfully"
+        toast.success(response.data.message)
       } else {
-        console.log(response.data.message) // Error message
+        toast.error(response.data.message) // Error message
       }
     } catch (error) {
-      console.error("Error in follow/unfollow:", error)
-      alert("An error occurred while processing your request")
+      toast.error("Error in follow/unfollow:", error)
+    } finally {
+      setIsLoading(false)
     }
   }
 

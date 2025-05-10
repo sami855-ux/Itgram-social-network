@@ -27,6 +27,7 @@ import person from "../assets/person.png"
 import logo from "../assets/logo2.png"
 import CreatePost from "./CreatePost"
 import { Button } from "./ui/button"
+import { resetLikedNotification } from "@/redux/rtnSlice"
 
 const LeftSidebar = () => {
   const { user } = useSelector((store) => store.auth)
@@ -98,6 +99,7 @@ const LeftSidebar = () => {
   const sidebarHandler = (textType) => {
     if (textType === "Logout") {
       logoutHandler()
+      dispatch(resetLikedNotification())
     } else if (textType === "Create") {
       setOpen(true)
     } else if (textType === "Profile") {
@@ -318,7 +320,7 @@ const LeftSidebar = () => {
             className="w-full my-4 border border-gray-100"
             initial={{ width: 0 }}
             animate={{ width: "100%" }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.2 }}
           />
 
           <AnimatePresence>

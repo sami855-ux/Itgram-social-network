@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Button } from "./ui/button"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
+import axios from "axios"
+import { toast } from "sonner"
 
 export default function ExplorePeople() {
   const { suggestedUsers } = useSelector((store) => store.auth)
@@ -73,6 +75,50 @@ const SingleUser = ({ user }) => {
     }, 800)
   }
 
+  const followOrUnfollowUser = async (targetUserId) => {
+    try {
+      setIsLoading(true)
+
+      // Send the follow/unfollow request to the backend
+      const response = await axios.post(
+        `${
+          import.meta.env.VITE_BASE_URL
+        }/api/v1/user/followorunfollow/${targetUserId}`,
+        {},
+        { withCredentials: true }
+      )
+      const isFollowed = await checkIfFollowed(user?._id)
+      setIsFollowing(isFollowed)
+
+      // Handle the response
+      if (response.data.success) {
+        toast.success(response.data.message)
+      } else {
+        toast.error(response.data.message) // Error message
+      }
+    } catch (error) {
+      toast.error("Error in follow/unfollow:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const checkIfFollowed = async (userId) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/isfollowing/${userId}`,
+        { withCredentials: true }
+      )
+
+      if (response.data.success) {
+        return response.data.isFollowing // true or false
+      } else {
+        return false
+      }
+    } catch (error) {
+      return false
+    }
+  }
   return (
     <motion.section
       className="h-24 w-full max-w-[600px] flex items-center justify-between px-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
@@ -111,7 +157,9 @@ const SingleUser = ({ user }) => {
               ? "bg-gray-100 text-gray-800 hover:bg-gray-200"
               : "bg-blue-600 hover:bg-blue-700"
           }`}
-          onClick={handleFollow}
+          onClick={() => {
+            followOrUnfollowUser(user?._id)
+          }}
           disabled={isLoading}
         >
           {isLoading ? (

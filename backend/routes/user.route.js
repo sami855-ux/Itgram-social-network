@@ -27,7 +27,7 @@ router
 router.route("/suggested").get(isAuthenticated, getSuggestedUsers)
 router.route("/followorunfollow/:id").post(isAuthenticated, followOrUnfollow)
 router.get("/isfollowing/:id", isAuthenticated, checkFollowing)
-router.get("/userForMessaging", getUsersForMessaging)
+router.route("/userForMessaging").get(isAuthenticated, getUsersForMessaging)
 router.get("/search", isAuthenticated, searchUser)
 router.get("/getRecruiters", isAuthenticated, getRecruiters)
 
