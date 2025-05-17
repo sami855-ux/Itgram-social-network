@@ -688,6 +688,42 @@ const Profile = () => {
             </Dialog>
           )}
 
+          {unapplyOpen && (
+            <Dialog open={unapplyOpen} onOpenChange={setUnapplyOpen}>
+              <DialogContent className="max-w-md rounded-lg">
+                <DialogHeader className="mb-4 text-lg font-semibold text-gray-800">
+                  <TranslatableText
+                    text="Are you sure you want to withdraw your application?"
+                    language={language}
+                  />
+                </DialogHeader>
+                <p className="mb-6 text-gray-600">
+                  <TranslatableText
+                    text="This action cannot be undone."
+                    language={language}
+                  />
+                </p>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setUnapplyOpen(false)}
+                    className="px-4 py-2 text-gray-700 transition-colors rounded-md hover:bg-gray-100"
+                  >
+                    <TranslatableText text="Cancel" language={language} />
+                  </button>
+                  <button
+                    onClick={handleRemoveUser}
+                    className="px-4 py-2 text-white transition-colors bg-red-600 rounded-md hover:bg-red-700"
+                  >
+                    <TranslatableText
+                      text="Withdraw Application"
+                      language={language}
+                    />
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
+
           {/* Resume Preview Modal */}
           {resumeOpen && (
             <Dialog open={resumeOpen} onOpenChange={setResumeOpen}>
@@ -1222,7 +1258,6 @@ const Profile = () => {
   )
 }
 
-// Enhanced Job Component with animations
 const Job = ({
   job,
   setDeleteOpen,
