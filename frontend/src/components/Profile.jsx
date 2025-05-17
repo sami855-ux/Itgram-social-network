@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion"
 import {
+  ArrowRight,
   AtSign,
   BadgeDollarSign,
   CalendarCheck,
@@ -8,13 +9,14 @@ import {
   Loader,
   MapPin,
   MessageCircle,
+  MessageSquare,
   Plus,
   Send,
   X,
 } from "lucide-react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { useSelector } from "react-redux"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import axios from "axios"
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
@@ -1267,6 +1269,26 @@ const Job = ({
   setResumeOpen,
 }) => {
   const { language } = useLanguage()
+  const navigate = useNavigate()
+  const acceptRef = useRef("Accept Applicant")
+
+  const handleAccept = async () => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/job/${job?._id}/hired`
+      )
+
+      if (response.data.success) {
+        toast.success("Job marked as hired!")
+        acceptRef.current = "Accepted"
+      } else {
+        toast.error("Failed to update job status.")
+      }
+    } catch (error) {
+      console.error("Error marking job as hired:", error)
+      toast.error("Server error occurred. Please try again.")
+    }
+  }
 
   return (
     <motion.div
@@ -1325,40 +1347,90 @@ const Job = ({
             {job.applicants.map((message, index) => (
               <motion.div
                 key={index}
-                className="p-4 rounded-lg bg-gray-50"
+                className="p-5 transition-shadow bg-white border border-gray-200 shadow-sm rounded-xl hover:shadow-md"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
+                transition={{
+                  delay: index * 0.05,
+                  type: "spring",
+                  stiffness: 100,
+                }}
+                whileHover={{ scale: 1.01 }}
               >
-                <div className="flex items-center gap-3">
-                  <Link to={`/profile/${message.user?._id}`}>
-                    <Avatar className="w-12 h-12">
-                      <AvatarImage src={message.user?.profilePicture} />
-                      <AvatarFallback>
-                        <img src={person} alt="default" />
-                      </AvatarFallback>
-                    </Avatar>
-                  </Link>
-                  <div>
-                    <h4 className="font-medium">
-                      <TranslatableText
-                        text={message.user.username}
-                        language={language}
-                      />
-                    </h4>
-                    <p className="text-sm text-gray-600">{message.message}</p>
-                    <button
-                      className="mt-1 text-sm text-blue-600 hover:underline"
-                      onClick={() => {
-                        setResume(message.resume)
-                        setResumeOpen(true)
-                      }}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start flex-1 gap-4">
+                    <a
+                      href={`/profile/${message.user?._id}`}
+                      className="shrink-0"
                     >
-                      <TranslatableText
-                        text="View resume"
-                        language={language}
-                      />
-                    </button>
+                      <Avatar className="transition-all w-14 h-14 ring-2 ring-blue-100 hover:ring-blue-300">
+                        <AvatarImage
+                          src={message.user?.profilePicture}
+                          className="object-cover"
+                        />
+                        <AvatarFallback className="bg-gradient-to-br from-blue-100 to-purple-100">
+                          <img
+                            src={person}
+                            alt="default"
+                            className="w-6 h-6 opacity-70"
+                          />
+                        </AvatarFallback>
+                      </Avatar>
+                    </a>
+
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-semibold text-gray-800">
+                          <TranslatableText
+                            text={message.user.username}
+                            language={language}
+                          />
+                        </h4>
+                        <span className="px-2 py-1 text-xs text-blue-600 rounded-full bg-blue-50">
+                          New applicant
+                        </span>
+                      </div>
+
+                      <p className="mt-1 text-gray-600 line-clamp-2">
+                        {message.message}
+                      </p>
+
+                      <div className="flex gap-3 mt-3">
+                        <button
+                          className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 group"
+                          onClick={() => {
+                            setResume(message.resume)
+                            setResumeOpen(true)
+                          }}
+                        >
+                          <TranslatableText
+                            text="View resume"
+                            language={language}
+                          />
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                        </button>
+
+                        <a
+                          href={`/profile/${message.user?._id}`}
+                          className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-800"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                          <span>Message</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2 shrink-0">
+                    <Link to={`/profile/${message.user?._id}`}>
+                      <Button
+                        variant="default"
+                        className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
+                        onClick={handleAccept}
+                      >
+                        {acceptRef.current}
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </motion.div>

@@ -98,11 +98,14 @@ export const createJob = async (req, res) => {
 }
 
 // 2. Get all jobs
+
 export const getAllJobs = async (req, res) => {
   try {
-    const jobs = await Job.find().populate("author", "username profilePicture")
+    const jobs = await Job.find({
+      $or: [{ hired: false }, { hired: { $exists: false } }],
+    }).populate("author", "username profilePicture")
 
-    res.status(200).json({ success: true, jobs: jobs })
+    res.status(200).json({ success: true, jobs })
   } catch (error) {
     console.error("Error fetching jobs:", error)
     res
@@ -370,24 +373,6 @@ export const updateJob = async (req, res) => {
       skills,
     } = req.body
 
-    //  const [jobInput, setJobInput] = useState({
-    //     jobTitle: "",
-    //     role: "",
-    //     category: "",
-    //     jobDescription: "",
-    //     employmentType: "",
-    //     jobPlacement: "",
-    //     jobExperience: "",
-    //     companyName: "",
-    //     city: "",
-    //     country: "",
-    //     skills: [],
-    //     salary: {
-    //       max: 0,
-    //       min: 0,
-    //     },
-    //     deadline: "",
-    //   })
     if (
       !jobTitle ||
       !role ||
@@ -427,5 +412,32 @@ export const updateJob = async (req, res) => {
   } catch (error) {
     console.error("Error updating job:", error)
     res.status(500).json({ error: "Server error while updating job" })
+  }
+}
+
+export const setJobHired = async (req, res) => {
+  const { jobId } = req.params
+
+  try {
+    const job = await Job.findById(jobId)
+
+    if (!job) {
+      return res.status(404).json({ success: false, message: "Job not found" })
+    }
+
+    job.hired = true
+    await job.save()
+
+    res.status(200).json({
+      success: true,
+      message: "Job marked as hired",
+      job,
+    })
+  } catch (error) {
+    console.error("Error updating job hired status:", error)
+    res.status(500).json({
+      success: false,
+      error: "Server error while updating hired status",
+    })
   }
 }

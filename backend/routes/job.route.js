@@ -10,6 +10,7 @@ import {
   getAppliedJobsByUser,
   getJobsByUser,
   getSingleJob,
+  setJobHired,
   unapplyFromJob,
   updateJob,
 } from "../controllers/job.controller.js"
@@ -44,5 +45,7 @@ router.get("/getJob/:jobId", isAuthenticated, getSingleJob)
 
 //update job
 router.put("/update/:jobId", isAuthenticated, updateJob)
+
+router.put("/:jobId/hired", setJobHired)
 
 export default router

@@ -74,6 +74,10 @@ const jobSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  hired: {
+    type: Boolean,
+    require: false,
+  },
 })
 
 export default mongoose.model("Job", jobSchema)
