@@ -1292,7 +1292,7 @@ const Job = ({
 
   return (
     <motion.div
-      className="w-full p-6 bg-white border border-gray-100 shadow-sm w-fit rounded-xl"
+      className="w-full p-6 bg-white border border-gray-100 shadow-sm rounded-xl"
       whileHover={{ y: -5 }}
     >
       <div className="flex flex-col gap-4">

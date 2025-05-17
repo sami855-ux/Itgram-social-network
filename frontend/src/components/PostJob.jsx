@@ -77,9 +77,19 @@ export default function PostJob() {
           salary: { ...jobInput.salary, min: parseInt(e.target.value) },
         })
         break
-      case "deadline":
+      case "deadline": {
+        const selectedDate = new Date(e.target.value)
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        if (selectedDate < today) {
+          toast.error("Deadline cannot be a past date.")
+          break
+        }
+
         setJobInput({ ...jobInput, deadline: e.target.value })
         break
+      }
       default:
         console.log("Error")
         break
