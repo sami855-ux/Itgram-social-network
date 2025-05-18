@@ -392,7 +392,7 @@ const Profile = () => {
                 >
                   <Badge className="h-8 text-blue-700 capitalize bg-blue-100">
                     <TranslatableText
-                      text={userProfile.role}
+                      text={userProfile?.role}
                       language={language}
                     />
                   </Badge>
@@ -825,7 +825,7 @@ const Profile = () => {
                             <section className="flex flex-col w-1/2 gap-1">
                               <InputOne
                                 label="role"
-                                value={jobInput.role}
+                                value={jobInput?.role}
                                 onHandleChange={handleChange}
                               />
                             </section>
