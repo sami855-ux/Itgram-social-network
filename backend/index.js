@@ -23,10 +23,7 @@ const PORT = process.env.PORT || 3000
 const __dirname = path.resolve()
 
 const corsOptions = {
-  origin: [
-    "http://localhost:5173",
-    "https://instagram-clone-eight-theta.vercel.app/",
-  ],
+  origin: ["https://instagram-clone-ybbi.vercel.app", "http://localhost/5173"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }
@@ -43,10 +40,6 @@ app.use("/api/v1/story", storyRoutes)
 app.use("/api/v1/job", jobRoutes)
 
 app.use(express.static(path.join(__dirname, "/frontend/dist")))
-
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
-// })
 
 server.listen(PORT, () => {
   console.log(`Server listen at port ${PORT} ⚡`)
