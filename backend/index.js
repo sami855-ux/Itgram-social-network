@@ -23,10 +23,15 @@ const PORT = process.env.PORT || 3000
 const __dirname = path.resolve()
 
 const corsOptions = {
-  origin: ["https://instagram-clone-ybbi.vercel.app", "http://localhost/5173"],
+  origin: [
+    "https://itgram-social-network-w6pm.vercel.app",
+    "https://instagram-clone-ybbi.vercel.app",
+    "http://localhost:5173",
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }
+
 app.use(cors(corsOptions))
 
 //MONGOOSE
