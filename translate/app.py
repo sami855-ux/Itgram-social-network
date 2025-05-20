@@ -147,13 +147,13 @@ def translate():
 
 def _build_cors_preflight_response():
     response = jsonify({"message": "Preflight accepted"})
-    response.headers.add("Access-Control-Allow-Origin", "http://localhost:5173")
+    response.headers.add("Access-Control-Allow-Origin", "https://itgram-social-network-w6pm.vercel.app")
     response.headers.add("Access-Control-Allow-Headers", "Content-Type")
     response.headers.add("Access-Control-Allow-Methods", "POST")
     return response
 
 def _cors_response(response, status_code=200):
-    response.headers.add("Access-Control-Allow-Origin", "http://localhost:5173")
+    response.headers.add("Access-Control-Allow-Origin", "https://itgram-social-network-w6pm.vercel.app")
     return response, status_code
 
 if __name__ == '__main__':
