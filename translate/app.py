@@ -10,7 +10,7 @@ app = Flask(__name__)
 # Enable CORS with specific configuration
 CORS(app, resources={
     r"/translate": {
-        "origins": ["https://instagram-clone-ybbi.vercel.app"],
+        "origins": ["https://itgram-social-network-w6pm.vercel.app"],
         "methods": ["POST"],
         "allow_headers": ["Content-Type"]
     }
