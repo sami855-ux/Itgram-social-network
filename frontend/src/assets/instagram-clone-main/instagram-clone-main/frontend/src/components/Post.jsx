@@ -51,7 +51,7 @@ const Post = ({ post }) => {
     try {
       const action = liked ? "dislike" : "like"
       const res = await axios.get(
-        `http://localhost:3000/api/v1/post/${post?._id}/${action}`,
+        `${import.meta.env.VITE_BASE_URL}/api/v1/post/${post?._id}/${action}`,
         { withCredentials: true }
       )
       if (res.data.success) {
@@ -80,7 +80,7 @@ const Post = ({ post }) => {
   const commentHandler = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:3000/api/v1/post/${post?._id}/comment`,
+        `${import.meta.env.VITE_BASE_URL}/api/v1/post/${post?._id}/comment`,
         { text },
         {
           headers: {
