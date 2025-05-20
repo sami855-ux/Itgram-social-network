@@ -7,11 +7,13 @@ from functools import wraps
 
 app = Flask(__name__)
 
-# Enable CORS with specific configuration
 CORS(app, resources={
     r"/translate": {
-        "origins": ["https://itgram-social-network-w6pm.vercel.app"],
-        "methods": ["POST"],
+        "origins": [
+            "https://itgram-social-network-w6pm.vercel.app",
+            "http://localhost:5173"  # Optional for local dev
+        ],
+        "methods": ["POST", "OPTIONS"],
         "allow_headers": ["Content-Type"]
     }
 })
