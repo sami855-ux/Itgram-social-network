@@ -1,6 +1,8 @@
 import { Conversation } from "../models/conversation.model.js"
 import { getReceiverSocketId, io } from "../socket/socket.js"
 import { Message } from "../models/message.model.js"
+import { User } from "../models/user.model.js"
+import Notification from "../models/Notification.model.js"
 
 export const sendMessage = async (req, res) => {
   try {
@@ -8,29 +10,51 @@ export const sendMessage = async (req, res) => {
     const receiverId = req.params.id
     const { textMessage: message } = req.body
 
+    // Check or create conversation
     let conversation = await Conversation.findOne({
       participants: { $all: [senderId, receiverId] },
     })
 
-    // establish the conversation if not started yet.
     if (!conversation) {
       conversation = await Conversation.create({
         participants: [senderId, receiverId],
       })
     }
+
+    // Create message
     const newMessage = await Message.create({
       senderId,
       receiverId,
       message,
     })
+
+    // Append message to conversation
     if (newMessage) conversation.messages.push(newMessage._id)
 
     await Promise.all([conversation.save(), newMessage.save()])
 
-    // implement socket io for real time data transfer
+    // Fetch sender details for notification
+    const sender = await User.findById(senderId).select(
+      "username profilePicture"
+    )
+
+    // Create a database notification
+    const newNotification = await Notification.create({
+      recipient: receiverId,
+      sender: senderId,
+      type: "message",
+      message: `${sender.username} sent you a message`,
+    })
+
+    // Real-time delivery via Socket.IO
     const receiverSocketId = getReceiverSocketId(receiverId)
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage)
+
+      io.to(receiverSocketId).emit("notification", {
+        ...newNotification.toObject(),
+        senderDetails: sender,
+      })
     }
 
     return res.status(201).json({
@@ -38,7 +62,8 @@ export const sendMessage = async (req, res) => {
       newMessage,
     })
   } catch (error) {
-    console.log(error)
+    console.error("Error in sendMessage:", error)
+    res.status(500).json({ success: false, message: "Failed to send message" })
   }
 }
 

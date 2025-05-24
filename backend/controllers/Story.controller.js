@@ -13,31 +13,50 @@ export const addStory = async (req, res) => {
 
     if (!image) return res.status(400).json({ message: "Image required" })
 
-    // image upload
+    // Optimize image
     const optimizedImageBuffer = await sharp(image.buffer)
       .resize({ width: 800, height: 800, fit: "inside" })
       .toFormat("jpeg", { quality: 80 })
       .toBuffer()
 
-    // buffer to data uri
     const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString(
       "base64"
     )}`
+
     const cloudResponse = await cloudinary.uploader.upload(fileUri, {
       timestamp: Math.floor(Date.now() / 1000),
     })
+
     const story = await Story.create({
       caption,
       media: cloudResponse.secure_url,
       author: authorId,
     })
-    const user = await User.findById(authorId)
+
+    const user = await User.findById(authorId).select(
+      "followers stories username profilePicture"
+    )
     if (user) {
       user.stories.push(story._id)
       await user.save()
     }
 
-    await story.populate({ path: "author", select: "-password" })
+    await story.populate({ path: "author", select: "username profilePicture" })
+
+    // Notify followers
+    if (user?.followers?.length > 0) {
+      const notifications = user.followers.map(async (followerId) => {
+        const notification = await Notification.create({
+          recipient: followerId,
+          sender: authorId,
+          type: "story",
+          message: `${user.username} has posted a new story.`,
+          story: story._id,
+        })
+      })
+
+      await Promise.all(notifications)
+    }
 
     return res.status(201).json({
       message: "New story is added successfully",
@@ -45,7 +64,11 @@ export const addStory = async (req, res) => {
       success: true,
     })
   } catch (error) {
-    console.log(error)
+    console.error("Error adding story:", error)
+    return res.status(500).json({
+      success: false,
+      message: "Server error while adding story",
+    })
   }
 }
 

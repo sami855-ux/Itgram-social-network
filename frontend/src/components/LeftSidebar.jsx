@@ -45,7 +45,9 @@ const LeftSidebar = () => {
   const [searchText] = useState(
     language == "am" ? "ተጠቃሚ ፍልግ" : "Search a user..."
   )
-
+  const unreadNotifications = useSelector((state) =>
+    state.notifications.items.filter((n) => !n.isRead)
+  )
   const logoutHandler = async () => {
     try {
       const res = await axios.get(
@@ -114,6 +116,8 @@ const LeftSidebar = () => {
       navigate("/postJob")
     } else if (textType === "Posted Job") {
       navigate("/postedJob")
+    } else if (textType === "Notifications") {
+      navigate("/notification")
     }
   }
 
@@ -183,67 +187,16 @@ const LeftSidebar = () => {
                 </span>
 
                 {item.text === "Notifications" &&
-                  likeNotification.length > 0 && (
+                  unreadNotifications.length > 0 && (
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           size="icon"
                           className="absolute w-5 h-5 bg-red-500 rounded-full hover:bg-red-600 bottom-6 left-6"
                         >
-                          {likeNotification.length}
+                          {unreadNotifications.length}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent>
-                        <div>
-                          {likeNotification.length === 0 ? (
-                            <p>
-                              <TranslatableText
-                                text={"No new notification"}
-                                language={language}
-                              />
-                            </p>
-                          ) : (
-                            likeNotification.map((notification) => {
-                              return (
-                                <div
-                                  key={notification.userId}
-                                  className="flex items-center gap-2 my-2"
-                                >
-                                  <Link
-                                    to={`/profile/${notification.userDetails?._id}`}
-                                  >
-                                    <Avatar>
-                                      <AvatarImage
-                                        src={
-                                          notification.userDetails
-                                            ?.profilePicture
-                                        }
-                                        alt="post_image"
-                                      />
-                                      <AvatarFallback>CN</AvatarFallback>
-                                    </Avatar>
-                                  </Link>
-
-                                  <p className="text-sm">
-                                    <span className="font-bold">
-                                      <TranslatableText
-                                        text={
-                                          notification.userDetails?.username
-                                        }
-                                        language={language}
-                                      />
-                                    </span>{" "}
-                                    <TranslatableText
-                                      text={"liked your post"}
-                                      language={language}
-                                    />
-                                  </p>
-                                </div>
-                              )
-                            })
-                          )}
-                        </div>
-                      </PopoverContent>
                     </Popover>
                   )}
               </div>

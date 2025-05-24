@@ -3,6 +3,9 @@ import Job from "../models/jobs.model.js"
 import mongoose from "mongoose"
 import sharp from "sharp"
 
+import { User } from "../models/user.model.js"
+import Notification from "../models/Notification.model.js"
+
 // 1. Create a new job post
 
 export const createJob = async (req, res) => {
@@ -84,6 +87,14 @@ export const createJob = async (req, res) => {
     // Save the job to the database
     const savedJob = await newJob.save()
 
+    await Notification.create({
+      recipient: author,
+      sender: author,
+      type: "jobApplication",
+      job: newJob._id,
+      message: `${newJob.jobTitle} has been created successfully.`,
+    })
+
     res.status(201).json({
       success: true,
       message: "Job created successfully",
@@ -147,7 +158,7 @@ export const applyToJob = async (req, res) => {
       return res.status(400).json({ error: "Invalid job ID" })
     }
 
-    const job = await Job.findById(jobId)
+    const job = await Job.findById(jobId).populate("jobTitle")
     if (!job) {
       return res.status(404).json({ error: "Job not found" })
     }
@@ -209,6 +220,14 @@ export const applyToJob = async (req, res) => {
     job.applicants.push(applicant)
 
     await job.save()
+
+    await Notification.create({
+      recipient: userId,
+      sender: userId,
+      type: "jobApplication",
+      job: jobId,
+      message: `You have applied to ${job.jobTitle} successfully.`,
+    })
 
     res.status(200).json({
       message: "Application submitted successfully",
@@ -299,6 +318,7 @@ export const getAppliedJobsByUser = async (req, res) => {
 }
 
 //User for unapply
+
 export const unapplyFromJob = async (req, res) => {
   try {
     const jobId = req.params.jobId
@@ -314,26 +334,47 @@ export const unapplyFromJob = async (req, res) => {
     }
 
     const hasApplied = job.applicants.some(
-      (applicant) => applicant.user.toString() === userId.toString()
+      (applicant) => applicant.user.toString() === userId
     )
 
     if (!hasApplied) {
       return res.status(400).json({ error: "You have not applied to this job" })
     }
 
+    // Remove user from applicants
     job.applicants = job.applicants.filter(
-      (applicant) => applicant.user.toString() !== userId.toString()
+      (applicant) => applicant.user.toString() !== userId
     )
-
     await job.save()
 
-    res.status(200).json({
+    const user = await User.findById(userId).select("username profilePicture")
+
+    await Notification.create({
+      recipient: job.author,
+      sender: userId,
+      type: "jobApplication",
+      job: job._id,
+      message: `${user.username} has withdrawn their application from "${job.jobTitle}".`,
+    })
+
+    // Notify the user (confirmation)
+    await Notification.create({
+      recipient: userId,
+      sender: null, // system
+      type: "message",
+      job: job._id,
+      message: `You have successfully withdrawn your application from "${job.jobTitle}".`,
+    })
+
+    return res.status(200).json({
       success: true,
       message: "Successfully removed your application from this job",
     })
   } catch (error) {
     console.error("Error unapplying from job:", error)
-    res.status(500).json({ error: "Server error while unapplying from job" })
+    return res
+      .status(500)
+      .json({ error: "Server error while unapplying from job" })
   }
 }
 
@@ -419,7 +460,10 @@ export const setJobHired = async (req, res) => {
   const { jobId } = req.params
 
   try {
-    const job = await Job.findById(jobId)
+    const job = await Job.findById(jobId).populate(
+      "applicants.user",
+      "username profilePicture"
+    )
 
     if (!job) {
       return res.status(404).json({ success: false, message: "Job not found" })
@@ -428,9 +472,26 @@ export const setJobHired = async (req, res) => {
     job.hired = true
     await job.save()
 
+    // Send notifications to all applicants
+    const notifications = job.applicants.map(async (applicant) => {
+      const userId = applicant.user._id
+
+      const notification = await Notification.create({
+        recipient: userId,
+        sender: job.author,
+        type: "jobApplication",
+        job: jobId,
+        message: `The job "${job.jobTitle}" has been closed.`,
+      })
+
+      return notification
+    })
+
+    await Promise.all(notifications)
+
     res.status(200).json({
       success: true,
-      message: "Job marked as hired",
+      message: "Job marked as hired and applicants notified",
       job,
     })
   } catch (error) {

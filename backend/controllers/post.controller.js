@@ -5,6 +5,7 @@ import { Comment } from "../models/comment.model.js"
 import cloudinary from "../utils/cloudinary.js"
 import { Post } from "../models/post.model.js"
 import { User } from "../models/user.model.js"
+import Notification from "../models/Notification.model.js"
 
 export const addNewPost = async (req, res) => {
   try {
@@ -108,34 +109,43 @@ export const likePost = async (req, res) => {
       return res.status(404).json({ message: "Post not found", success: false })
     }
 
-    //  Add user ID to the post's likes (if not already present)
+    // Add user ID to the post's likes if not already liked
     await post.updateOne({ $addToSet: { likes: currentUserId } })
     await post.save()
 
-    // Fetch user details for notification
-    const user = await User.findById(currentUserId).select(
-      "username profilePicture"
-    )
     const postOwnerId = post.author.toString()
 
-    // Send real-time notification if the liker isn't the post owner
+    // Don't notify yourself
     if (postOwnerId !== currentUserId) {
-      const notification = {
-        type: "like",
-        userId: currentUserId,
-        userDetails: user,
-        postId,
-        message: "Your post was liked",
-      }
+      const sender = await User.findById(currentUserId).select(
+        "username profilePicture name"
+      )
 
+      // Save to database
+      const newNotification = await Notification.create({
+        recipient: postOwnerId,
+        sender: currentUserId,
+        type: "like",
+        post: postId,
+        message: `${sender.username} liked your post`,
+      })
+
+      // Emit to socket
       const postOwnerSocketId = getReceiverSocketId(postOwnerId)
-      io.to(postOwnerSocketId).emit("notification", notification)
+      if (postOwnerSocketId) {
+        io.to(postOwnerSocketId).emit("notification", {
+          ...newNotification.toObject(),
+          senderDetails: sender,
+        })
+      }
     }
 
     return res.status(200).json({ message: "Post liked", success: true })
   } catch (error) {
     console.error("Error in likePost:", error)
-    res.status(500).json({ message: "Internal server error", success: false })
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false })
   }
 }
 
@@ -149,34 +159,33 @@ export const dislikePost = async (req, res) => {
       return res.status(404).json({ message: "Post not found", success: false })
     }
 
-    // Remove user ID from the post's likes
+    // Remove like
     await post.updateOne({ $pull: { likes: currentUserId } })
     await post.save()
 
-    // Fetch user details for notification
     const user = await User.findById(currentUserId).select(
-      "username profilePicture"
+      "username profilePicture name"
     )
     const postOwnerId = post.author.toString()
 
-    // Send real-time notification if the disliker isn't the post owner
+    // Don't notify if the user is unliking their own post
     if (postOwnerId !== currentUserId) {
-      const notification = {
-        type: "dislike",
-        userId: currentUserId,
-        userDetails: user,
-        postId,
-        message: "Your post was unliked", // updated message for clarity
-      }
-
+      // Send real-time notification
       const postOwnerSocketId = getReceiverSocketId(postOwnerId)
-      io.to(postOwnerSocketId).emit("notification", notification)
+      if (postOwnerSocketId) {
+        io.to(postOwnerSocketId).emit("notification", {
+          ...dbNotification.toObject(),
+          senderDetails: user,
+        })
+      }
     }
 
     return res.status(200).json({ message: "Post disliked", success: true })
   } catch (error) {
     console.error("Error in dislikePost:", error)
-    res.status(500).json({ message: "Internal server error", success: false })
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false })
   }
 }
 
@@ -184,15 +193,18 @@ export const addComment = async (req, res) => {
   try {
     const postId = req.params.id
     const userId = req.id
-
     const { text } = req.body
 
-    const post = await Post.findById(postId)
-
-    if (!text)
+    if (!text || text.trim() === "") {
       return res
         .status(400)
-        .json({ message: "text is required", success: false })
+        .json({ message: "Text is required", success: false })
+    }
+
+    const post = await Post.findById(postId).populate("author", "name")
+    if (!post) {
+      return res.status(404).json({ message: "Post not found", success: false })
+    }
 
     const comment = await Comment.create({
       text,
@@ -200,21 +212,35 @@ export const addComment = async (req, res) => {
       post: postId,
     })
 
-    await comment.populate({
-      path: "author",
-      select: "username profilePicture",
-    })
+    await comment.populate("author", "username profilePicture")
 
     post.comments.push(comment._id)
     await post.save()
 
+    // 🔔 Send notification to post author (if commenter is not the author)
+    if (post.author._id.toString() !== userId.toString()) {
+      const sender = await User.findById(userId)
+
+      await Notification.create({
+        recipient: post.author._id,
+        sender: userId,
+        type: "comment",
+        post: postId,
+        message: `${sender.username} commented on your post.`,
+      })
+    }
+
     return res.status(201).json({
-      message: "Comment Added",
+      message: "Comment added",
       comment,
       success: true,
     })
   } catch (error) {
-    console.log(error)
+    console.error("Error adding comment:", error)
+    res.status(500).json({
+      message: "Something went wrong while adding the comment",
+      success: false,
+    })
   }
 }
 export const getCommentsOfPost = async (req, res) => {
@@ -276,7 +302,7 @@ export const bookmarkPost = async (req, res) => {
     const currentUserId = req.id
 
     // Check if the post exists
-    const existingPost = await Post.findById(postId)
+    const existingPost = await Post.findById(postId).populate("author", "name")
     if (!existingPost) {
       return res.status(404).json({
         success: false,
@@ -313,6 +339,20 @@ export const bookmarkPost = async (req, res) => {
         { _id: currentUserId },
         { $addToSet: { bookmarks: postId } }
       )
+
+      const recipientId = existingPost.author._id
+      const senderName = currentUser.username
+
+      // Avoid self-notification
+      if (recipientId.toString() !== currentUserId.toString()) {
+        await Notification.create({
+          recipient: recipientId,
+          sender: currentUserId,
+          type: "message",
+          post: postId,
+          message: `${senderName} bookmarked your post.`,
+        })
+      }
 
       return res.status(200).json({
         success: true,

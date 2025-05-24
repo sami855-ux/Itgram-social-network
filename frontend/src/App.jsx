@@ -21,6 +21,7 @@ import { setOnlineUsers } from "./redux/chatSlice"
 import { setLikeNotification } from "./redux/rtnSlice"
 import PostedJobSeeker from "./components/PostedJobSeeker"
 import { LanguageProvider } from "./context/LanaguageContext"
+import Notification from "./components/Notfication"
 
 const browserRouter = createBrowserRouter([
   {
@@ -39,6 +40,7 @@ const browserRouter = createBrowserRouter([
           </ProtectedRoutes>
         ),
       },
+
       {
         path: "/explore",
         element: (
@@ -94,6 +96,10 @@ const browserRouter = createBrowserRouter([
             <ChatPage />
           </ProtectedRoutes>
         ),
+      },
+      {
+        path: "/notification",
+        element: <Notification />,
       },
     ],
   },

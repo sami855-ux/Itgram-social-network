@@ -141,6 +141,12 @@ export const editProfile = async (req, res) => {
     const profilePicture = req.file
     let cloudResponse
 
+    if (!bio && !gender && !profilePicture) {
+      return res.status(400).json({
+        message: "Something is missing, please check!",
+        success: false,
+      })
+    }
     if (profilePicture) {
       const fileUri = getDataUri(profilePicture)
       cloudResponse = await cloudinary.uploader.upload(fileUri)
@@ -153,8 +159,8 @@ export const editProfile = async (req, res) => {
         success: false,
       })
     }
-    if (bio) user.bio = bio
-    if (gender) user.gender = gender
+    if (bio) user.bio = bio || ""
+    if (gender) user.gender = gender || "male"
     if (profilePicture) user.profilePicture = cloudResponse.secure_url
 
     await user.save()

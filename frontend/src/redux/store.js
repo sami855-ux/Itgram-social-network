@@ -7,6 +7,7 @@ import socketSlice from "./socketSlice.js"
 import chatSlice from "./chatSlice.js"
 import rtnSlice from "./rtnSlice.js"
 import storySlice from "./storySlice.js"
+import notificationsReducer from "./notification.js"
 
 import {
   persistReducer,
@@ -45,6 +46,7 @@ const rootReducer = combineReducers({
   chat: chatSlice,
   realTimeNotification: rtnSlice,
   story: storySlice,
+  notifications: notificationsReducer,
 })
 
 // Transform to remove `socket` before persisting
