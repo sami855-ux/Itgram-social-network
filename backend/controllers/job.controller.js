@@ -89,7 +89,7 @@ export const createJob = async (req, res) => {
 
     await Notification.create({
       recipient: author,
-      sender: author,
+      sender: null,
       type: "jobApplication",
       job: newJob._id,
       message: `${newJob.jobTitle} has been created successfully.`,
