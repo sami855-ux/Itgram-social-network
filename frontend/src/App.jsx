@@ -22,6 +22,12 @@ import { setLikeNotification } from "./redux/rtnSlice"
 import PostedJobSeeker from "./components/PostedJobSeeker"
 import { LanguageProvider } from "./context/LanaguageContext"
 import Notification from "./components/Notfication"
+import Dashboard from "./components/admin/dashboard"
+import Users from "./components/admin/User"
+import UserDetails from "./components/admin/UserDetails"
+import Jobs from "./components/admin/Jobs"
+import JobDetails from "./components/admin/JobsDetails"
+import AdminLayout from "./components/admin/AdminLayout"
 
 const browserRouter = createBrowserRouter([
   {
@@ -114,6 +120,36 @@ const browserRouter = createBrowserRouter([
   {
     path: "/story/:storyId",
     element: <StoryViewer />,
+  },
+  {
+    path: "/admin", // ✅ no slash at start
+    element: (
+      <ProtectedRoutes>
+        <AdminLayout />
+      </ProtectedRoutes>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+      {
+        path: "user",
+        element: <Users />,
+      },
+      {
+        path: "user/:id",
+        element: <UserDetails />,
+      },
+      {
+        path: "jobs",
+        element: <Jobs />,
+      },
+      {
+        path: "job/detail/:id",
+        element: <JobDetails />,
+      },
+    ],
   },
 ])
 

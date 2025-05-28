@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     gender: { type: String, enum: ["male", "female"] },
     role: {
       type: String,
-      enum: ["job seeker", "recruiter"],
+      enum: ["job seeker", "recruiter", "admin"],
       default: "job seeker",
     },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

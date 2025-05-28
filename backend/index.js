@@ -11,6 +11,7 @@ import messageRoute from "./routes/message.route.js"
 import storyRoutes from "./routes/story.route.js"
 import jobRoutes from "./routes/job.route.js"
 import notificationRoute from "./routes/notification.route.js"
+import adminRoutes from "./routes/admin.routes.js"
 import { app, server } from "./socket/socket.js"
 
 dotenv.config()
@@ -45,6 +46,7 @@ app.use("/api/v1/message", messageRoute)
 app.use("/api/v1/story", storyRoutes)
 app.use("/api/v1/job", jobRoutes)
 app.use("/api/v1/notifications", notificationRoute)
+app.use("/api/v1/admin", adminRoutes)
 
 app.use(express.static(path.join(__dirname, "/frontend/dist")))
 

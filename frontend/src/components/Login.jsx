@@ -40,7 +40,11 @@ const Login = () => {
       )
       if (res.data.success) {
         dispatch(setAuthUser(res.data.user))
-        navigate("/")
+        if (res.data.user.role === "admin") {
+          navigate("/admin")
+        } else {
+          navigate("/")
+        }
         toast.success(res.data.message)
         setInput({
           email: "",
@@ -212,7 +216,7 @@ const Login = () => {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.9 }}
               >
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link
                   to="/signup"
                   className="relative font-medium text-blue-600 transition-colors hover:text-blue-800 group"

@@ -134,6 +134,88 @@ export const getProfile = async (req, res) => {
   }
 }
 
+export const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .populate("posts")
+      .populate("followers", "username")
+      .populate("following", "username")
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    res.status(200).json(user)
+  } catch (err) {
+    console.error("Error fetching user by ID:", err)
+    res.status(500).json({ message: "Failed to fetch user" })
+  }
+}
+
+export const toggleAdminStatus = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const user = await User.findById(id)
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // Toggle admin status
+    if (user.role === "admin") {
+      user.role = "job seeker"
+    } else {
+      user.role = "admin"
+    }
+
+    await user.save()
+
+    res.status(200).json({
+      message: `User role updated to ${user.role}`,
+      user,
+      success: true,
+    })
+  } catch (error) {
+    console.error("Error toggling admin status:", error)
+    res.status(500).json({ message: "Server error while updating user role" })
+  }
+}
+
+export const deleteUser = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    // Find the user
+    const user = await User.findById(id)
+    if (!user) return res.status(404).json({ message: "User not found" })
+
+    // 1. Delete user's posts
+    await Post.deleteMany({ author: user._id })
+
+    // 2. Remove this user from followers' following lists
+    await User.updateMany(
+      { following: user._id },
+      { $pull: { following: user._id } }
+    )
+
+    // 3. Remove this user from followings' followers lists
+    await User.updateMany(
+      { followers: user._id },
+      { $pull: { followers: user._id } }
+    )
+
+    // 4. Finally, delete the user
+    await User.findByIdAndDelete(id)
+
+    res
+      .status(200)
+      .json({ message: "User and related data deleted successfully" })
+  } catch (error) {
+    console.error("Error deleting user:", error)
+    res.status(500).json({ message: "Server error while deleting user" })
+  }
+}
+
 export const editProfile = async (req, res) => {
   try {
     const userId = req.id
