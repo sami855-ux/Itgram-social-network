@@ -345,7 +345,7 @@ const Profile = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="flex justify-center max-w-5xl mx-auto"
+      className="flex justify-center max-w-5xl mx-auto ml-16 md:ml-0"
     >
       <div className="flex flex-col w-full gap-10 p-6">
         {/* Profile Header */}

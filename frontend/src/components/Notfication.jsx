@@ -227,9 +227,9 @@ const Notification = () => {
   }, [notifi, loading, notifi?.length])
 
   return (
-    <div className="flex flex-col h-screen bg-white  w-full min-h-screen px-4 py-10 sm:px-6 md:pl-[18%] md:pr-7">
+    <div className="flex flex-col h-screen bg-white ml-16 md:ml-0 w-[80%]  md:w-full min-h-screen md:px-4 py-10 sm:px-6 md:pl-[18%] md:pr-7">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white ">
+      <header className="sticky top-0 bg-white z-5 ">
         <div className="flex items-center px-4 pb-3">
           {searchOpen ? (
             <div className="flex items-center w-full">

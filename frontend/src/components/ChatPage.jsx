@@ -75,7 +75,7 @@ const ChatPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="flex md:ml-[16%] h-screen"
+      className="flex ml-16 md:ml-[16%] h-screen"
     >
       {/* Left sidebar */}
       <motion.section
