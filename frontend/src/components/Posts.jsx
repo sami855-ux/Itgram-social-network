@@ -16,7 +16,7 @@ const Posts = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
-    }, 2000) // Adjust the time in milliseconds as needed
+    }, 1000)
 
     return () => clearTimeout(timer)
   }, [])

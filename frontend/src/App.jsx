@@ -122,7 +122,7 @@ const browserRouter = createBrowserRouter([
     element: <StoryViewer />,
   },
   {
-    path: "/admin", // ✅ no slash at start
+    path: "/admin",
     element: (
       <ProtectedRoutes>
         <AdminLayout />
