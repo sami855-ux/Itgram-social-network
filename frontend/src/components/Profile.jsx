@@ -345,9 +345,9 @@ const Profile = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="flex justify-center max-w-5xl ml-16 md:mx-auto"
+      className="flex justify-center max-w-5xl md:mx-auto"
     >
-      <div className="flex flex-col w-full gap-10 p-6">
+      <div className="flex flex-col w-full gap-10 md:p-6">
         {/* Profile Header */}
         <motion.div
           className="grid grid-cols-1 gap-8 p-6 bg-white shadow-sm md:grid-cols-2 rounded-xl"

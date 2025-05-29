@@ -14,7 +14,7 @@ export default function Explore() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="w-full min-h-screen ml-[13%] md:ml-0 md:pl-[20%] py-10 md:pr-7"
+      className="w-full min-h-screen md:ml-0 md:pl-[20%] py-10 md:pr-7"
     >
       <motion.h2
         className="mb-6 text-2xl font-bold text-gray-800"
@@ -28,7 +28,7 @@ export default function Explore() {
       <AnimatePresence>
         {posts && posts.length > 0 ? (
           <motion.div
-            className="grid w-[85%] md:w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 justify-items-center"
+            className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 justify-items-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}

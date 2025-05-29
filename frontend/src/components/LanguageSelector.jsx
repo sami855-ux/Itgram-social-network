@@ -16,7 +16,7 @@ const LanguageSelector = () => {
   }, [language])
 
   return (
-    <div className="flex items-center justify-center h-32 p-4 mb-4 bg-gray-100 rounded-2xl ">
+    <div className="flex items-center justify-center h-32 p-4 bg-gray-100 md:mb-4 md:rounded-2xl ">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -37,7 +37,7 @@ const LanguageSelector = () => {
           whileHover={{ scale: 1.05 }}
           whileFocus={{ scale: 1.05 }}
           onChange={handleChangeLanguage}
-          className="w-64 p-2 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+          className="w-40 p-2 text-gray-700 border border-gray-300 rounded-lg md:w-64 focus:outline-none focus:ring-2 focus:ring-pink-400"
         >
           <option value="en">English</option>
           <option value="am">አማረኛ</option>

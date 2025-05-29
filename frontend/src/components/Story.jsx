@@ -98,7 +98,7 @@ export default function Story() {
 
   return (
     <>
-      <div className="max-w-full h-28 pl-[28%] flex items-center gap-4 overflow-x-auto scrollbar-hide">
+      <div className="max-w-full h-28 md:pl-[28%] flex items-center gap-4 overflow-x-auto scrollbar-hide">
         <section
           className="flex items-center justify-center w-16 h-16 transition bg-gray-200 rounded-full shadow cursor-pointer hover:bg-gray-300"
           onClick={handleModal}

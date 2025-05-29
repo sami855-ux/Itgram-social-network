@@ -222,8 +222,8 @@ const Post = ({ post }) => {
 
   return (
     <div className="w-[500px] max-w-sm mx-auto my-8 border-b border-gray-300">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between mx-4 md:mx-0">
+        <div className="flex items-center gap-2 ">
           <Link to={`/profile/${post.author?._id}`}>
             <Avatar>
               <AvatarImage src={post.author?.profilePicture} alt="post_image" />
@@ -251,7 +251,7 @@ const Post = ({ post }) => {
           <DialogTrigger asChild>
             <MoreHorizontal className="cursor-pointer" />
           </DialogTrigger>
-          <DialogContent className="flex flex-col items-center text-sm text-center">
+          <DialogContent className="flex w-[90%] md:w-fit mx-auto md:mx-0 flex-col items-center text-sm text-center">
             {post?.author?._id !== user?._id &&
               (isClickedLoading ? (
                 <Button>
@@ -286,12 +286,12 @@ const Post = ({ post }) => {
         </Dialog>
       </div>
       <img
-        className="object-cover w-full my-2 rounded-md h-[450px] aspect-square"
+        className="object-cover w-[90%] md:w-full mx-auto md:mx-0 my-2 rounded-md h-[450px] aspect-square"
         src={post?.image}
         alt="post_img"
       />
 
-      <div className="flex items-center justify-between my-2">
+      <div className="flex items-center justify-between my-2 w-[90%] md:w-full mx-auto md:mx-0">
         <div className="flex items-center gap-3">
           {liked ? (
             <FaHeart
@@ -328,14 +328,14 @@ const Post = ({ post }) => {
           />
         )}
       </div>
-      <span className="block mb-2 font-medium">
+      <span className="block mb-2 ml-4 font-medium md:ml-0">
         {postLike} <TranslatableText text="likes" language={language} />
       </span>
       <p>
-        <span className="mr-2 font-semibold">
+        <span className="ml-4 mr-2 font-semibold md:ml-0">
           <TranslatableText text={post.author?.username} language={language} />
         </span>
-        <span className="text-[15px]">
+        <span className="text-[15px] ">
           <TranslatableText text={post?.caption} language={language} />
         </span>
       </p>
@@ -345,7 +345,7 @@ const Post = ({ post }) => {
             dispatch(setSelectedPost(post))
             setOpen(true)
           }}
-          className="py-2 text-sm text-gray-400 cursor-pointer"
+          className="py-2 ml-4 text-sm text-gray-400 cursor-pointer md:ml-0"
         >
           <TranslatableText text={"View all"} language={language} />{" "}
           {comment.length}{" "}
@@ -353,7 +353,7 @@ const Post = ({ post }) => {
         </span>
       )}
       <CommentDialog open={open} setOpen={setOpen} />
-      <div className="flex items-center justify-between py-2">
+      <div className="flex items-center justify-between py-2 ml-4 md:ml-0">
         <input
           type="text"
           placeholder={commentStyle}

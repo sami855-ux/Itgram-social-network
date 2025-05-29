@@ -167,7 +167,7 @@ export default function PostJob() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="w-full min-h-screen pl-[18%] py-10 pr-7"
+      className="w-full min-h-screen md:pl-[18%] py-10 pr-7"
     >
       <motion.form
         onSubmit={handelCreateJob}

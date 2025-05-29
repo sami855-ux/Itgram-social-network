@@ -149,7 +149,7 @@ const LeftSidebar = () => {
   }, [isSearchClicked])
 
   return (
-    <div className="fixed top-0 z-10 left-0 md:px-4 border-r border-gray-300 w-16 md:block lg:w-[16%] md:w-24 h-screen bg-gray-900 transition-all ease duration-200">
+    <div className="fixed top-0 z-10 left-0 md:px-4 border-r border-gray-300 hidden md:block lg:w-[16%] md:w-24 h-screen bg-gray-900 transition-all ease duration-200">
       <div className="flex flex-col">
         <div className="flex items-center justify-center my-2">
           <img
