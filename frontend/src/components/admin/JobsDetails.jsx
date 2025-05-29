@@ -37,6 +37,10 @@ export default function JobDetails() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  const handleViewResume = (resume) => {
+    setSelectedResume(resume)
+    setIsResumeModalOpen(true)
+  }
   const logoutHandler = async () => {
     try {
       const res = await axios.get(
