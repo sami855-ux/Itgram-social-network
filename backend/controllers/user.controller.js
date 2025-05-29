@@ -109,6 +109,31 @@ export const login = async (req, res) => {
     console.log(error)
   }
 }
+
+export const getUserInfo = async (req, res) => {
+  try {
+    const user = await User.findById(req.id).select("-password")
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    })
+  } catch (error) {
+    console.error("Get User Info Error:", error)
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching user info",
+    })
+  }
+}
+
 export const logout = async (_, res) => {
   try {
     return res.cookie("token", "", { maxAge: 0 }).json({

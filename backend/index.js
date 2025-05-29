@@ -13,6 +13,8 @@ import jobRoutes from "./routes/job.route.js"
 import notificationRoute from "./routes/notification.route.js"
 import adminRoutes from "./routes/admin.routes.js"
 import { app, server } from "./socket/socket.js"
+import isAuthenticated from "./middlewares/isAuthenticated.js"
+import { getUserInfo } from "./controllers/user.controller.js"
 
 dotenv.config()
 //mongodb://localhost:27017/itgram
@@ -47,6 +49,7 @@ app.use("/api/v1/story", storyRoutes)
 app.use("/api/v1/job", jobRoutes)
 app.use("/api/v1/notifications", notificationRoute)
 app.use("/api/v1/admin", adminRoutes)
+app.get("/me", isAuthenticated, getUserInfo)
 
 app.use(express.static(path.join(__dirname, "/frontend/dist")))
 
