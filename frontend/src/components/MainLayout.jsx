@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom"
+import { Outlet, useNavigate, useLocation } from "react-router-dom"
 import LeftSidebar from "./LeftSidebar"
 import { useDispatch, useSelector } from "react-redux"
 import { useEffect, useState } from "react"
@@ -10,6 +10,7 @@ const MainLayout = () => {
   const { user } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
   const [loading, setLoading] = useState(true)
 
   // Fetch authenticated user
@@ -24,7 +25,16 @@ const MainLayout = () => {
         )
 
         if (response.data.success) {
-          dispatch(setAuthUser(response.data.user))
+          const fetchedUser = response.data.user
+          dispatch(setAuthUser(fetchedUser))
+
+          // 👇 Redirect admin users to /admin if not already there
+          if (
+            fetchedUser.role === "admin" &&
+            !location.pathname.startsWith("/admin")
+          ) {
+            navigate("/admin")
+          }
         } else {
           navigate("/login")
         }
@@ -37,7 +47,7 @@ const MainLayout = () => {
     }
 
     fetchCurrentUser()
-  }, [dispatch, navigate])
+  }, [dispatch, navigate, location.pathname])
 
   // Fetch notifications after user is loaded
   useEffect(() => {
