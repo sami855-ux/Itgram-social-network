@@ -10,7 +10,9 @@ import upload from "../middlewares/multer.js"
 
 const router = express.Router()
 
-router.route("/send/:id").post(isAuthenticated, sendMessage)
+router
+  .route("/send/:id")
+  .post(isAuthenticated, upload.single("image"), sendMessage)
 router.route("/all/:id").get(isAuthenticated, getMessage)
 
 router.delete("/:id", deleteMessage)

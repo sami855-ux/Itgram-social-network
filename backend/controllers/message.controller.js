@@ -4,11 +4,62 @@ import { Message } from "../models/message.model.js"
 import { User } from "../models/user.model.js"
 import Notification from "../models/Notification.model.js"
 
+import sharp from "sharp"
+import cloudinary from "../utils/cloudinary.js"
+
 export const sendMessage = async (req, res) => {
   try {
     const senderId = req.id
     const receiverId = req.params.id
     const { textMessage: message } = req.body
+    const image = req.file || null
+
+    let imageUrl = null
+
+    // Validate that at least one of text or image is present
+    if (!message && !image) {
+      return res.status(400).json({
+        success: false,
+        error: "Either text message or image is required",
+      })
+    }
+
+    // Process image if present
+    if (image) {
+      // Validate image type
+      if (!image.mimetype.startsWith("image/")) {
+        return res.status(400).json({
+          success: false,
+          error: "File must be an image",
+        })
+      }
+
+      // Optimize image
+      const optimizedImageBuffer = await sharp(image.buffer)
+        .resize({ width: 1000, height: 1000, fit: "inside" })
+        .toFormat("jpeg", { quality: 80 })
+        .toBuffer()
+
+      const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString(
+        "base64"
+      )}`
+
+      // Upload to Cloudinary
+      const cloudResponse = await cloudinary.uploader.upload(fileUri, {
+        folder: "chat_images",
+        resource_type: "image",
+        timestamp: Math.floor(Date.now() / 1000),
+      })
+
+      if (!cloudResponse || !cloudResponse.secure_url) {
+        return res.status(500).json({
+          success: false,
+          error: "Failed to upload image",
+        })
+      }
+
+      imageUrl = cloudResponse.secure_url
+    }
 
     // Check or create conversation
     let conversation = await Conversation.findOne({
@@ -25,7 +76,8 @@ export const sendMessage = async (req, res) => {
     const newMessage = await Message.create({
       senderId,
       receiverId,
-      message,
+      message: message || null,
+      image: imageUrl || null,
     })
 
     // Append message to conversation
@@ -38,19 +90,25 @@ export const sendMessage = async (req, res) => {
       "username profilePicture"
     )
 
+    // Create appropriate notification message
+    const notificationMessage = imageUrl
+      ? message
+        ? `${sender.username} sent you a message with an image`
+        : `${sender.username} sent you an image`
+      : `${sender.username} sent you a message`
+
     // Create a database notification
     const newNotification = await Notification.create({
       recipient: receiverId,
       sender: senderId,
       type: "message",
-      message: `${sender.username} sent you a message`,
+      message: notificationMessage,
     })
 
     // Real-time delivery via Socket.IO
     const receiverSocketId = getReceiverSocketId(receiverId)
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage)
-
       io.to(receiverSocketId).emit("notification", {
         ...newNotification.toObject(),
         senderDetails: sender,
@@ -63,7 +121,11 @@ export const sendMessage = async (req, res) => {
     })
   } catch (error) {
     console.error("Error in sendMessage:", error)
-    res.status(500).json({ success: false, message: "Failed to send message" })
+    res.status(500).json({
+      success: false,
+      error: "Failed to send message",
+      details: error.message,
+    })
   }
 }
 
