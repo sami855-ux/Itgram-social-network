@@ -18,11 +18,11 @@ import {
   ClipboardPlus,
   Heart,
   HomeIcon,
+  MessageCircle,
 } from "lucide-react"
 import { setPosts, setSelectedPost } from "@/redux/postSlice"
 import { toast } from "sonner"
 import LanguageSelector from "./LanguageSelector"
-import { MessageCircle } from "lucide-react"
 import CreatePost from "./CreatePost"
 
 const MainLayout = () => {
@@ -34,55 +34,50 @@ const MainLayout = () => {
   const [loading, setLoading] = useState(true)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
   const logoutHandler = async () => {
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/api/v1/user/logout`,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       )
       if (res.data.success) {
         dispatch(setAuthUser(null))
         dispatch(setSelectedPost(null))
         dispatch(setPosts([]))
-
-        navigate("/login")
         toast.success(res.data.message)
+        navigate("/login")
       }
     } catch (error) {
-      toast.error(error.response.data.message)
+      toast.error(error?.response?.data?.message || "Logout failed")
     }
   }
 
-  // Fetch authenticated user
+  // Fetch authenticated user and redirect admin if needed
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/me`,
-          {
-            withCredentials: true,
-          }
+          { withCredentials: true }
         )
 
         if (response.data.success) {
           const fetchedUser = response.data.user
           dispatch(setAuthUser(fetchedUser))
 
-          // 👇 Redirect admin users to /admin if not already there
+          // Redirect admin user to admin dashboard if they're not already there
           if (
             fetchedUser.role === "admin" &&
             !location.pathname.startsWith("/admin")
           ) {
             navigate("/admin")
+            return
           }
         } else {
           navigate("/login")
+          return
         }
       } catch (error) {
         console.error("Error fetching current user:", error)
@@ -93,9 +88,9 @@ const MainLayout = () => {
     }
 
     fetchCurrentUser()
-  }, [dispatch, navigate, location.pathname])
+  }, [location.pathname])
 
-  // Fetch notifications after user is loaded
+  // Fetch notifications once user is available
   useEffect(() => {
     if (user?._id) {
       dispatch(fetchNotifications(user._id))
@@ -112,6 +107,7 @@ const MainLayout = () => {
 
   return (
     <>
+      {/* Mobile Top Bar */}
       <div className="flex items-center w-full gap-3 px-3 py-2 border-b border-gray-200 h-fit md:hidden">
         <button onClick={toggleMenu}>
           <Menu className="text-gray-700 dark:text-gray-300" />
@@ -119,14 +115,15 @@ const MainLayout = () => {
         <p className="text-2xl font-semibold">ItGram</p>
       </div>
 
+      {/* Mobile Overlay */}
       {isMenuOpen && (
         <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden"
           onClick={toggleMenu}
-        ></div>
+        />
       )}
 
-      {/* Mobile Sidebar Menu */}
+      {/* Mobile Sidebar */}
       <div
         className={`fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
@@ -150,10 +147,9 @@ const MainLayout = () => {
                 <span>Home</span>
               </Link>
             </li>
-
             <li>
               <Link
-                to={`/explore`}
+                to="/explore"
                 onClick={toggleMenu}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               >
@@ -164,18 +160,18 @@ const MainLayout = () => {
             {user?.role !== "job seeker" && (
               <li>
                 <Link
-                  to={`/postJob`}
+                  to="/postJob"
                   onClick={toggleMenu}
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <ClipboardPlus className="w-5 h-5" />
-                  <span>Post a Jobs</span>
+                  <span>Post a Job</span>
                 </Link>
               </li>
             )}
             <li>
               <Link
-                to={`/postedJob`}
+                to="/postedJob"
                 onClick={toggleMenu}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               >
@@ -185,7 +181,7 @@ const MainLayout = () => {
             </li>
             <li>
               <Link
-                to={`/notification`}
+                to="/notification"
                 onClick={toggleMenu}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               >
@@ -195,7 +191,7 @@ const MainLayout = () => {
             </li>
             <li>
               <Link
-                to={`/chat`}
+                to="/chat"
                 onClick={toggleMenu}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               >
@@ -204,16 +200,16 @@ const MainLayout = () => {
               </Link>
             </li>
             <li>
-              <Link
-                to={`/chat`}
+              <button
                 onClick={() => {
+                  toggleMenu()
                   setOpen(true)
                 }}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="flex items-center w-full gap-3 p-2 text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <PlusSquare className="w-5 h-5" />
                 <span>Create</span>
-              </Link>
+              </button>
             </li>
             <li>
               <Link
@@ -226,13 +222,13 @@ const MainLayout = () => {
               </Link>
             </li>
             <li>
-              <span
+              <button
                 onClick={logoutHandler}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="flex items-center w-full gap-3 p-2 text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <LogOut className="w-5 h-5" />
                 <span>Logout</span>
-              </span>
+              </button>
             </li>
           </ul>
         </nav>
@@ -241,9 +237,9 @@ const MainLayout = () => {
           <LanguageSelector />
         </div>
       </div>
-      <div className="flex">
-        {/* Mobile Header */}
 
+      {/* Desktop Layout */}
+      <div className="flex">
         <LeftSidebar />
         <div className="flex-1 p-4">
           <Outlet />
