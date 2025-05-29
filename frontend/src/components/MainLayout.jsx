@@ -118,14 +118,14 @@ const MainLayout = () => {
       {/* Mobile Overlay */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden"
+          className="fixed inset-0 top-0 z-40 bg-black bg-opacity-50 md:hidden"
           onClick={toggleMenu}
         />
       )}
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-50 h-dvh w-64 bg-white dark:bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         } md:hidden`}
       >
