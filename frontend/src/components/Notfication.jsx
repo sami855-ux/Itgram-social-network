@@ -212,7 +212,7 @@ const Notification = () => {
   const filteredNotifications = notifications.filter((n) => {
     const matchesTab = activeTab === "all" || !n.isRead
     const matchesSearch =
-      n.sender.username?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
+      n.sender?.username?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
       n.message?.toLowerCase()?.includes(searchQuery?.toLowerCase())
     return matchesTab && (searchQuery === "" || matchesSearch)
   })

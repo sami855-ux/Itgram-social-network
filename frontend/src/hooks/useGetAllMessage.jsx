@@ -19,6 +19,7 @@ const useGetAllMessage = () => {
         if (res.data.success) {
           dispatch(setMessages(res.data.messages))
         }
+        console.log(res.data)
       } catch (error) {
         console.log(error)
       }

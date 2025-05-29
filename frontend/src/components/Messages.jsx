@@ -40,6 +40,7 @@ const Messages = ({ selectedUser }) => {
     if (endRef.current) {
       endRef.current.scrollIntoView({ behavior: "smooth" })
     }
+    console.log(messages)
   }, [messages])
 
   const handleDeleteClick = (messageId) => {
@@ -133,6 +134,9 @@ const Messages = ({ selectedUser }) => {
                     }`}
                   >
                     <TranslatableText text={msg.message} language={language} />
+                    {msg?.image && (
+                      <img src={msg.image} className="w-64 h-64" alt="" />
+                    )}
                   </div>
                 </div>
               </motion.div>

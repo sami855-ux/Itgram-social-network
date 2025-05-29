@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { useDispatch, useSelector } from "react-redux"
-import { MessageCircleCode, Send } from "lucide-react"
-import { useEffect, useState } from "react"
+import { MessageCircleCode, Send, ImageIcon, X } from "lucide-react"
+import { useEffect, useState, useRef } from "react"
 import axios from "axios"
 
 import { setSelectedUser } from "@/redux/authSlice"
@@ -16,6 +16,10 @@ import { TranslatableText } from "@/utils/TranslatableText"
 const ChatPage = () => {
   const [textMessage, setTextMessage] = useState("")
   const [suggestedUsers, setSuggestedUsers] = useState([])
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef(null)
   const { user, selectedUser } = useSelector((store) => store.auth)
   const { onlineUsers, messages } = useSelector((store) => store.chat)
   const { language } = useLanguage()
@@ -25,13 +29,20 @@ const ChatPage = () => {
   const sendMessageHandler = async (receiverId) => {
     if (!textMessage.trim()) return
 
+    const formData = new FormData()
+    if (textMessage.trim()) formData.append("textMessage", textMessage)
+    if (selectedImage) formData.append("image", selectedImage)
+
+    console.log("selectedImage", selectedImage)
+    console.log("textMessage", textMessage)
     try {
+      setIsUploading(true)
       const res = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/api/v1/message/send/${receiverId}`,
-        { textMessage },
+        formData,
         {
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
           withCredentials: true,
         }
@@ -39,9 +50,33 @@ const ChatPage = () => {
       if (res.data.success) {
         dispatch(setMessages([...messages, res.data.newMessage]))
         setTextMessage("")
+        setSelectedImage(null)
+        setImagePreview(null)
       }
     } catch (error) {
       console.log(error)
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setSelectedImage(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const removeImage = () => {
+    setSelectedImage(null)
+    setImagePreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
     }
   }
 
@@ -202,33 +237,76 @@ const ChatPage = () => {
             {/* Messages */}
             <Messages selectedUser={selectedUser} />
 
+            {/* Image preview */}
+            {imagePreview && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative p-4 bg-gray-100 border-t border-gray-200"
+              >
+                <div className="relative max-w-xs mx-auto">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="object-cover rounded-lg"
+                  />
+                  <button
+                    onClick={removeImage}
+                    className="absolute top-0 right-0 p-1 text-white translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full hover:bg-red-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
             {/* Message input */}
             <motion.div
-              className="sticky bottom-0 flex items-center p-4 bg-white border-t border-gray-200"
+              className="sticky bottom-0 p-4 bg-white border-t border-gray-200"
               initial={{ y: 10 }}
               animate={{ y: 0 }}
             >
-              <Input
-                value={textMessage}
-                onChange={(e) => setTextMessage(e.target.value)}
-                type="text"
-                className="flex-1 mr-3 border-gray-300 rounded-full focus-visible:ring-2 focus-visible:ring-blue-500/50"
-                placeholder="Type a message..."
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    sendMessageHandler(selectedUser?._id)
+              <div className="flex items-center">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageChange}
+                  accept="image/*"
+                  className="hidden"
+                  id="image-upload"
+                />
+                <label
+                  htmlFor="image-upload"
+                  className="p-2 mr-2 text-gray-600 rounded-full cursor-pointer hover:bg-gray-100"
+                >
+                  <ImageIcon className="w-5 h-5" />
+                </label>
+                <Input
+                  value={textMessage}
+                  onChange={(e) => setTextMessage(e.target.value)}
+                  type="text"
+                  className="flex-1 mr-3 border-gray-300 rounded-full focus-visible:ring-2 focus-visible:ring-blue-500/50"
+                  placeholder="Type a message..."
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      sendMessageHandler(selectedUser?._id)
+                    }
+                  }}
+                />
+                <Button
+                  className="px-6 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+                  onClick={() => sendMessageHandler(selectedUser?._id)}
+                  disabled={
+                    (!textMessage.trim() && !selectedImage) || isUploading
                   }
-                }}
-              />
-              <Button
-                className="px-6 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
-                onClick={() => sendMessageHandler(selectedUser?._id)}
-                disabled={!textMessage.trim()}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Send className="w-5 h-5" />
-              </Button>
+                >
+                  {isUploading ? (
+                    <div className="w-5 h-5 border-2 border-white rounded-full border-t-transparent animate-spin"></div>
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                </Button>
+              </div>
             </motion.div>
           </motion.section>
         ) : (
